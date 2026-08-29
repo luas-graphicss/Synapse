@@ -1,0 +1,186 @@
+#syncBack {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(3px);
+	z-index: 99998;
+	display: none;
+}
+#syncBack.on {
+	display: block;
+}
+#syncModal {
+	position: fixed;
+	z-index: 99999;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: min(460px, 94vw);
+	max-height: 88vh;
+	overflow: auto;
+	background: var(--bg-2, #161b26);
+	color: var(--fg, #e7ecf5);
+	border: 1px solid rgba(127, 127, 127, 0.28);
+	border-radius: 14px;
+	box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+	padding: 18px;
+	display: none;
+	font-size: 13px;
+}
+#syncModal.on {
+	display: block;
+}
+#syncModal h3 {
+	margin: 0 0 2px;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+#syncModal .sy-sub {
+	opacity: 0.62;
+	font-size: 11.5px;
+	line-height: 1.5;
+	margin-bottom: 14px;
+}
+.sy-tabs {
+	display: flex;
+	gap: 6px;
+	margin-bottom: 14px;
+}
+.sy-tab {
+	flex: 1;
+	cursor: pointer;
+	border: 1px solid rgba(127, 127, 127, 0.3);
+	background: transparent;
+	color: inherit;
+	border-radius: 8px;
+	padding: 7px 4px;
+	font-size: 12px;
+	font-weight: 600;
+}
+.sy-tab.on {
+	border-color: var(--acc, #6aa3ff);
+	color: var(--acc, #6aa3ff);
+	background: rgba(var(--acc-rgb, 106, 163, 255), 0.1);
+}
+.sy-pane {
+	display: none;
+}
+.sy-pane.on {
+	display: block;
+}
+.sy-lab {
+	display: block;
+	font-size: 10.5px;
+	text-transform: uppercase;
+	letter-spacing: 0.6px;
+	opacity: 0.65;
+	margin: 0 0 6px;
+}
+.sy-in {
+	width: 100%;
+	box-sizing: border-box;
+	background: rgba(127, 127, 127, 0.11);
+	border: 1px solid rgba(127, 127, 127, 0.28);
+	border-radius: 9px;
+	padding: 11px 12px;
+	color: inherit;
+	font:
+		600 16px/1.2 ui-monospace,
+		SFMono-Regular,
+		Menlo,
+		monospace;
+	letter-spacing: 2.5px;
+	text-transform: uppercase;
+	text-align: center;
+}
+.sy-in:focus {
+	outline: none;
+	border-color: var(--acc, #6aa3ff);
+}
+.sy-row {
+	display: flex;
+	gap: 8px;
+	margin-top: 10px;
+}
+.sy-btn {
+	cursor: pointer;
+	border: 1px solid rgba(127, 127, 127, 0.32);
+	background: transparent;
+	color: inherit;
+	border-radius: 9px;
+	padding: 9px 12px;
+	font-size: 12.5px;
+	font-weight: 600;
+}
+.sy-btn:hover {
+	border-color: var(--acc, #6aa3ff);
+	color: var(--acc, #6aa3ff);
+}
+.sy-btn.pri {
+	flex: 1;
+	background: var(--acc, #6aa3ff);
+	border-color: transparent;
+	color: #04101f;
+}
+.sy-btn.pri:hover {
+	filter: brightness(1.08);
+	color: #04101f;
+}
+.sy-btn[disabled] {
+	opacity: 0.45;
+	cursor: default;
+	filter: none;
+}
+.sy-st {
+	margin-top: 12px;
+	font-size: 11.5px;
+	line-height: 1.55;
+	opacity: 0.8;
+	min-height: 16px;
+}
+.sy-st b {
+	color: var(--acc, #6aa3ff);
+}
+.sy-bar {
+	height: 5px;
+	border-radius: 4px;
+	background: rgba(127, 127, 127, 0.2);
+	overflow: hidden;
+	margin-top: 9px;
+	display: none;
+}
+.sy-bar.on {
+	display: block;
+}
+.sy-bar i {
+	display: block;
+	height: 100%;
+	width: 0;
+	background: var(--acc, #6aa3ff);
+	transition: width 0.18s;
+}
+.sy-note {
+	margin-top: 14px;
+	padding-top: 12px;
+	border-top: 1px solid rgba(127, 127, 127, 0.18);
+	font-size: 10.8px;
+	line-height: 1.6;
+	opacity: 0.6;
+}
+.sy-x {
+	position: absolute;
+	top: 12px;
+	right: 14px;
+	cursor: pointer;
+	background: none;
+	border: 0;
+	color: inherit;
+	opacity: 0.5;
+	font-size: 19px;
+	line-height: 1;
+}
+.sy-x:hover {
+	opacity: 1;
+}

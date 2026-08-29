@@ -1,0 +1,94 @@
+.mcp-modo {
+	display: flex;
+	gap: 6px;
+	background: var(--bg-1);
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	padding: 4px;
+	margin: 0 0 10px;
+}
+.mcp-modo-b {
+	flex: 1 1 0;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	align-items: flex-start;
+	text-align: left;
+	padding: 7px 9px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--txt-2);
+	font: inherit;
+	cursor: pointer;
+	transition: var(--t);
+}
+.mcp-modo-b b {
+	font-size: 11.5px;
+	font-weight: 700;
+	line-height: 1.2;
+}
+.mcp-modo-b span {
+	font-size: 10px;
+	color: var(--txt-3);
+	line-height: 1.25;
+	white-space: normal;
+}
+.mcp-modo-b:hover {
+	background: var(--bg-3);
+}
+.mcp-modo-b.on {
+	background: var(--bg-2);
+	border-color: rgba(var(--acc-rgb), 0.55);
+	color: var(--acc);
+}
+.mcp-modo-b.on span {
+	color: var(--txt-2);
+}
+.mcp-chk {
+	display: flex;
+	align-items: flex-start;
+	gap: 7px;
+	cursor: pointer;
+	margin-top: 10px;
+	font-size: 12px;
+	line-height: 1.45;
+	color: var(--txt-2);
+}
+.mcp-chk input {
+	accent-color: var(--acc);
+	margin-top: 2px;
+	flex: 0 0 auto;
+}
+.mcp-chk.off {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+.mcp-teste {
+	font-size: 11px;
+	line-height: 1.5;
+	color: var(--txt-3);
+	margin-top: 6px;
+	word-break: break-word;
+}
+.mcp-teste.ok {
+	color: var(--ok);
+}
+.mcp-teste.err {
+	color: var(--err);
+}
+#mcpBlocoLocal code,
+#mcpDicaModo code {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 10.5px;
+	background: var(--bg-1);
+	border: 1px solid var(--line);
+	border-radius: 5px;
+	padding: 1px 4px;
+	white-space: nowrap;
+}
+body.mcp-movel #mcpModo,
+body.mcp-movel #mcpBlocoLocal {
+	display: none !important;
+}

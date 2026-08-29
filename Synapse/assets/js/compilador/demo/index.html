@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Auto-compiler — demonstração</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				padding: 18px;
+				background: #0d1117;
+				color: #c9d1d9;
+				font:
+					14px/1.6 ui-sans-serif,
+					system-ui,
+					-apple-system,
+					Segoe UI,
+					Roboto,
+					sans-serif;
+			}
+			h1 {
+				font-size: 18px;
+				margin: 0 0 4px;
+			}
+			.sub {
+				color: #8b949e;
+				font-size: 13px;
+				margin-bottom: 18px;
+			}
+			.grade {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 16px;
+				align-items: start;
+			}
+			@media (max-width: 900px) {
+				.grade {
+					grid-template-columns: 1fr;
+				}
+			}
+			.cartao {
+				background: #161b22;
+				border: 1px solid #30363d;
+				border-radius: 10px;
+				padding: 14px;
+			}
+			.cartao h2 {
+				font-size: 13px;
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				color: #8b949e;
+				margin: 0 0 10px;
+				font-weight: 600;
+			}
+			textarea {
+				width: 100%;
+				height: 150px;
+				background: #0d1117;
+				color: #c9d1d9;
+				border: 1px solid #30363d;
+				border-radius: 6px;
+				padding: 9px;
+				font:
+					12px/1.5 ui-monospace,
+					Menlo,
+					Consolas,
+					monospace;
+				resize: vertical;
+			}
+			button {
+				background: #238636;
+				color: #fff;
+				border: 0;
+				border-radius: 6px;
+				padding: 8px 14px;
+				font: inherit;
+				font-weight: 600;
+				cursor: pointer;
+				margin: 8px 6px 0 0;
+			}
+			button.sec {
+				background: #21262d;
+				border: 1px solid #30363d;
+				color: #c9d1d9;
+			}
+			button:hover {
+				filter: brightness(1.12);
+			}
+			iframe {
+				width: 100%;
+				height: 320px;
+				border: 1px solid #30363d;
+				border-radius: 8px;
+				background: #0d1117;
+			}
+			#veredito {
+				margin-top: 10px;
+				font-size: 13px;
+			}
+			.pill {
+				display: inline-block;
+				padding: 2px 9px;
+				border-radius: 999px;
+				font-size: 11px;
+				font-weight: 700;
+				margin-right: 6px;
+			}
+			.n1 {
+				background: #1a7f37;
+				color: #fff;
+			}
+			.n2 {
+				background: #9e6a03;
+				color: #fff;
+			}
+			.n0 {
+				background: #b62324;
+				color: #fff;
+			}
+			.linha {
+				margin: 5px 0;
+			}
+			.rot {
+				color: #8b949e;
+				display: inline-block;
+				min-width: 88px;
+			}
+			.aviso {
+				color: #d29922;
+				font-size: 12px;
+				margin-top: 8px;
+				line-height: 1.5;
+			}
+			code {
+				background: #0d1117;
+				border: 1px solid #30363d;
+				border-radius: 4px;
+				padding: 1px 5px;
+				font-size: 12px;
+			}
+			.nota {
+				background: #161b22;
+				border: 1px solid #30363d;
+				border-left: 3px solid #d29922;
+				border-radius: 6px;
+				padding: 11px 13px;
+				margin-top: 16px;
+				font-size: 13px;
+				color: #c9d1d9;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Auto-compiler — demonstração</h1>
+		<div class="sub">Detector de projeto, runtime WASI e shell de preview, rodando de verdade.</div>
+
+		<div class="grade">
+			<div class="cartao">
+				<h2>1. Detector de projeto</h2>
+				<p style="margin: 0 0 8px; font-size: 13px; color: #8b949e">
+					Um arquivo por linha, no formato <code>caminho :: conteúdo</code>. O conteúdo é opcional, mas é o que permite
+					detectar GUI.
+				</p>
+				<textarea id="entrada">
+main.c :: #include &lt;stdio.h&gt;
+int main(void){ printf("ola do C\n"); return 0; }</textarea>
+				<div>
+					<button id="btnDetectar">Detectar</button>
+					<button class="sec" id="btnExemploSdl">Exemplo SDL2</button>
+					<button class="sec" id="btnExemploWin">Exemplo Win32</button>
+					<button class="sec" id="btnExemploCs">Exemplo C#</button>
+					<button class="sec" id="btnExemploRust">Exemplo Rust</button>
+				</div>
+				<div id="veredito"></div>
+			</div>
+
+			<div class="cartao">
+				<h2>2. Execução no shell de preview</h2>
+				<p style="margin: 0 0 8px; font-size: 13px; color: #8b949e">
+					Dois binários WASI reais, executados pelo <code>wasi.js</code> dentro do iframe.
+				</p>
+				<div style="margin-bottom: 10px">
+					<button id="btnRodarOlaWasm">Executar (sucesso)</button>
+					<button class="sec" id="btnRodarSaida7Wasm">Executar (erro, código 7)</button>
+					<button class="sec" id="btnLimpar">Limpar</button>
+				</div>
+				<iframe id="frame" title="preview"></iframe>
+			</div>
+		</div>
+
+		<div class="nota">
+			<b>O que esta demo não faz:</b> não compila C ainda. Os binários acima já vêm prontos, montados byte a byte para
+			provar o runtime. Compilar de verdade depende de preencher <code>catalogo.js</code> com as URLs do Clang — veja
+			<code>VERIFICAR.md</code>.
+		</div>
+
+		<script src="../../nucleo/diagnostico.js"></script>
+		<script src="../deteccao.js"></script>
+		<script src="../wasi.js"></script>
+		<script src="../shell-preview.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>

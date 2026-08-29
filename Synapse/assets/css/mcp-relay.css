@@ -1,0 +1,8 @@
+html body.mcp-movel label[for='mcpRelay'],
+html body.mcp-movel #mcpRelay {
+	display: block !important;
+}
+html body.mcp-movel #mcpRelay {
+	width: 100%;
+	box-sizing: border-box;
+}

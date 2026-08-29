@@ -1,0 +1,1313 @@
+<!doctype html>
+
+<html lang="pt-BR" data-theme="rose">
+	<head>
+		<meta charset="utf-8" />
+		<meta
+			name="description"
+			content="Synapse Live Preview: editor de projetos web com preview ao vivo, compilador no navegador e conector MCP."
+		/>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+		<title>Synapse • Live Preview</title>
+		<link rel="icon" href="./favicon.ico?v=997" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=997" />
+		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png?v=997" />
+		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=997" />
+		<link rel="manifest" href="./site.webmanifest" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="stylesheet" href="./assets/css/base.css" />
+
+		<link rel="stylesheet" id="aurora-mobile-fix" href="./assets/css/celular.css" />
+		<link rel="stylesheet" id="aurora-mcp-mobile" href="./assets/css/mcp-celular.css" />
+		<link rel="stylesheet" id="aurora-relay-visivel" href="./assets/css/mcp-relay.css" />
+		<link rel="stylesheet" id="aurora-mcp-local" href="./assets/css/mcp-local.css" />
+
+		<link rel="stylesheet" id="aurora-v9-skin" href="./assets/css/tema.css" />
+		<link rel="stylesheet" id="aurora-mcp-menu-altura" href="./assets/css/mcp-menu.css" />
+
+		<script src="./assets/js/nucleo/diagnostico.js"></script>
+		<script src="./assets/js/nucleo/seguranca.js"></script>
+
+		<script src="./assets/js/i18n/idiomas.js"></script>
+	</head>
+	<body>
+		<div class="app">
+			<div class="topbar">
+				<div class="brand">
+					<div class="logo">
+						<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Synapse">
+							<defs>
+								<linearGradient id="synHdrBg" x1="32" y1="0" x2="32" y2="64" gradientUnits="userSpaceOnUse">
+									<stop stop-color="#0c1430"></stop>
+									<stop offset="1" stop-color="#171f44"></stop>
+								</linearGradient>
+								<linearGradient id="synHdrMk" x1="16" y1="48" x2="50" y2="14" gradientUnits="userSpaceOnUse">
+									<stop stop-color="#6aa3ff"></stop>
+									<stop offset="1" stop-color="#8b7bff"></stop>
+								</linearGradient>
+							</defs>
+							<rect x="2" y="2" width="60" height="60" rx="14" fill="url(#synHdrBg)"></rect>
+							<rect
+								x="3"
+								y="3"
+								width="58"
+								height="58"
+								rx="13"
+								fill="none"
+								stroke="#ffffff"
+								stroke-opacity="0.08"
+								stroke-width="2"
+							></rect>
+							<path
+								d="M20 45 C 35 45 29 19 44 19"
+								fill="none"
+								stroke="url(#synHdrMk)"
+								stroke-width="6.5"
+								stroke-linecap="round"
+							></path>
+							<circle cx="20" cy="45" r="7" fill="url(#synHdrMk)"></circle>
+							<circle cx="44" cy="19" r="7" fill="url(#synHdrMk)"></circle>
+							<circle cx="53" cy="11" r="2.6" fill="#aeb9ff"></circle>
+							<circle cx="56.5" cy="18" r="1.8" fill="#8b7bff"></circle>
+						</svg>
+					</div>
+					<div><b>Synapse</b> <span>Live Preview</span></div>
+				</div>
+				<div class="tabs" id="tabs"></div>
+				<div class="topbar-actions">
+					<div class="menu-wrap">
+						<button class="btn primary" id="importBtn">
+							<span class="i-import" data-ico="1"
+								><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"></path></svg
+							></span>
+							Importar
+						</button>
+						<div class="menu" id="importMenu">
+							<button class="menu-item" data-imp="zip">
+								<span class="i-zip" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<path d="M6 3h8l4 4v14H6z"></path>
+										<path d="M14 3v4h4"></path>
+										<path d="M10 7h2M10 10h2M10 13h2M9 16h4v3H9z"></path></svg></span
+								><span><b>Importar .zip</b><span class="mi-sub">Extrai e roda o projeto</span></span>
+							</button>
+							<button class="menu-item" data-imp="assets">
+								<span class="i-zip" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<path d="M6 3h8l4 4v14H6z"></path>
+										<path d="M14 3v4h4"></path>
+										<path d="M10 7h2M10 10h2M10 13h2M9 16h4v3H9z"></path></svg></span
+								><span><b>Importar assets (.zip)</b><span class="mi-sub">glb, png, mp4… na raiz do projeto</span></span>
+							</button>
+							<button class="menu-item" data-imp="folder">
+								<span class="i-folder" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<path
+											d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+										></path></svg></span
+								><span><b>Importar pasta</b><span class="mi-sub">Estrutura completa</span></span>
+							</button>
+							<button class="menu-item" data-imp="html">
+								<span class="i-html" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<path d="M5 4l1.5 16L12 22l5.5-2L19 4z"></path>
+										<path d="M8 8h8l-.5 4-3.5 1-3.5-1"></path></svg></span
+								><span><b>index.html avulso</b><span class="mi-sub">Arquivo único</span></span>
+							</button>
+							<div class="menu-sep"></div>
+							<button class="menu-item" data-imp="sample">
+								<span class="i-spark" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg></span
+								><span><b>Carregar exemplo</b><span class="mi-sub">Projeto demonstração</span></span>
+							</button>
+						</div>
+					</div>
+					<button class="btn" id="exportBtn" title="Exportar projeto aberto como .zip (com todas as edições)">
+						<span class="i-export" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<path d="M12 3v10"></path>
+								<path d="M8 9l4 4 4-4"></path>
+								<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></svg
+						></span>
+						Exportar .zip
+					</button>
+					<button
+						class="top-ico tour-btn"
+						id="tourBtn"
+						title="Tutorial do site (tour guiado)"
+						aria-label="Tutorial do site"
+					>
+						<svg
+							class="icon"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.8"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<circle cx="12" cy="12" r="9"></circle>
+							<path d="M9.5 9.3a2.6 2.6 0 1 1 3.6 2.4c-.8.3-1.1.9-1.1 1.7v.3"></path>
+							<path d="M12 17.3h.01"></path></svg
+						><i class="tour-dot"></i></button
+					><button class="top-ico" id="cmdkBtn" title="Paleta de comandos (Ctrl/⌘ K)">
+						<svg class="icon" viewBox="0 0 24 24">
+							<rect x="4" y="4" width="16" height="16" rx="3"></rect>
+							<path d="M9 9h6v6H9z"></path>
+						</svg>
+					</button>
+					<div class="menu-wrap">
+						<button class="top-ico" id="themeBtn" title="Tema e cor de destaque">
+							<svg class="icon" viewBox="0 0 24 24">
+								<path
+									d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c1.7 0 3-1.3 3-3 0-.8-.3-1.5-.8-2-.5-.5-.8-1.2-.8-2 0-1.7 1.3-3 3-3h1.8c1.5 0 2.8-1.3 2.8-2.8C23 5.6 18 2 12 2z"
+								></path>
+								<circle cx="6.5" cy="11.5" r="1.3"></circle>
+								<circle cx="9.5" cy="7.5" r="1.3"></circle>
+								<circle cx="14.5" cy="7.5" r="1.3"></circle>
+								<circle cx="17.5" cy="11.5" r="1.3"></circle>
+							</svg>
+						</button>
+						<div class="menu theme-menu" id="themeMenu">
+							<div class="tm-sec">Tema</div>
+							<div class="tm-themes" id="tmThemes">
+								<button class="tm-th" data-theme="dark">
+									<span class="tm-sw" style="background: #11141b"><i style="background: #6aa3ff"></i></span
+									><span>Escuro</span></button
+								><button class="tm-th" data-theme="light">
+									<span class="tm-sw" style="background: #ffffff"><i style="background: #6aa3ff"></i></span
+									><span>Claro</span></button
+								><button class="tm-th" data-theme="midnight">
+									<span class="tm-sw" style="background: #0c1326"><i style="background: #22d3ee"></i></span
+									><span>Meia-noite</span></button
+								><button class="tm-th" data-theme="nord">
+									<span class="tm-sw" style="background: #2e3440"><i style="background: #88c0d0"></i></span
+									><span>Nórdico</span></button
+								><button class="tm-th on" data-theme="rose">
+									<span class="tm-sw" style="background: #291b24"><i style="background: #fb7185"></i></span
+									><span>Rosé</span></button
+								><button class="tm-th" data-theme="forest">
+									<span class="tm-sw" style="background: #14271d"><i style="background: #34d399"></i></span
+									><span>Floresta</span>
+								</button>
+							</div>
+							<div class="menu-sep"></div>
+							<div class="tm-sec">Cor de destaque</div>
+							<div class="tm-accents" id="tmAccents">
+								<button
+									class="tm-ac"
+									data-accent="#6aa3ff"
+									style="background: #6aa3ff; color: #6aa3ff"
+									title="#6aa3ff"
+								></button
+								><button
+									class="tm-ac"
+									data-accent="#22d3ee"
+									style="background: #22d3ee; color: #22d3ee"
+									title="#22d3ee"
+								></button
+								><button
+									class="tm-ac"
+									data-accent="#34d399"
+									style="background: #34d399; color: #34d399"
+									title="#34d399"
+								></button
+								><button
+									class="tm-ac"
+									data-accent="#fbbf24"
+									style="background: #fbbf24; color: #fbbf24"
+									title="#fbbf24"
+								></button
+								><button
+									class="tm-ac"
+									data-accent="#fb7185"
+									style="background: #fb7185; color: #fb7185"
+									title="#fb7185"
+								></button
+								><button
+									class="tm-ac"
+									data-accent="#f472b6"
+									style="background: #f472b6; color: #f472b6"
+									title="#f472b6"
+								></button
+								><button
+									class="tm-ac"
+									data-accent="#a78bfa"
+									style="background: #a78bfa; color: #a78bfa"
+									title="#a78bfa"
+								></button
+								><button
+									class="tm-ac"
+									data-accent="#38bdf8"
+									style="background: #38bdf8; color: #38bdf8"
+									title="#38bdf8"
+								></button
+								><button class="tm-custom" data-pick="1" title="Cor personalizada"></button
+								><button class="tm-ac tm-reset" data-accent="" title="Padrão do tema" style="background: var(--bg-3)">
+									<svg class="icon tm-rico" viewBox="0 0 24 24">
+										<path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"></path>
+										<path d="M21 4v4h-4"></path>
+									</svg>
+								</button>
+							</div>
+							<div class="tm-picker" id="tmPicker" hidden="">
+								<div class="tm-prow">
+									<span class="tm-prev" id="tmPrev"></span
+									><input class="tm-hex" id="tmHex" maxlength="7" spellcheck="false" placeholder="#6AA3FF" />
+								</div>
+								<label class="tm-slab"
+									>Matiz<input type="range" class="tm-range tm-hue" id="tmHue" min="0" max="360" value="217"
+								/></label>
+								<label class="tm-slab"
+									>Saturação<input type="range" class="tm-range" id="tmSat" min="0" max="100" value="100"
+								/></label>
+								<label class="tm-slab"
+									>Brilho<input type="range" class="tm-range" id="tmLit" min="0" max="100" value="70"
+								/></label>
+							</div>
+						</div>
+					</div>
+					<button
+						class="top-ico"
+						id="syncBtn"
+						title="Espelhar projeto em outro aparelho com um codigo secreto"
+						aria-label="Espelhar projeto"
+					>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-7.5-4"></path>
+							<path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 7.5 4"></path>
+							<path d="M19.5 3v4h-4"></path>
+							<path d="M4.5 21v-4h4"></path>
+							<circle cx="12" cy="12" r="2.2"></circle>
+						</svg>
+					</button>
+					<button class="top-ico" id="recentBtn" title="Projetos recentes e backups — recuperar projetos fechados">
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<circle cx="12" cy="12" r="9"></circle>
+							<path d="M12 7v5l3 2"></path>
+						</svg>
+					</button>
+					<button class="top-ico" id="lockBtn" title="Proteger projetos com senha">
+						<svg class="icon" viewBox="0 0 24 24">
+							<rect x="4" y="10" width="16" height="10" rx="2"></rect>
+							<path d="M8 10V7a4 4 0 0 1 7.5-2.6"></path>
+						</svg>
+					</button>
+					<div class="menu-wrap">
+						<button class="top-ico" id="teamsBtn" title="Equipes de agentes" aria-label="Equipes de agentes">
+							<svg
+								class="icon"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M17 20v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+								<circle cx="9" cy="7" r="4"></circle>
+								<path d="M23 20v-2a4 4 0 0 0-3-3.87"></path>
+								<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+							</svg>
+						</button>
+						<div class="menu tmui-menu" id="teamsMenu">
+							<div id="tmuiBody">
+								<div class="tm-sec">Equipes de agentes</div>
+								<div class="tmui-status">
+									<span class="tmui-dot"></span>Nenhuma equipe sua ainda - o site funciona como antes ate voce criar a
+									primeira
+								</div>
+								<div class="mcp-row">
+									<button class="btn primary" id="tmuiNova" style="flex: 1">+ Criar nova equipe</button>
+								</div>
+								<div class="mcp-row">
+									<button class="btn" id="tmuiAlist" style="flex: 1">
+										Alistamento automatico · ligado, 1 por equipe
+									</button>
+								</div>
+								<div class="tmui-lista">
+									<div class="mcp-empty">Voce ainda nao criou nenhuma equipe.</div>
+									<button class="tmui-item" data-team="nativa-revisor">
+										<span class="tmui-nome">Integrador Revisor<span class="tmui-tag">nativa - revisor</span></span
+										><span class="tmui-sub">0/1 agente(s) - 0 caminho(s)</span></button
+									><button class="tmui-item" data-team="nativa-gerenciador">
+										<span class="tmui-nome">Gerenciador<span class="tmui-tag">nativa - gerenciador</span></span
+										><span class="tmui-sub">0/1 agente(s) - 0 caminho(s)</span></button
+									><button class="tmui-item" data-team="nativa-planejador">
+										<span class="tmui-nome">Planejador / Divisor<span class="tmui-tag">nativa - planejador</span></span
+										><span class="tmui-sub">0/1 agente(s) - 0 caminho(s)</span>
+									</button>
+								</div>
+								<div class="tm-sec">Arquivos globais</div>
+								<div class="mcp-empty">Nenhum arquivo global neste projeto.</div>
+								<div class="mcp-hint">
+									Arquivo global nao tem dono: <b>todas</b> as equipes podem altera-lo (README, changelog, docs). Quem
+									define e o agente da equipe <b>Gerenciador</b>, com <code>team_global_add</code> /
+									<code>team_global_remove</code>.
+								</div>
+								<div class="mcp-hint">
+									As equipes <b>Integrador Revisor</b>, <b>Gerenciador</b> e <b>Planejador / Divisor</b> sao do site e
+									nao podem ser apagadas (uma vaga cada). O Planejador nao altera arquivos: ele planeja o sistema e
+									entrega um prompt por equipe para voce rodar em paralelo. Para um agente entrar, peca a ele:
+									<code>entre na equipe "nome" e se registre</code>.
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="menu-wrap">
+						<button class="top-ico" id="mcpBtn" title="MCP ativo (Conectado — pronto para receber o agente do Notion)">
+							<svg class="icon" viewBox="0 0 24 24">
+								<path d="M9 2v5M15 2v5"></path>
+								<path d="M6 7h12v4a6 6 0 0 1-12 0z"></path>
+								<path d="M12 17v2.5a2.5 2.5 0 0 1-2.5 2.5H7"></path></svg
+							><span class="mcp-ind" id="mcpInd"></span>
+						</button>
+						<div class="menu mcp-menu" id="mcpMenu">
+							<div class="tm-sec">MCP para Notion</div>
+							<div class="mcp-modo" id="mcpModo">
+								<button
+									type="button"
+									class="mcp-modo-b on"
+									data-modo="nuvem"
+									title="Servidor MCP gerenciado (Cloudflare Workers) — nenhuma instalação necessária"
+								>
+									<b>Nuvem</b><span>sem instalação · ideal para celular</span>
+								</button>
+								<button
+									type="button"
+									class="mcp-modo-b"
+									data-modo="local"
+									title="Conecta o complemento local Synapse Relay (relay.js) — terminal, disco e dev server"
+								>
+									<b>Local (desktop)</b><span>terminal · disco · dev server</span>
+								</button>
+							</div>
+							<div class="mcp-hint hidden" id="mcpAppDica">
+								<b>App Synapse Relay detectado.</b> O site esta usando o relay do proprio aparelho (127.0.0.1) e a URL
+								do tunel do app - nao precisa de relay no Render. Os campos abaixo sao preenchidos e mantidos
+								automaticamente.
+							</div>
+							<div class="mcp-status">
+								<span class="mcp-sdot" id="mcpSdot"></span
+								><span id="mcpStatusText">Inativo — ative para gerar a URL do Notion</span>
+							</div>
+							<div id="mcpBlocoNuvem">
+								<div class="mcp-hint">
+									Usa o servidor MCP do próprio site (Cloudflare Workers). Não precisa instalar nada: ative, copie a URL
+									e cole no Notion. O agente edita os arquivos do projeto, mas <b>não roda comandos</b> (sem terminal).
+								</div>
+								<label class="mcp-lab" for="mcpRelay">URL do relay do site (avançado — deixe como está)</label>
+								<input
+									class="mcp-in"
+									id="mcpRelay"
+									placeholder="https://aurora-relay.seu-nome.workers.dev"
+									spellcheck="false"
+									autocomplete="off"
+								/>
+							</div>
+							<div id="mcpBlocoLocal" class="hidden">
+								<label class="mcp-lab" for="mcpRelayLocal"
+									>Endereço do Synapse Relay (relay.js) — <b>habilita terminal, disco e dev server</b></label
+								>
+								<div class="mcp-row">
+									<input
+										class="mcp-in"
+										id="mcpRelayLocal"
+										placeholder="http://localhost:8787"
+										spellcheck="false"
+										autocomplete="off"
+									/><button type="button" class="ui-btn" id="mcpTestar" title="Verifica se o relay responde">
+										Testar
+									</button>
+								</div>
+								<div class="mcp-teste" id="mcpTesteMsg"></div>
+								<div class="mcp-teste" id="mcpSideMsg"></div>
+								<div class="mcp-hint">
+									<b>Como ativar:</b> 1) execute <code>node relay.js</code> (Node 18+) · 2) clique em <b>Testar</b> · 3)
+									marque a permissão abaixo. <b>Sem túnel:</b> a URL entregue ao Notion é sempre a da nuvem (mesma
+									capacidade do modo nuvem); o Synapse Relay acrescenta terminal, disco e dev server.
+								</div>
+								<details style="margin-top: 6px">
+									<summary class="mcp-lab" style="cursor: pointer">Avançado: relay em outra máquina (túnel)</summary>
+									<label class="mcp-lab" for="mcpPub">URL pública do túnel (cloudflared/ngrok)</label>
+									<input
+										class="mcp-in"
+										id="mcpPub"
+										placeholder="https://xxxx.trycloudflare.com"
+										spellcheck="false"
+										autocomplete="off"
+									/>
+									<div class="mcp-hint">
+										Use só quando este navegador não alcançar o PC do relay (site aberto em outro aparelho). A URL
+										colada aqui vira o endereço do <b>complemento</b>; o transporte do MCP continua na nuvem.
+									</div>
+								</details>
+								<label class="mcp-chk" id="mcpTermLab"
+									><input type="checkbox" id="mcpTermAllow" /><span
+										>Permitir que o agente execute comandos no computador (terminal)</span
+									></label
+								>
+								<div id="mcpTermListWrap" style="margin-top: 6px">
+									<label class="mcp-lab" for="mcpTermList"
+										>Comandos permitidos (um prefixo por linha — vazio = todos):</label
+									>
+									<textarea
+										class="mcp-in"
+										id="mcpTermList"
+										rows="3"
+										placeholder="npm
+node
+git"
+										style="
+											resize: vertical;
+											font-family: ui-monospace, Menlo, monospace;
+											font-size: 11px;
+											width: 100%;
+											box-sizing: border-box;
+										"
+									></textarea>
+								</div>
+								<div class="mcp-row">
+									<button class="ui-btn" id="mcpDlRelay" style="flex: 1">Baixar relay.js</button>
+								</div>
+							</div>
+							<div id="mcpBlocoFailover">
+								<label class="mcp-lab" for="mcpReservas" style="margin-top: 6px"
+									>Nós de reserva — failover automático em URL única (opcional)</label
+								>
+								<textarea
+									class="mcp-in"
+									id="mcpReservas"
+									rows="2"
+									placeholder="https://aurora-relay.reserva-1.workers.dev&#10;https://aurora-relay.reserva-2.workers.dev"
+									spellcheck="false"
+									autocomplete="off"
+									style="resize: vertical; min-height: 52px"
+								></textarea>
+								<div class="mcp-teste" id="mcpFlvMsg"></div>
+								<div class="mcp-hint">
+									Um endereço por linha, em ordem de prioridade (publique o <b>mesmo worker.js</b> em outras contas).
+									Enquanto o nó principal <b>roda</b>, ele mesmo encaminha cada chamada ao próximo nó ao atingir o
+									limite de capacidade — sem trocar nada no Notion. A lista também pode ser fixada no deploy via
+									<code>RESERVAS</code> no wrangler.toml. <b>Para cobrir também o bloqueio total na borda</b> (nó morto
+									antes do código rodar), preencha o portão abaixo.
+								</div>
+								<label class="mcp-lab" for="mcpPortao" style="margin-top: 6px"
+									>Portão da URL única — failover total, cobre até bloqueio de borda (recomendado)</label
+								>
+								<input
+									class="mcp-in"
+									id="mcpPortao"
+									placeholder="https://aurora-portao.conta-do-portao.workers.dev"
+									spellcheck="false"
+									autocomplete="off"
+								/>
+								<div class="mcp-teste" id="mcpPortaoMsg"></div>
+								<div class="mcp-hint">
+									O portão é um roteador minúsculo (<code>portao.js</code>) publicado numa
+									<b>conta Cloudflare separada e grátis</b>. Com ele preenchido, a URL do Notion passa a ser a do
+									portão: cada chamada entra por lá e é desviada na hora para o primeiro nó vivo —
+									<b>inclusive quando o nó principal é bloqueado na borda</b> (erro 1027), caso em que o encaminhador
+									interno dos nós nem chega a rodar. Deploy:
+									<code>npx wrangler deploy -c wrangler-portao.toml</code> (LEIA-ME → seção PORTÃO). Custo: R$ 0 no free
+									tier.
+								</div>
+							</div>
+							<div class="mcp-row" id="mcpAcoes">
+								<button class="ui-btn primary" id="mcpToggle" style="flex: 1">Ativar MCP</button>
+								<button class="ui-btn" id="mcpRotate" title="Gera nova URL e token (a antiga para de funcionar)">
+									Nova URL
+								</button>
+							</div>
+							<div id="mcpUrlBox" class="hidden">
+								<label class="mcp-lab" for="mcpUrlOut">URL do servidor MCP — cole no Notion</label>
+								<div class="mcp-row">
+									<input class="mcp-in" id="mcpUrlOut" readonly="" spellcheck="false" /><button
+										class="ui-btn"
+										id="mcpCopy"
+									>
+										Copiar
+									</button>
+								</div>
+								<div class="mcp-hint">
+									No Notion: <b>Configurações → Conectores → Adicionar conector MCP personalizado</b> → cole a URL acima
+									(o token já vai embutido nela). Depois habilite o conector no seu agente.
+								</div>
+							</div>
+							<div class="menu-sep"></div>
+							<div class="mcp-hint" id="mcpDicaModo">
+								<b>Modo nuvem.</b> A conexão já vem pronta: toque em <b>Ativar MCP</b>, copie a URL e cole no conector
+								MCP do Notion. <b>Mantenha esta aba aberta</b> enquanto o agente trabalha.
+							</div>
+							<div class="menu-sep"></div>
+							<div class="tm-sec">Atividade do agente</div>
+							<div class="mcp-log" id="mcpLog"></div>
+							<div id="mcpAgents"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="toolbar">
+				<button id="auroraExpToggle" class="tbtn" title="Arquivos" aria-label="Arquivos">
+					<svg
+						class="icon"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.8"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+					</svg>
+				</button>
+				<div class="seg" id="deviceSeg">
+					<button data-dev="responsive" class="">
+						<span class="i-resp" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<rect x="3" y="5" width="12" height="9" rx="1"></rect>
+								<rect x="16" y="8" width="5" height="11" rx="1"></rect></svg></span
+						>Responsivo
+					</button>
+					<button data-dev="desktop" class="on">
+						<span class="i-desktop" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<rect x="3" y="4" width="18" height="12" rx="1"></rect>
+								<path d="M8 20h8M12 16v4"></path></svg></span
+						>Desktop
+					</button>
+					<button data-dev="tablet">
+						<span class="i-tablet" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<rect x="5" y="3" width="14" height="18" rx="2"></rect>
+								<path d="M11 18h2"></path></svg></span
+						>Tablet
+					</button>
+					<button data-dev="mobile">
+						<span class="i-mobile" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<rect x="7" y="3" width="10" height="18" rx="2"></rect>
+								<path d="M11 18h2"></path></svg></span
+						>Mobile
+					</button>
+				</div>
+				<div class="dims" id="dims" style="display: flex">
+					<input id="dimW" type="number" value="1280" title="Largura" />
+					<span class="x">×</span>
+					<input id="dimH" type="number" value="800" title="Altura" />
+					<button class="tbtn" id="rotateBtn" title="Girar">
+						<span class="i-rotate" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<path d="M4 9a8 8 0 0 1 14-3l2 2M20 15a8 8 0 0 1-14 3l-2-2"></path>
+								<path d="M18 4v4h-4M6 20v-4h4"></path></svg
+						></span>
+					</button>
+				</div>
+				<span class="zoom" id="zoomLabel">10%</span>
+				<div class="tool-spacer"></div>
+				<div class="seg" id="layoutSeg">
+					<button data-lay="split" class="" title="Editor + Preview">
+						<span class="i-split" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<rect x="3" y="4" width="18" height="16" rx="1"></rect>
+								<path d="M12 4v16"></path></svg
+						></span>
+					</button>
+					<button data-lay="editor" title="Só editor" class="on">
+						<span class="i-code" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"></path></svg
+						></span>
+					</button>
+					<button data-lay="preview" title="Só preview">
+						<span class="i-eye" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"></path>
+								<circle cx="12" cy="12" r="3"></circle></svg
+						></span>
+					</button>
+				</div>
+				<div class="tdiv"></div>
+				<button class="tbtn" id="reloadBtn" title="Recarregar preview">
+					<span class="i-reload" data-ico="1"
+						><svg class="icon" viewBox="0 0 24 24">
+							<path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"></path>
+							<path d="M21 4v4h-4"></path></svg
+					></span>
+				</button>
+				<button class="tbtn" id="consoleBtn" title="Console / DevTools (saída sem F12)">
+					<span class="i-term" data-ico="1"
+						><svg class="icon" viewBox="0 0 24 24">
+							<rect x="3" y="4" width="18" height="16" rx="2"></rect>
+							<path d="M7 9l3 3-3 3M13 15h4"></path></svg></span
+					><span class="badge hidden" id="consoleBadge">0</span>
+				</button>
+				<button class="tbtn" id="termBtn" title="Terminal integrado">
+					<span class="i-term" data-ico="1"
+						><svg class="icon" viewBox="0 0 24 24">
+							<rect x="3" y="4" width="18" height="16" rx="2"></rect>
+							<path d="M7 9l3 3-3 3M13 15h4"></path></svg
+					></span>
+				</button>
+				<button class="tbtn" id="popoutBtn" title="Abrir preview em nova aba (sincronizado)">
+					<span class="i-external" data-ico="1"
+						><svg class="icon" viewBox="0 0 24 24">
+							<path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"></path></svg
+					></span>
+				</button>
+			</div>
+
+			<div class="body">
+				<div class="explorer" id="explorer">
+					<div class="ex-head">
+						<span>Explorer</span>
+						<div class="ex-actions">
+							<button class="tbtn" id="exNewFile" title="Novo arquivo (o nome se digita no proprio Explorer)">
+								<span class="i-newfile" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path>
+										<path d="M14 3v5h5"></path>
+										<path d="M18 3v6M21 6h-6"></path></svg
+								></span>
+							</button>
+							<button class="tbtn" id="exNewFolder" title="Nova pasta (o nome se digita no proprio Explorer)">
+								<span class="i-newdir" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<path d="M3 7a2 2 0 0 1 2-2h4l2 2h5a2 2 0 0 1 2 2v3"></path>
+										<path d="M3 7v10a2 2 0 0 0 2 2h7"></path>
+										<path d="M17 14v6M20 17h-6"></path></svg
+								></span>
+							</button>
+							<button class="tbtn" id="collapseBtn" title="Recolher tudo">
+								<span class="i-collapse" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24"><path d="M9 9l3-3 3 3M9 15l3 3 3-3"></path></svg
+								></span>
+							</button>
+							<button class="tbtn" id="addBtn" title="Importar arquivo(s) para a raiz do projeto">
+								<span class="i-plus" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg
+								></span>
+							</button>
+							<button class="tbtn" id="exProjBtn" title="Projeto: renomear, criar novo, arquivos globais, memoria">
+								<span class="i-proj" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<circle cx="12" cy="12" r="3"></circle>
+										<path
+											d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"
+										></path></svg
+								></span>
+							</button>
+						</div>
+					</div>
+					<div class="ex-search">
+						<span class="i-search" data-ico="1"
+							><svg class="icon" viewBox="0 0 24 24">
+								<circle cx="11" cy="11" r="7"></circle>
+								<path d="M21 21l-4-4"></path></svg></span
+						><input id="exSearch" placeholder="Filtrar arquivos…" />
+					</div>
+					<div class="tree" id="tree"></div>
+				</div>
+				<div class="resizer" id="rz1"></div>
+				<div class="workspace">
+					<div class="panes" id="panes">
+						<div class="editor" id="editorPane">
+							<div class="editor-head" id="editorHead">
+								<span class="i-code fico" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"></path></svg></span
+								><span id="editorTitle">Nenhum arquivo</span><span class="dirty" id="editorDirty"></span
+								><span class="ehpath" id="editorPath"></span><span style="flex: 1"></span
+								><button class="eh-btn" id="fmtBtn" title="Formatar código (Shift+Alt+F)">
+									<svg class="icon" viewBox="0 0 24 24">
+										<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path>
+									</svg></button
+								><button class="eh-btn" id="foldBtn" title="Dobrar / desdobrar tudo">
+									<svg
+										class="icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M4 7h16M4 17h16M10 11l2 2 2-2"></path>
+									</svg></button
+								><button class="eh-btn" id="miniBtn" title="Minimapa (mostrar/ocultar)">
+									<svg
+										class="icon"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14m6-12v14"></path>
+									</svg></button
+								><button class="eh-btn" id="qopenBtn" title="Buscar arquivo (Ctrl/⌘ P)">
+									<svg class="icon" viewBox="0 0 24 24">
+										<circle cx="11" cy="11" r="7"></circle>
+										<path d="M21 21l-4-4"></path>
+									</svg></button
+								><button class="eh-btn" id="histBtn" title="Histórico de versões (Ctrl/⌘ H)">
+									<svg class="icon" viewBox="0 0 24 24">
+										<circle cx="12" cy="12" r="9"></circle>
+										<path d="M12 7v5l3 2"></path>
+									</svg>
+								</button>
+							</div>
+							<div class="editor-tabs" id="editorTabs"></div>
+							<div class="editor-scroll" id="editorScroll">
+								<div class="editor-empty" id="editorEmpty">
+									<div>
+										<span class="i-code icon" data-ico="1"
+											><svg class="icon" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"></path></svg></span
+										>Selecione um arquivo no Explorer para editar
+									</div>
+								</div>
+								<div class="media-view hidden" id="mediaView"></div>
+								<canvas class="minimap hidden" id="miniMap"></canvas>
+								<div class="editor-grid hidden" id="editorGrid">
+									<div class="gutter" id="gutter"></div>
+									<div class="code-wrap">
+										<pre class="code-hl" id="codeHl"></pre>
+										<textarea class="code-ta" id="codeTa" spellcheck="false" wrap="off"></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="resizer" id="rz2"></div>
+						<div class="preview" id="previewPane">
+							<div class="preview-stage" id="stage">
+								<div class="preview-empty" id="previewEmpty">
+									<div class="pe-card welcome">
+										<div class="wl-logo">
+											<svg
+												viewBox="0 0 64 64"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+												role="img"
+												aria-label="Synapse"
+											>
+												<defs>
+													<linearGradient id="synWlBg" x1="32" y1="0" x2="32" y2="64" gradientUnits="userSpaceOnUse">
+														<stop stop-color="#0c1430"></stop>
+														<stop offset="1" stop-color="#171f44"></stop>
+													</linearGradient>
+													<linearGradient id="synWlMk" x1="16" y1="48" x2="50" y2="14" gradientUnits="userSpaceOnUse">
+														<stop stop-color="#6aa3ff"></stop>
+														<stop offset="1" stop-color="#8b7bff"></stop>
+													</linearGradient>
+												</defs>
+												<rect x="2" y="2" width="60" height="60" rx="14" fill="url(#synWlBg)"></rect>
+												<rect
+													x="3"
+													y="3"
+													width="58"
+													height="58"
+													rx="13"
+													fill="none"
+													stroke="#ffffff"
+													stroke-opacity="0.08"
+													stroke-width="2"
+												></rect>
+												<path
+													d="M20 45 C 35 45 29 19 44 19"
+													fill="none"
+													stroke="url(#synWlMk)"
+													stroke-width="6.5"
+													stroke-linecap="round"
+												></path>
+												<circle cx="20" cy="45" r="7" fill="url(#synWlMk)"></circle>
+												<circle cx="44" cy="19" r="7" fill="url(#synWlMk)"></circle>
+												<circle cx="53" cy="11" r="2.6" fill="#aeb9ff"></circle>
+												<circle cx="56.5" cy="18" r="1.8" fill="#8b7bff"></circle>
+											</svg>
+										</div>
+										<h2>Bem-vindo ao <span class="wl-name">Synapse</span></h2>
+										<p>
+											Seu editor com <b>preview ao vivo</b>. Importe um projeto para começar — as edições aparecem aqui
+											em tempo real.
+										</p>
+										<div class="wl-actions">
+											<button class="wl-btn primary" data-imp="zip">
+												<span class="i-zip" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24">
+														<path d="M6 3h8l4 4v14H6z"></path>
+														<path d="M14 3v4h4"></path>
+														<path d="M10 7h2M10 10h2M10 13h2M9 16h4v3H9z"></path></svg
+												></span>
+												Importar .zip
+											</button>
+											<button class="wl-btn" data-imp="folder">
+												<span class="i-folder" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24">
+														<path
+															d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+														></path></svg
+												></span>
+												Importar pasta
+											</button>
+											<button class="wl-btn" data-imp="html">
+												<span class="i-html" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24">
+														<path d="M5 4l1.5 16L12 22l5.5-2L19 4z"></path>
+														<path d="M8 8h8l-.5 4-3.5 1-3.5-1"></path></svg
+												></span>
+												index.html
+											</button>
+											<button class="wl-btn ghost" data-imp="sample">
+												<span class="i-spark" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24">
+														<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg
+												></span>
+												Carregar exemplo
+											</button>
+										</div>
+										<div class="wl-actions wl-tour-wrap" style="margin: 2px 0 0">
+											<button class="wl-btn ghost wl-tour" data-tour="1" type="button">
+												<svg
+													class="icon"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.8"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path d="M5 4.6l14 7.4-14 7.4z"></path>
+												</svg>
+												Ver tutorial
+											</button>
+										</div>
+										<div class="wl-feats">
+											<span class="wl-feat"
+												><span class="i-code" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"></path></svg
+												></span>
+												Editor + snapshots</span
+											>
+											<span class="wl-feat"
+												><span class="i-eye" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24">
+														<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"></path>
+														<circle cx="12" cy="12" r="3"></circle></svg
+												></span>
+												Preview responsivo</span
+											>
+											<span class="wl-feat"
+												><span class="i-search" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24">
+														<circle cx="11" cy="11" r="7"></circle>
+														<path d="M21 21l-4-4"></path></svg
+												></span>
+												Busca global</span
+											>
+											<span class="wl-feat"
+												><span class="i-spark" data-ico="1"
+													><svg class="icon" viewBox="0 0 24 24">
+														<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg
+												></span>
+												6 temas + cor própria</span
+											>
+										</div>
+										<span class="drop-hint"
+											><span class="i-drop" data-ico="1"
+												><svg class="icon" viewBox="0 0 24 24">
+													<path d="M12 3v12m0 0l-4-4m4 4l4-4"></path>
+													<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></svg
+											></span>
+											Ou arraste arquivos para qualquer lugar</span
+										>
+									</div>
+								</div>
+								<div class="device hidden" id="device">
+									<iframe
+										id="frame"
+										title="preview"
+										referrerpolicy="no-referrer"
+										allow="pointer-lock; fullscreen; gamepad; autoplay"
+										sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock allow-modals"
+									></iframe>
+								</div>
+							</div>
+							<div class="preview-loading hidden" id="previewLoading">
+								<div class="pl-card">
+									<div class="pl-spinner"></div>
+									<h2 id="previewLoadingText">Carregando arquivos…</h2>
+									<p id="previewLoadingDetail">Preparando o preview do projeto…</p>
+									<div class="pl-bar"></div>
+									<div class="sk-list">
+										<div class="sk-line"></div>
+										<div class="sk-line"></div>
+										<div class="sk-line"></div>
+									</div>
+								</div>
+							</div>
+							<div class="preview-error hidden" id="previewError"></div>
+						</div>
+					</div>
+					<div class="resizer h" id="rz3"></div>
+					<div class="console" id="console">
+						<div class="console-head">
+							<div class="console-tabs" id="consoleTabs">
+								<button data-f="all" class="on">
+									<span class="i-term" data-ico="1"
+										><svg class="icon" viewBox="0 0 24 24">
+											<rect x="3" y="4" width="18" height="16" rx="2"></rect>
+											<path d="M7 9l3 3-3 3M13 15h4"></path></svg></span
+									>Tudo <span class="cnt" id="cAll">0</span>
+								</button>
+								<button data-f="error">
+									<span class="i-err" data-ico="1"
+										><svg class="icon" viewBox="0 0 24 24">
+											<circle cx="12" cy="12" r="9"></circle>
+											<path d="M12 7v6M12 16.5v.5"></path></svg></span
+									>Erros <span class="cnt" id="cErr">0</span>
+								</button>
+								<button data-f="warn">
+									<span class="i-warn" data-ico="1"
+										><svg class="icon" viewBox="0 0 24 24">
+											<path d="M12 3l9 16H3z"></path>
+											<path d="M12 9v5M12 17v.5"></path></svg></span
+									>Avisos <span class="cnt" id="cWarn">0</span>
+								</button>
+								<button data-f="cmd">
+									<span class="i-term" data-ico="1"
+										><svg class="icon" viewBox="0 0 24 24">
+											<rect x="3" y="4" width="18" height="16" rx="2"></rect>
+											<path d="M7 9l3 3-3 3M13 15h4"></path></svg></span
+									>Build/Comandos
+								</button>
+							</div>
+							<div class="tool-spacer"></div>
+							<input class="console-search" id="consoleSearch" type="text" placeholder="Filtrar…" spellcheck="false" />
+							<button class="tbtn" id="copyConsole" title="Copiar tudo">
+								<span class="i-copy" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<rect x="9" y="9" width="11" height="11" rx="2"></rect>
+										<path d="M5 15V5a2 2 0 0 1 2-2h8"></path></svg
+								></span>
+							</button>
+							<button class="tbtn" id="clearConsole" title="Limpar">
+								<span class="i-trash" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"></path></svg
+								></span>
+							</button>
+							<button class="tbtn" id="closeConsole" title="Fechar">
+								<span class="i-close" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg
+								></span>
+							</button>
+						</div>
+						<div class="console-body" id="consoleBody"></div>
+					</div>
+					<div class="console term-pane" id="termPane">
+						<div class="console-head">
+							<span class="term-title"
+								><span class="i-term" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24">
+										<rect x="3" y="4" width="18" height="16" rx="2"></rect>
+										<path d="M7 9l3 3-3 3M13 15h4"></path></svg></span
+								>Terminal <span style="opacity: 0.6; font-weight: 500">Synapse Relay</span></span
+							>
+							<span class="term-cwd" id="termCwd"></span>
+							<div class="tool-spacer"></div>
+							<button class="tbtn" id="termStop" title="Parar comando atual">■</button>
+							<button class="tbtn" id="termClear" title="Limpar">
+								<span class="i-trash" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"></path></svg
+								></span>
+							</button>
+							<button class="tbtn" id="termClose" title="Fechar">
+								<span class="i-close" data-ico="1"
+									><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg
+								></span>
+							</button>
+						</div>
+						<div class="console-body term-out" id="termOut"></div>
+						<div class="term-inrow">
+							<span class="term-prompt" id="termPrompt">&gt;</span
+							><input
+								id="termIn"
+								placeholder="Comando no projeto ativo (ex.: npm install)… Enter para executar"
+								spellcheck="false"
+								autocomplete="off"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="statusbar">
+				<div class="st"><span class="dot ok" id="stDot"></span><span id="stState">Pronto</span></div>
+				<div class="st" id="stProject">
+					<svg class="icon icon" viewBox="0 0 24 24">
+						<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg
+					><span>—</span>
+				</div>
+				<div class="sp"></div>
+				<div class="st" id="stContext">—</div>
+				<div class="st" id="stFiles">—</div>
+			</div>
+		</div>
+
+		<div class="dropzone" id="dropzone">
+			<div class="dz-card">
+				<span class="i-drop icon" data-ico="1"
+					><svg class="icon" viewBox="0 0 24 24">
+						<path d="M12 3v12m0 0l-4-4m4 4l4-4"></path>
+						<path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></svg
+				></span>
+				<h2>Solte para importar</h2>
+				<p>.zip, pasta ou index.html</p>
+			</div>
+		</div>
+		<div class="cmdk-back hidden" id="frBack">
+			<div class="cmdk fr" role="dialog" aria-modal="true">
+				<div class="fr-head">
+					<span class="cmdk-ic" id="frIcon"></span><b>Buscar e substituir</b><span style="flex: 1"></span
+					><span class="cmdk-esc">esc</span>
+				</div>
+				<div class="fr-row">
+					<input id="frFind" placeholder="Buscar em todos os arquivos…" autocomplete="off" spellcheck="false" />
+				</div>
+				<div class="fr-row">
+					<input id="frRepl" placeholder="Substituir por…" autocomplete="off" spellcheck="false" />
+				</div>
+				<div class="fr-opts">
+					<button class="fr-opt" id="frCase" title="Diferenciar maiúsculas/minúsculas">Aa</button
+					><button class="fr-opt" id="frRegex" title="Expressão regular">.*</button
+					><span class="fr-count" id="frCount"></span><span style="flex: 1"></span
+					><button class="fr-btn" id="frReplaceAll">Substituir tudo</button>
+				</div>
+				<div class="cmdk-list" id="frList"></div>
+			</div>
+		</div>
+		<div class="cmdk-back hidden" id="cmdkBack">
+			<div class="cmdk" id="cmdk" role="dialog" aria-modal="true">
+				<div class="cmdk-top">
+					<span class="cmdk-ic" id="cmdkIcon"></span
+					><input id="cmdkInput" placeholder="Buscar comando…" autocomplete="off" spellcheck="false" /><span
+						class="cmdk-esc"
+						>esc</span
+					>
+				</div>
+				<div class="cmdk-list" id="cmdkList"></div>
+			</div>
+		</div>
+		<div class="cmdk-back hidden" id="qopenBack">
+			<div class="cmdk" id="qopen" role="dialog" aria-modal="true">
+				<div class="cmdk-top">
+					<span class="cmdk-ic" id="qopenIcon"></span
+					><input
+						id="qopenInput"
+						placeholder="Buscar arquivo ou conteúdo…"
+						autocomplete="off"
+						spellcheck="false"
+					/><span class="cmdk-esc">esc</span>
+				</div>
+				<div class="cmdk-list" id="qopenList"></div>
+			</div>
+		</div>
+		<div class="hist-back hidden" id="histBack">
+			<div class="hist" role="dialog" aria-modal="true">
+				<div class="hist-head">
+					<span id="histTitle">Histórico de versões</span><span class="cmdk-esc" id="histClose">esc</span>
+				</div>
+				<div class="hist-body">
+					<div class="hist-list" id="histList"></div>
+					<div class="hist-prev">
+						<pre id="histPre"></pre>
+						<div class="hist-actions"><button id="histRestore">Restaurar esta versão</button></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="toasts" id="toasts"></div>
+
+		<input type="file" id="fileZip" accept=".zip" class="hidden" />
+		<input type="file" id="fileAssets" accept=".zip" class="hidden" />
+		<input type="file" id="fileHtml" accept=".html,.htm" class="hidden" />
+		<input type="file" id="fileFolder" webkitdirectory="" directory="" multiple="" class="hidden" />
+
+		<script src="./assets/js/nucleo/icones-e-constantes.js"></script>
+		<script src="./assets/js/nucleo/estado.js"></script>
+
+		<script src="./assets/js/estudio-3d/nucleo.js"></script>
+
+		<script src="./assets/js/editor/dobrar-minimapa-e-arrastar.js"></script>
+
+		<script src="./assets/js/preview/reconstrucao-agrupada.js"></script>
+
+		<script src="./assets/js/compilador/deteccao.js"></script>
+		<script src="./assets/js/compilador/toolchains.js"></script>
+		<script src="./assets/js/compilador/catalogo.js"></script>
+		<script src="./assets/js/compilador/shell-preview.js"></script>
+		<script src="./assets/js/compilador/bundle-web.js"></script>
+		<script src="./assets/js/compilador/orquestrador.js"></script>
+
+		<script src="./assets/js/preview/entrada-e-execucao.js"></script>
+
+		<script src="./assets/js/mcp/configuracao/relay-pela-url.js"></script>
+		<script src="./assets/js/mcp/local/complemento.js"></script>
+		<script src="./assets/js/mcp/protocolo/saneamento-waf.js"></script>
+		<script src="./assets/js/mcp/protocolo/pacote-rpc.js"></script>
+		<script src="./assets/js/mcp/transporte/ponte-relay.js"></script>
+		<script src="./assets/js/mcp/protocolo/identificacao-de-chamada.js"></script>
+		<script src="./assets/js/mcp/transporte/cliente.js"></script>
+		<script src="./assets/js/mcp/transporte/failover.js"></script>
+		<script src="./assets/js/mcp/transporte/pool-de-canais.js"></script>
+		<script src="./assets/js/mcp/transporte/segundo-plano.js"></script>
+		<script src="./assets/js/mcp/interface/camada-movel.js"></script>
+
+		<script src="./assets/js/terminal/fila-de-comandos.js"></script>
+
+		<script src="./assets/js/equipes/gestao.js"></script>
+		<script src="./assets/js/equipes/identidade-de-agente.js"></script>
+		<script src="./assets/js/equipes/status-legivel.js"></script>
+		<script src="./assets/js/equipes/travas-de-arquivo.js"></script>
+
+		<script src="./assets/js/mcp/protocolo/json-rpc.js"></script>
+
+		<script src="./assets/js/versionamento/diff-e-snapshots.js"></script>
+
+		<script src="./assets/js/estudio-3d/forge.js"></script>
+
+		<script src="./assets/js/terminal/politica-de-disco.js"></script>
+		<script src="./assets/js/terminal/comandos-e-espelho.js"></script>
+
+		<script src="./assets/js/interface/painel.js"></script>
+		<script src="./assets/js/interface/desenho-do-painel.js"></script>
+
+		<script src="./assets/js/arquivos/caminho-real.js"></script>
+
+		<script src="./assets/js/mcp/ferramentas/catalogo.js"></script>
+		<script src="./assets/js/mcp/ferramentas/compactacao-do-manifesto.js"></script>
+
+		<script src="./assets/js/arquivos/persistencia.js"></script>
+
+		<script src="./assets/js/mcp/local/modo-local.js"></script>
+
+		<script id="aurora-mobile-fix-js" src="./assets/js/plataforma/celular.js"></script>
+		<link rel="stylesheet" href="./assets/css/sincronizacao.css" />
+		<link rel="stylesheet" href="./assets/css/interface.css" />
+
+		<div id="syncBack"></div>
+		<div id="syncModal" role="dialog" aria-modal="true">
+			<button class="sy-x" id="syncClose" aria-label="Fechar">×</button>
+			<h3>Espelhar projeto</h3>
+			<div class="sy-sub">
+				Transfere o projeto aberto para outro aparelho byte a byte, direto de navegador para navegador. Nada e gravado
+				em servidor.
+			</div>
+
+			<div class="sy-tabs">
+				<button class="sy-tab on" data-pane="send">Enviar deste aparelho</button>
+				<button class="sy-tab" data-pane="recv">Baixar com codigo</button>
+			</div>
+
+			<div class="sy-pane on" id="syPaneSend">
+				<label class="sy-lab" for="syCodeHost">Codigo secreto desta aba</label>
+				<input
+					class="sy-in"
+					id="syCodeHost"
+					maxlength="14"
+					placeholder="HJHJ88STO"
+					autocomplete="off"
+					spellcheck="false"
+				/>
+				<div class="sy-row">
+					<button class="sy-btn" id="syGen" title="Gerar codigo aleatorio">Gerar</button>
+					<button class="sy-btn pri" id="syPub">Publicar projeto</button>
+				</div>
+				<div class="sy-row">
+					<button class="sy-btn" id="syStop" style="flex: 1" disabled="">Parar de compartilhar</button>
+					<button class="sy-btn" id="syExport" title="Salvar arquivo .aurora para enviar por WhatsApp, AirDrop, e-mail">
+						Salvar .aurora
+					</button>
+					<button
+						class="sy-btn"
+						id="syCopyLink"
+						title="Copiar link de download do arquivo .aurora — funciona neste navegador enquanto esta aba estiver aberta (10 min)"
+					>
+						Copiar link
+					</button>
+				</div>
+				<div class="sy-st" id="syStSend">Digite um codigo e clique em Publicar. Mantenha esta aba aberta.</div>
+				<div class="sy-bar" id="syBarSend"><i></i></div>
+			</div>
+
+			<div class="sy-pane" id="syPaneRecv">
+				<label class="sy-lab" for="syCodeGuest">Codigo recebido do outro aparelho</label>
+				<input
+					class="sy-in"
+					id="syCodeGuest"
+					maxlength="14"
+					placeholder="HJHJ88STO"
+					autocomplete="off"
+					spellcheck="false"
+				/>
+				<div class="sy-row">
+					<button class="sy-btn pri" id="syGet">Baixar projeto</button>
+					<button class="sy-btn" id="syImport" title="Abrir um arquivo .aurora">Abrir .aurora</button>
+				</div>
+				<div class="sy-st" id="syStRecv">O outro aparelho precisa estar com o codigo publicado e a aba aberta.</div>
+				<div class="sy-bar" id="syBarRecv"><i></i></div>
+				<input type="file" id="syFile" accept=".aurora,application/octet-stream" style="display: none" />
+			</div>
+
+			<div class="sy-note">
+				A conexao e ponto a ponto (WebRTC). O codigo so serve para os dois aparelhos se encontrarem — quem souber o
+				codigo enquanto ele estiver publicado consegue baixar o projeto, entao prefira codigos longos. Em redes moveis
+				muito restritas a conexao direta pode falhar; nesse caso use o arquivo .aurora.
+			</div>
+		</div>
+
+		<script src="./assets/js/sincronizacao/p2p.js"></script>
+
+		<div id="auroraExpBackdrop"></div>
+
+		<script src="./assets/js/preview/modo-servidor.js"></script>
+
+		<script src="./assets/js/estudio-3d/biblioteca-forge.js"></script>
+
+		<script src="./assets/js/onboarding/tour.js"></script>
+
+		<script src="./assets/js/desempenho/render-coalescido.js"></script>
+		<script src="./assets/js/desempenho/memoria.js"></script>
+
+		<script src="./assets/js/mcp/resiliencia/diagnostico.js"></script>
+
+		<script src="./assets/js/interface/explorer-e-projeto.js"></script>
+
+		<script src="./assets/js/desempenho/governador-de-memoria.js"></script>
+
+		<script src="./assets/js/mcp/resiliencia/rajada.js"></script>
+		<script src="./assets/js/mcp/protocolo/resposta-sempre.js"></script>
+		<script src="./assets/js/mcp/resiliencia/telemetria.js"></script>
+	</body>
+</html>

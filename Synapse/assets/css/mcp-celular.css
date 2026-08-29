@@ -1,0 +1,16 @@
+body.mcp-movel label[for='mcpPub'],
+body.mcp-movel #mcpPub,
+body.mcp-movel #mcpTermListWrap,
+body.mcp-movel #mcpDlRelay,
+body.mcp-movel #termBtn {
+	display: none !important;
+}
+body.mcp-movel label[for='mcpRelay'] {
+	display: none !important;
+}
+body.mcp-movel #mcpRelay {
+	display: none !important;
+}
+body.mcp-movel .mcp-menu {
+	max-width: 94vw;
+}

@@ -1,0 +1,31 @@
+html:not(.aurora-mobile) .mcp-menu {
+	max-height: calc(100vh - 58px);
+	overflow-y: auto;
+	overflow-x: hidden;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
+}
+@supports (height: 100dvh) {
+	html:not(.aurora-mobile) .mcp-menu {
+		max-height: calc(100dvh - 58px);
+	}
+}
+
+html .mcp-menu #mcpAcoes {
+	position: sticky;
+	bottom: 0;
+	z-index: 3;
+	margin-top: 10px;
+	padding: 9px 0 3px;
+	background: var(--bg-2);
+	border-top: 1px solid var(--line);
+}
+
+html .mcp-menu .mcp-log {
+	max-height: 120px;
+	overscroll-behavior: contain;
+}
+html .mcp-menu #mcpAgents {
+	overflow: hidden;
+}

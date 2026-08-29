@@ -1,0 +1,365 @@
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+html,
+body {
+	max-width: 100%;
+	overflow-x: hidden;
+	overscroll-behavior: none;
+}
+
+.app {
+	height: calc(var(--app-vh, 1vh) * 100);
+}
+@supports (height: 100dvh) {
+	.app {
+		height: 100dvh;
+	}
+}
+
+.topbar {
+	padding-left: calc(12px + env(safe-area-inset-left));
+	padding-right: calc(12px + env(safe-area-inset-right));
+}
+.toolbar {
+	padding-left: calc(12px + env(safe-area-inset-left));
+	padding-right: calc(12px + env(safe-area-inset-right));
+}
+.statusbar {
+	height: auto;
+	min-height: 24px;
+	padding-left: calc(12px + env(safe-area-inset-left));
+	padding-right: calc(12px + env(safe-area-inset-right));
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+.aurora-mobile .tab .tclose {
+	opacity: 1;
+	width: 24px;
+	height: 24px;
+}
+.aurora-mobile .tab {
+	height: 34px;
+	padding: 0 6px 0 11px;
+}
+
+.aurora-mobile .topbar {
+	height: auto;
+	min-height: 46px;
+	flex-wrap: wrap;
+	align-items: center;
+	padding-top: 5px;
+	padding-bottom: 0;
+	row-gap: 0;
+}
+.aurora-mobile .brand {
+	order: 1;
+	flex: 0 1 auto;
+	min-width: 0;
+	border-right: 0;
+	padding-right: 8px;
+	height: 36px;
+}
+.aurora-mobile .brand > div {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.aurora-mobile .topbar-actions {
+	order: 2;
+	margin-left: auto;
+	flex: 0 0 auto;
+	gap: 6px;
+	height: 36px;
+}
+
+.aurora-mobile .tabs {
+	order: 3;
+	flex: 1 0 100%;
+	width: 100%;
+	height: 42px;
+	min-height: 42px;
+	margin-top: 4px;
+	padding: 0 2px 6px;
+	border-top: 1px solid var(--line);
+	overflow-x: auto;
+	overflow-y: hidden;
+	-webkit-overflow-scrolling: touch;
+	scroll-snap-type: x proximity;
+	scrollbar-width: none;
+}
+.aurora-mobile .tabs::-webkit-scrollbar {
+	display: none;
+}
+.aurora-mobile .tabs:empty {
+	display: none;
+}
+.aurora-mobile .tab {
+	flex: 0 0 auto;
+	scroll-snap-align: start;
+	max-width: 58vw;
+}
+.aurora-mobile .tab.active::after {
+	bottom: -4px;
+}
+
+.aurora-mobile .top-ico,
+.aurora-mobile .btn {
+	height: 36px;
+	min-width: 36px;
+}
+.aurora-mobile .tbtn {
+	width: 34px;
+	height: 34px;
+}
+.aurora-mobile button {
+	touch-action: manipulation;
+}
+
+.aurora-narrow #importBtn,
+.aurora-narrow #exportBtn {
+	font-size: 0;
+	gap: 0;
+	padding: 0 9px;
+}
+.aurora-narrow #importBtn [data-ico],
+.aurora-narrow #exportBtn [data-ico] {
+	font-size: 14px;
+}
+.aurora-narrow .brand span {
+	display: none;
+}
+
+.aurora-mobile .panes {
+	flex-direction: column;
+}
+.aurora-mobile .editor {
+	border-right: 0;
+	border-bottom: 1px solid var(--line);
+	flex: 1 1 45%;
+	min-height: 0;
+	min-width: 0;
+}
+.aurora-mobile .preview {
+	flex: 1 1 55%;
+	min-height: 0;
+	min-width: 0;
+}
+.aurora-mobile .resizer {
+	width: 100%;
+	height: 12px;
+	flex: none;
+	cursor: row-resize;
+	background: var(--bg-1);
+	border-top: 1px solid var(--line);
+	border-bottom: 1px solid var(--line);
+}
+.aurora-mobile .resizer::after {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 38px;
+	height: 4px;
+	border-radius: 3px;
+	background: var(--line-2);
+}
+
+@media (orientation: landscape) and (min-width: 640px) {
+	.aurora-mobile .panes {
+		flex-direction: row;
+	}
+	.aurora-mobile .editor {
+		border-right: 1px solid var(--line);
+		border-bottom: 0;
+		flex: 1 1 50%;
+		min-width: 220px;
+	}
+	.aurora-mobile .preview {
+		flex: 1 1 50%;
+		min-width: 220px;
+	}
+	.aurora-mobile .resizer {
+		width: 10px;
+		height: auto;
+		cursor: col-resize;
+		border: 0;
+		border-left: 1px solid var(--line);
+		border-right: 1px solid var(--line);
+	}
+	.aurora-mobile .resizer::after {
+		width: 4px;
+		height: 38px;
+	}
+}
+
+.aurora-mobile .toolbar {
+	height: auto;
+	min-height: 42px;
+	flex-wrap: wrap;
+	row-gap: 6px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+.aurora-narrow .tool-spacer {
+	display: none;
+}
+.aurora-narrow .dims {
+	font-size: 10px;
+	order: 99;
+}
+
+.aurora-mobile .menu {
+	position: fixed;
+	top: auto;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	min-width: 0;
+	max-width: 100%;
+	max-height: min(70vh, 70dvh);
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	border-radius: 16px 16px 0 0;
+	padding: 8px 10px calc(14px + env(safe-area-inset-bottom));
+	transform: translateY(14px);
+}
+.aurora-mobile .menu.open {
+	transform: translateY(0);
+}
+.aurora-mobile .menu-item {
+	min-height: 44px;
+}
+
+.aurora-mobile .cmdk-back {
+	padding-top: max(6vh, env(safe-area-inset-top));
+	padding-left: env(safe-area-inset-left);
+	padding-right: env(safe-area-inset-right);
+	align-items: flex-start;
+}
+@media (orientation: landscape) {
+	.aurora-mobile .cmdk-back {
+		padding-top: 12px;
+	}
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+	.aurora-mobile .topbar {
+		min-height: 40px;
+		padding-top: 3px;
+	}
+	.aurora-mobile .brand {
+		height: 32px;
+	}
+	.aurora-mobile .topbar-actions {
+		height: 32px;
+	}
+	.aurora-mobile .top-ico,
+	.aurora-mobile .btn {
+		height: 32px;
+		min-width: 32px;
+	}
+	.aurora-mobile .tbtn {
+		width: 30px;
+		height: 30px;
+	}
+	.aurora-mobile .tabs {
+		height: 36px;
+		min-height: 36px;
+		margin-top: 2px;
+		padding-bottom: 4px;
+	}
+	.aurora-mobile .tab {
+		height: 30px;
+		max-width: 40vw;
+	}
+	.aurora-mobile .toolbar {
+		min-height: 38px;
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+	.aurora-mobile .statusbar {
+		display: none;
+	}
+}
+
+.aurora-mobile .console {
+	height: min(210px, 38vh);
+}
+
+.aurora-mobile textarea,
+.aurora-mobile input,
+.aurora-mobile select {
+	font-size: 16px;
+}
+.aurora-mobile .gutter {
+	min-width: 40px;
+}
+
+.aurora-mobile .explorer {
+	width: min(248px, 42vw);
+}
+
+#auroraExpToggle {
+	display: none;
+}
+.aurora-narrow #auroraExpToggle {
+	display: grid;
+	flex: none;
+}
+.aurora-narrow #auroraExpToggle.on {
+	background: var(--bg-3);
+	border-color: var(--line-2);
+	color: var(--txt);
+}
+
+.aurora-narrow .explorer {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 220;
+	width: min(290px, 84vw);
+	transform: translateX(-103%);
+	transition: transform 0.22s ease;
+	box-shadow: 0 0 40px rgba(0, 0, 0, 0.55);
+	padding-top: env(safe-area-inset-top);
+	padding-bottom: env(safe-area-inset-bottom);
+	padding-left: env(safe-area-inset-left);
+	border-right: 1px solid var(--line-2);
+}
+.aurora-narrow.exp-open .explorer {
+	transform: translateX(0);
+}
+
+#auroraExpBackdrop {
+	display: none;
+}
+.aurora-narrow #auroraExpBackdrop {
+	display: block;
+	position: fixed;
+	inset: 0;
+	z-index: 210;
+	background: rgba(6, 9, 15, 0.55);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s;
+}
+.aurora-narrow.exp-open #auroraExpBackdrop {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.aurora-narrow .explorer + .resizer {
+	display: none;
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+	.aurora-mobile .console {
+		height: min(150px, 34vh);
+	}
+}
