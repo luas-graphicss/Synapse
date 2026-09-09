@@ -1,0 +1,19 @@
+.modeler-navigation-gizmo {
+  position: absolute;
+  top: 56px;
+  right: 12px;
+  z-index: 6;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.modeler-navigation-gizmo:active {
+  cursor: grabbing;
+}
+@media (max-width: 720px) {
+  .modeler-navigation-gizmo {
+    top: 48px;
+    right: 8px;
+  }
+}

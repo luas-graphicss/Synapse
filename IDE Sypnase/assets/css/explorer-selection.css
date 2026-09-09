@@ -1,0 +1,49 @@
+#tree {
+  outline: none;
+  user-select: none;
+}
+#tree .row {
+  min-height: 28px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm, 2px);
+}
+#tree:focus-visible .row.explorer-focused {
+  border-color: var(--acc);
+}
+#tree .row.sel {
+  background: rgba(var(--acc-rgb), 0.14);
+  color: var(--txt);
+}
+#tree:not(:focus-within) .row.sel {
+  background: color-mix(in srgb, var(--txt-3) 16%, transparent);
+}
+#tree .row.explorer-cut {
+  opacity: 0.48;
+}
+#tree .row.dragging {
+  opacity: 0.5;
+}
+#tree .row.drop-into {
+  border-color: var(--acc);
+}
+.explorer-selection-status {
+  flex: none;
+  min-height: 28px;
+  padding: 6px 12px;
+  color: var(--txt-2);
+  font: 11px/1.4 var(--mono);
+  border-top: 1px solid var(--line);
+}
+.explorer-selection-status[hidden] {
+  display: none;
+}
+.file-language-icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+@media (pointer: coarse) {
+  #tree .row {
+    min-height: 44px;
+  }
+}

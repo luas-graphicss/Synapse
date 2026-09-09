@@ -1,0 +1,293 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Visão geral | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Documentação oficial da Synapse IDE: arquitetura, ferramentas, plataforma e suporte."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="visao-geral">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Fundamentos / Visão geral</p>
+              <h1 class="docs-title">Synapse IDE</h1>
+              <p class="docs-lede">
+                A Synapse é um ambiente de desenvolvimento que roda inteiro no navegador: editor,
+                preview ao vivo, build, terminal ligado ao seu disco, Blepse 3D e uma ponte para
+                agentes externos. Esta documentação explica como cada parte funciona, o que esperar
+                dela e onde olhar quando algo dá errado.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 7 min</span>
+                <span>público: todos</span>
+              </div>
+              <section>
+                <h2>O que a Synapse é</h2>
+                <p>
+                  A IDE foi feita para projetos web que precisam de retorno imediato. Você edita um
+                  arquivo e o preview atualiza sem passar por servidor de build remoto. Nada do seu
+                  código precisa sair da máquina para o editor funcionar: o projeto vive no
+                  armazenamento do navegador e, quando você liga o relay, também numa pasta espelhada
+                  no disco.
+                </p>
+                <p>
+                  Ela não tenta ser um editor genérico com mil plugins. O foco é um ciclo curto de
+                  escrever, ver rodando, medir e corrigir, com ferramentas de build e de 3D no mesmo
+                  lugar.
+                </p>
+                <h3>Para quem esta documentação serve</h3>
+                <ul>
+                  <li>
+                    Quem está começando e quer sair do zero até um projeto rodando em poucos minutos.
+                  </li>
+                  <li>
+                    Quem quer estudar a engine por dentro: como o preview é montado, como o build
+                    resolve módulos, como os agentes escrevem no projeto.
+                  </li>
+                  <li>
+                    Quem esbarrou num comportamento estranho e quer confirmar se é bug, limite
+                    conhecido ou configuração.
+                  </li>
+                </ul>
+              </section>
+              <section>
+                <h2>Como a IDE está organizada por dentro</h2>
+                <p>
+                  O código é dividido em camadas independentes. Cada camada conversa com a vizinha por
+                  uma superfície pequena, o que permite trocar uma parte sem quebrar as outras.
+                </p>
+                <dl class="docs-definition">
+                  <dt>núcleo</dt>
+                  <dd>
+                    Estado do projeto em memória, lista de arquivos, arquivo ativo e eventos que o
+                    resto da IDE escuta.
+                  </dd>
+                  <dt>sincronização</dt>
+                  <dd>
+                    Gravação no armazenamento local, histórico de versões e espelho opcional no disco
+                    via relay.
+                  </dd>
+                  <dt>editor</dt>
+                  <dd>
+                    Realce de sintaxe próprio, sugestões, diagnósticos, formatação e navegação entre
+                    símbolos.
+                  </dd>
+                  <dt>preview</dt>
+                  <dd>
+                    Monta a árvore de arquivos em endereço temporário e injeta no iframe, capturando
+                    console, erros e requisições.
+                  </dd>
+                  <dt>build</dt>
+                  <dd>Perfis de compilação, adaptadores de linguagem e leitura de diagnósticos.</dd>
+                  <dt>relay</dt>
+                  <dd>
+                    Processo local que executa comandos de verdade e devolve a saída para a IDE.
+                  </dd>
+                  <dt>agentes</dt>
+                  <dd>
+                    Servidor MCP que expõe leitura, escrita, testes visuais e coordenação entre vários
+                    agentes.
+                  </dd>
+                  <dt>estúdio 3D</dt>
+                  <dd>
+                    Blepse 3D, o modelador que abre em aba própria e devolve os assets direto no
+                    projeto.
+                  </dd>
+                </dl>
+                <p>
+                  Na prática, isso significa que um problema quase sempre pertence a uma camada. Um
+                  arquivo que não salva é sincronização. Um preview em branco raramente é o editor. A
+                  categoria <strong>Solução de problemas</strong> usa essa mesma divisão para separar
+                  sintomas.
+                </p>
+              </section>
+              <section>
+                <h2>Mapa da documentação</h2>
+                <p>
+                  Cada categoria tem uma página própria: use a barra lateral para trocar de assunto e a
+                  lista da direita para pular entre as seções da página aberta.
+                </p>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Categoria</th>
+                      <th>Serve para</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <a href="./primeiros-passos.html">Primeiros passos</a>
+                      </td>
+                      <td>Primeiro projeto, importação e o preview inicial.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./interface.html">Área de trabalho</a>
+                      </td>
+                      <td>Onde fica cada painel, botão e layout.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./editor.html">Editor de código</a>
+                      </td>
+                      <td>Linguagens, sugestões, diagnósticos e formatação.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./preview.html">Preview ao vivo</a>
+                      </td>
+                      <td>Ciclo de atualização, console e rede.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./build.html">Build e compilador</a>
+                      </td>
+                      <td>Perfis, adaptadores e erros de compilação.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./blepse-3d.html">Blepse 3D</a>
+                      </td>
+                      <td>Modelagem, materiais e exportação de assets.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./ia.html">Assistente de IA</a>
+                      </td>
+                      <td>Sugestões em linha, chat e limites de uso.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./terminal.html">Terminal e relay</a>
+                      </td>
+                      <td>Comandos no disco, dev server e permissões.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./mcp.html">MCP e agentes</a>
+                      </td>
+                      <td>Automação externa, equipes e travas de escrita.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./arquivos.html">Arquivos e persistência</a>
+                      </td>
+                      <td>Onde o projeto é salvo, versões e snapshots.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./configuracoes.html">Configurações e atalhos</a>
+                      </td>
+                      <td>Aparência, fontes, temas e teclas.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./problemas.html">Solução de problemas</a>
+                      </td>
+                      <td>Sintoma, causa provável e o que fazer.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="./atualizacoes.html">Atualizações</a>
+                      </td>
+                      <td>Último update publicado e o próximo em desenvolvimento.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <section>
+                <h2>Convenções usadas aqui</h2>
+                <ul>
+                  <li>
+                    <span class="docs-keys">Mod</span> significa <span class="docs-keys">Ctrl</span> no
+                      Windows e Linux e <span class="docs-keys">Cmd</span> no macOS.
+                    </li>
+                    <li>
+                      Caminhos de arquivo aparecem como <code>src/app.js</code>, sempre relativos à raiz do
+                      projeto e sem barra inicial.
+                    </li>
+                    <li>
+                      Quando o texto diz "o relay", trata-se do processo local que a IDE usa para tocar no
+                      disco e rodar comandos.
+                    </li>
+                    <li>
+                      Recursos marcados como estimativa ou em desenvolvimento podem mudar de forma antes
+                      de chegar na versão estável.
+                    </li>
+                  </ul>
+                  <div class="docs-note">
+                    <span class="docs-note-label">Como chegar aqui de dentro da IDE</span>
+                    <p>
+                      Na barra superior, o botão <strong>Ajuda</strong> fica à esquerda de Importar. Ele
+                      abre esta documentação e também o formulário de relato de bug.
+                    </p>
+                  </div>
+                </section>
+                <section>
+                  <h2>Limites que vale conhecer antes</h2>
+                  <ul>
+                    <li>
+                      O projeto é guardado pelo navegador, por origem. Trocar de navegador ou limpar dados
+                      do site significa começar de um projeto vazio, por isso exporte com frequência.
+                    </li>
+                    <li>
+                      Terminal, instalação de pacotes e dev server exigem o relay ligado na sua máquina.
+                      Sem ele a IDE continua funcionando, mas fica limitada ao preview interno.
+                    </li>
+                    <li>
+                      Arquivos muito grandes entram em modo reduzido no editor para não travar a rolagem.
+                      Os números exatos estão em <strong>Editor de código</strong>.
+                    </li>
+                  </ul>
+                </section>
+              </article>
+              <footer class="docs-pager">
+              </footer>
+              <p class="docs-page-footer">
+                Faltou algo nesta página? Use o botão Ajuda na barra superior da IDE e envie um relato
+                dizendo qual categoria você procurava.
+              </p>
+            </main>
+            <aside class="docs-outline" aria-label="Nesta página">
+            </aside>
+          </div>
+          <script src="./assets/docs-catalog.js"></script>
+          <script src="./assets/docs-current-category.js"></script>
+          <script src="./assets/docs-sidebar.js"></script>
+          <script src="./assets/docs-filter.js"></script>
+          <script src="./assets/docs-outline.js"></script>
+          <script src="./assets/docs-pager.js"></script>
+          <script src="./assets/docs-boot.js"></script>
+          <script src="../assets/js/i18n/phrase-registration.js"></script>
+          <script src="./assets/docs-phrases.js"></script>
+          <script src="./assets/docs-error-silencer.js"></script>
+          <script src="../assets/js/i18n/idiomas.js"></script>
+        </body>
+      </html>

@@ -1,0 +1,407 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Blepse 3D | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="O Blepse 3D, modelador da Synapse IDE: viewport, modos de edição, malha, materiais, UV e exportação para o projeto."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="blepse-3d">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Ferramentas / Blepse 3D</p>
+              <h1 class="docs-title">Blepse 3D</h1>
+              <p class="docs-lede">
+                O Blepse 3D é o modelador que vem dentro da IDE. Ele abre em aba própria, trabalha no
+                mesmo projeto que o editor e grava o resultado como arquivo do projeto, pronto para ser
+                carregado pelo preview.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 11 min</span>
+                <span>público: dev e artista</span>
+              </div>
+              <section>
+                <h2>Para que ele serve</h2>
+                <p>
+                  A ideia não é competir com um pacote de modelagem completo. O Blepse resolve o caso do
+                  dia a dia de quem faz jogo ou cena web: criar e ajustar geometria simples, conferir
+                  escala, arrumar normais, gerar UV rápida e exportar sem sair da IDE.
+                </p>
+                <p>
+                  O teclado segue a convenção de modelador de desktop, com as mesmas teclas de
+                  transformar e selecionar que você já usa em outras ferramentas. Quem vem do Blender
+                  consegue trabalhar sem reaprender atalho.
+                </p>
+              </section>
+              <section>
+                <h2>Como abrir e o que fica gravado</h2>
+                <ol class="docs-steps">
+                  <li>Na barra superior da IDE, clique no botão do Blepse 3D.</li>
+                  <li>A ferramenta abre em outra aba e carrega a lista de arquivos do projeto atual.</li>
+                  <li>Modele, e ao gravar informe o caminho de destino dentro do projeto.</li>
+                  <li>Volte para a aba da IDE: o arquivo aparece no explorador e no preview.</li>
+                </ol>
+                <p>
+                  Cada modelo gera dois arquivos com o mesmo nome. O <code>.glb</code> é o resultado que
+                  o seu código carrega. Ao lado dele fica o arquivo de fonte da cena, que guarda a malha
+                  editável, os materiais e o histórico de operações.
+                </p>
+                <div class="docs-note">
+                  <span class="docs-note-label">Não apague o arquivo de fonte</span>
+                  <p>
+                    Se você apagar o arquivo de fonte e manter apenas o <code>.glb</code>, o modelo
+                    continua rodando no projeto, mas volta a ser um asset fechado: a próxima edição
+                    começa de uma importação, sem o histórico da cena.
+                  </p>
+                </div>
+                <p>
+                  Caminhos seguem a regra do resto da IDE: relativos à raiz do projeto, sem barra inicial
+                  e sem subir de diretório. <code>assets/models/nave.glb</code> é válido,
+                  <code>../nave.glb</code> não.
+                  </p>
+                </section>
+                <section>
+                  <h2>Viewport e navegação</h2>
+                  <p>
+                    A câmera trabalha em órbita ao redor de um ponto de interesse. O botão do meio do mouse
+                    orbita, a roda aproxima e afasta, e o teclado numérico coloca a câmera em vistas fixas.
+                  </p>
+                  <table class="docs-table">
+                    <thead>
+                      <tr>
+                        <th>Tecla</th>
+                        <th>Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Num 1</span> / <span class="docs-keys">Num 3</span> /
+                            <span class="docs-keys">Num 7</span>
+                          </td>
+                          <td>Vista de frente, direita e topo.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Ctrl + Num 1/3/7</span>
+                          </td>
+                          <td>Vista oposta: costas, esquerda e base.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Num 9</span>
+                          </td>
+                          <td>Gira para o lado oposto da vista atual.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Num 5</span>
+                          </td>
+                          <td>Alterna entre perspectiva e ortográfica.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Num 4/6/8/2</span>
+                          </td>
+                          <td>Órbita em passos fixos.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Home</span>
+                          </td>
+                          <td>Enquadra a cena inteira.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">.</span>
+                          </td>
+                          <td>Enquadra apenas a seleção.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">,</span>
+                          </td>
+                          <td>Troca o ponto de pivô usado pelas transformações.</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Shift + C</span>
+                          </td>
+                          <td>Devolve o cursor 3D para o centro do mundo.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <p>
+                      Se o seu teclado não tem bloco numérico, use o menu de vistas do cabeçalho da
+                      viewport. As entradas de menu chamam os mesmos operadores das teclas.
+                    </p>
+                  </section>
+                  <section>
+                    <h2>Modo objeto e modo edição</h2>
+                    <p>
+                      <span class="docs-keys">Tab</span> alterna entre os dois modos e essa é a distinção
+                        mais importante da ferramenta. No modo objeto você move e organiza objetos inteiros. No
+                        modo edição você mexe em vértice, aresta e face do objeto ativo.
+                      </p>
+                      <dl class="docs-definition">
+                        <dt>G, R, S</dt>
+                        <dd>Mover, girar e escalar. Valem nos dois modos, sobre o que está selecionado.</dd>
+                        <dt>1, 2, 3</dt>
+                        <dd>No modo edição, trocam a seleção para vértice, aresta ou face.</dd>
+                        <dt>A / Alt + A</dt>
+                        <dd>Selecionar tudo e limpar a seleção.</dd>
+                        <dt>Ctrl + I</dt>
+                        <dd>Inverter a seleção atual.</dd>
+                        <dt>Ctrl + L</dt>
+                        <dd>Selecionar tudo que está ligado ao elemento atual.</dd>
+                        <dt>Ctrl + Mais / Menos</dt>
+                        <dd>Crescer ou encolher a seleção pelas vizinhanças.</dd>
+                        <dt>Shift + D</dt>
+                        <dd>Duplicar o objeto selecionado e já entrar em movimento.</dd>
+                        <dt>X</dt>
+                        <dd>Apagar. No modo edição, apaga o que estiver selecionado no tipo ativo.</dd>
+                      </dl>
+                      <p>
+                        <span class="docs-keys">Ctrl + Z</span> desfaz e
+                          <span class="docs-keys">Ctrl + Shift + Z</span> refaz. O histórico é da sessão do
+                            modelador, separado do histórico de versões de arquivo da IDE.
+                          </p>
+                        </section>
+                        <section>
+                          <h2>Operações de malha</h2>
+                          <table class="docs-table">
+                            <thead>
+                              <tr>
+                                <th>Tecla</th>
+                                <th>Operação</th>
+                                <th>Quando usar</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">E</span>
+                                </td>
+                                <td>Extrudar</td>
+                                <td>Puxar volume novo a partir da seleção.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">I</span>
+                                </td>
+                                <td>Inset de face</td>
+                                <td>Criar borda interna antes de afundar ou levantar detalhe.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">Ctrl + B</span>
+                                </td>
+                                <td>Bevel</td>
+                                <td>Arredondar aresta viva para o material reagir melhor à luz.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">Ctrl + R</span>
+                                </td>
+                                <td>Loop cut</td>
+                                <td>Inserir anel de arestas para ganhar controle sem refazer a malha.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">Alt + S</span>
+                                </td>
+                                <td>Engrossar pela normal</td>
+                                <td>Dar espessura acompanhando a superfície, e não os eixos.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">F</span>
+                                </td>
+                                <td>Fechar face</td>
+                                <td>Criar aresta ou face entre elementos selecionados.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">M</span>
+                                </td>
+                                <td>Mesclar</td>
+                                <td>Juntar vértices próximos e fechar buraco de solda.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">Shift + N</span>
+                                </td>
+                                <td>Recalcular normais</td>
+                                <td>Face preta ou iluminação invertida depois de extrudar.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">Ctrl + Shift + N</span>
+                                </td>
+                                <td>Inverter normais</td>
+                                <td>Quando o lado de dentro precisa ser o visível.</td>
+                              </tr>
+                              <tr>
+                                <td>
+                                  <span class="docs-keys">U</span>
+                                </td>
+                                <td>Unwrap de UV</td>
+                                <td>Gerar coordenada de textura para a seleção.</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <p>
+                            As operações com valor contínuo entram em modo interativo: o movimento do mouse define
+                            a quantidade, clique confirma e <span class="docs-keys">Esc</span> cancela. Enquanto o
+                            modo está ativo, o cabeçalho da viewport mostra o valor atual.
+                          </p>
+                        </section>
+                        <section>
+                          <h2>Materiais, texturas e UV</h2>
+                          <p>
+                            O material do Blepse segue o modelo padrão de GLB: cor base, metálico, rugosidade,
+                            emissão e opacidade. Cada slot pode receber uma textura vinda do próprio projeto, o que
+                            mantém o asset autossuficiente na exportação.
+                          </p>
+                          <ul>
+                            <li>
+                              Texturas são referenciadas por caminho de projeto, então trocar o arquivo troca o
+                              resultado sem reeditar o modelo.
+                            </li>
+                            <li>O editor de UV mostra a ilha gerada pelo unwrap e permite ajustar escala e posição.</li>
+                            <li>
+                              Costura mal resolvida aparece como emenda visível na textura. Marque a aresta de
+                              costura antes de refazer o unwrap.
+                            </li>
+                          </ul>
+                          <div class="docs-note">
+                            <span class="docs-note-label">Escala importa</span>
+                            <p>
+                              Defina a escala no modelador em vez de corrigir por código. Modelo exportado com
+                              escala estranha causa problema de colisão, de sombra e de iluminação depois.
+                            </p>
+                          </div>
+                        </section>
+                        <section>
+                          <h2>Levar o modelo para o projeto</h2>
+                          <p>
+                            A exportação grava o <code>.glb</code> direto no caminho escolhido. Como o preview lê
+                            os arquivos do projeto por caminho relativo, o seu código carrega o asset como qualquer
+                            outro recurso.
+                          </p>
+                          <pre><code>const loader = new GLTFLoader();
+loader.load('assets/models/nave.glb', (gltf) =&gt; {
+  scene.add(gltf.scene);
+});</code></pre>
+                          <p>
+                            Gravar de novo no mesmo caminho substitui o arquivo e gera versão no histórico, então
+                            dar um passo atrás é sempre possível.
+                          </p>
+                        </section>
+                        <section>
+                          <h2>Limites e desempenho</h2>
+                          <ul>
+                            <li>
+                              A viewport precisa de WebGL. Sem aceleração de vídeo, a IDE avisa e o modelador não
+                              abre.
+                            </li>
+                            <li>
+                              Malha muito densa derruba a taxa de quadros da viewport antes de causar problema no
+                              preview. Trabalhe com contagem baixa e resolva detalhe com textura.
+                            </li>
+                            <li>
+                              Importação de GLB externo funciona, mas material com extensão fora do padrão pode
+                              voltar simplificado.
+                            </li>
+                            <li>Animação de esqueleto não é editada aqui. O Blepse cuida de geometria e material.</li>
+                          </ul>
+                        </section>
+                        <section>
+                          <h2>Quando algo sai errado</h2>
+                          <table class="docs-table">
+                            <thead>
+                              <tr>
+                                <th>Sintoma</th>
+                                <th>Causa provável</th>
+                                <th>O que fazer</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>Viewport preta</td>
+                                <td>Contexto WebGL perdido</td>
+                                <td>Recarregue a aba do modelador e feche outras abas 3D abertas.</td>
+                              </tr>
+                              <tr>
+                                <td>Face escura no preview</td>
+                                <td>Normal apontando para dentro</td>
+                                <td>Selecione tudo no modo edição e recalcule as normais.</td>
+                              </tr>
+                              <tr>
+                                <td>Modelo não aparece na cena</td>
+                                <td>Caminho de carregamento diferente do caminho gravado</td>
+                                <td>Confira o caminho no explorador e o registro de rede do preview.</td>
+                              </tr>
+                              <tr>
+                                <td>Textura branca</td>
+                                <td>UV ausente ou imagem fora do projeto</td>
+                                <td>Gere UV com unwrap e aponte a textura para um arquivo do projeto.</td>
+                              </tr>
+                              <tr>
+                                <td>Gravação recusada</td>
+                                <td>Caminho inválido ou sem extensão <code>.glb</code>
+                                </td>
+                                <td>Use caminho relativo simples, sem <code>..</code> e terminando em <code>.glb</code>.</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </section>
+                      </article>
+                      <footer class="docs-pager">
+                      </footer>
+                      <p class="docs-page-footer">
+                        Bug no modelador? Diga qual operação estava ativa e se a malha veio de importação.
+                      </p>
+                    </main>
+                    <aside class="docs-outline" aria-label="Nesta página">
+                    </aside>
+                  </div>
+                  <script src="./assets/docs-catalog.js"></script>
+                  <script src="./assets/docs-current-category.js"></script>
+                  <script src="./assets/docs-sidebar.js"></script>
+                  <script src="./assets/docs-filter.js"></script>
+                  <script src="./assets/docs-outline.js"></script>
+                  <script src="./assets/docs-pager.js"></script>
+                  <script src="./assets/docs-boot.js"></script>
+                  <script src="../assets/js/i18n/phrase-registration.js"></script>
+                  <script src="./assets/docs-phrases.js"></script>
+                  <script src="./assets/docs-error-silencer.js"></script>
+                  <script src="../assets/js/i18n/idiomas.js"></script>
+                </body>
+              </html>

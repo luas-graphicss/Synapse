@@ -1,0 +1,248 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Área de trabalho | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Barra superior, explorador, abas, painéis e layouts da Synapse IDE."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="interface">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Fundamentos / Área de trabalho</p>
+              <h1 class="docs-title">Área de trabalho</h1>
+              <p class="docs-lede">
+                A janela da IDE tem quatro regiões fixas: barra superior, explorador à esquerda, área
+                de edição no centro com o preview ao lado e a faixa de painéis embaixo. Tudo o mais é
+                variação dessas quatro.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 9 min</span>
+                <span>público: todos</span>
+              </div>
+              <section>
+                <h2>Barra superior</h2>
+                <p>
+                  A barra reúne as ações que afetam o projeto inteiro. Da esquerda para a direita você
+                  encontra identidade do projeto, ações de arquivo e, no canto, os controles de
+                  ambiente.
+                </p>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Controle</th>
+                      <th>Função</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Ajuda</td>
+                      <td>
+                        Abre esta documentação ou o formulário de relato de bug. Fica à esquerda de
+                        Importar.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Importar</td>
+                      <td>Traz zip, pasta ou arquivos soltos para dentro do projeto.</td>
+                    </tr>
+                    <tr>
+                      <td>Exportar</td>
+                      <td>Gera o zip do projeto atual para download.</td>
+                    </tr>
+                    <tr>
+                      <td>Paleta de comandos</td>
+                      <td>Lista tudo que a IDE sabe fazer, com busca por nome.</td>
+                    </tr>
+                    <tr>
+                      <td>Tema</td>
+                      <td>Troca a paleta da interface sem recarregar a página.</td>
+                    </tr>
+                    <tr>
+                      <td>Configurações</td>
+                      <td>Aparência, editor, atalhos e integrações.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  Em telas estreitas os rótulos desaparecem e sobram apenas os ícones, para a barra não
+                  quebrar em duas linhas.
+                </p>
+              </section>
+              <section>
+                <h2>Explorador de arquivos</h2>
+                <p>
+                  O explorador mostra a árvore do projeto com pastas colapsáveis. Ele guarda quais
+                  pastas estavam abertas, então ao voltar depois você reencontra o mesmo estado.
+                </p>
+                <ul>
+                  <li>Clique simples abre o arquivo na aba ativa.</li>
+                  <li>
+                    Clique com o botão direito abre o menu de contexto com renomear, duplicar, excluir e
+                    copiar caminho.
+                  </li>
+                  <li>Arrastar move o arquivo entre pastas.</li>
+                  <li>
+                    <span class="docs-keys">Mod+B</span> esconde e mostra o painel para ganhar largura.
+                    </li>
+                  </ul>
+                  <div class="docs-note">
+                    <span class="docs-note-label">Em desenvolvimento</span>
+                    <p>
+                      A próxima versão troca a árvore atual por uma árvore virtualizada, que renderiza
+                      apenas as linhas visíveis. Isso muda o comportamento em projetos com milhares de
+                      arquivos. Detalhes em <a href="./atualizacoes.html">Atualizações</a>.
+                    </p>
+                  </div>
+                </section>
+                <section>
+                  <h2>Abas de arquivo</h2>
+                  <p>
+                    Cada arquivo aberto vira uma aba. A aba mostra o nome, o ícone da linguagem e um ponto
+                    quando existe gravação pendente.
+                  </p>
+                  <table class="docs-table">
+                    <thead>
+                      <tr>
+                        <th>Ação</th>
+                        <th>Atalho</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Próximo arquivo</td>
+                        <td>
+                          <span class="docs-keys">Alt+Seta direita</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Arquivo anterior</td>
+                        <td>
+                          <span class="docs-keys">Alt+Seta esquerda</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Fechar arquivo</td>
+                        <td>
+                          <span class="docs-keys">Alt+W</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Abertura rápida por nome</td>
+                        <td>
+                          <span class="docs-keys">Mod+P</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </section>
+                <section>
+                  <h2>Painéis inferiores</h2>
+                  <p>
+                    A faixa de baixo concentra as saídas. Todos os painéis compartilham a mesma altura e
+                    você alterna entre eles pelas abas ou pelos atalhos.
+                  </p>
+                  <dl class="docs-definition">
+                    <dt>Console</dt>
+                    <dd>
+                      Mensagens do preview, incluindo erros de script e avisos.
+                      <span class="docs-keys">Mod+`</span>
+                    </dd>
+                    <dt>Terminal</dt>
+                    <dd>
+                      Comandos reais executados pelo relay.
+                      <span class="docs-keys">Mod+Alt+T</span>
+                    </dd>
+                    <dt>Build</dt>
+                    <dd>
+                      Log da compilação e lista de diagnósticos.
+                      <span class="docs-keys">Mod+Alt+B</span>
+                    </dd>
+                    <dt>Depurador</dt>
+                    <dd>
+                      Inspeção do estado do preview e pontos de parada.
+                      <span class="docs-keys">Mod+Shift+D</span>
+                    </dd>
+                  </dl>
+                </section>
+                <section>
+                  <h2>Layouts</h2>
+                  <p>
+                    Três arranjos cobrem quase todo uso. Eles apenas mudam proporção, não fecham nada que
+                    você abriu.
+                  </p>
+                  <ul>
+                    <li>
+                      <span class="docs-keys">Mod+1</span> foco no código.</li>
+                        <li>
+                          <span class="docs-keys">Mod+2</span> código e preview divididos.</li>
+                            <li>
+                              <span class="docs-keys">Mod+3</span> foco no preview.</li>
+                              </ul>
+                              <p>
+                                As divisórias também podem ser arrastadas. A proporção escolhida fica salva junto com
+                                as preferências.
+                              </p>
+                            </section>
+                            <section>
+                              <h2>Paleta de comandos</h2>
+                              <p>
+                                <span class="docs-keys">Mod+K</span> abre a paleta. Ela busca por comando e também por
+                                  arquivo, e mostra o atalho de cada ação ao lado do nome. Quando você não lembra onde
+                                  um recurso mora na interface, a paleta é o caminho mais curto.
+                                </p>
+                                <p>
+                                  O histórico de ações recentes fica em <span class="docs-keys">Mod+H</span>, útil para
+                                  entender o que mudou no projeto nos últimos minutos.
+                                </p>
+                              </section>
+                            </article>
+                            <footer class="docs-pager">
+                            </footer>
+                            <p class="docs-page-footer">
+                              Algum controle desta página está diferente na sua versão? Envie um relato pelo botão
+                              Ajuda.
+                            </p>
+                          </main>
+                          <aside class="docs-outline" aria-label="Nesta página">
+                          </aside>
+                        </div>
+                        <script src="./assets/docs-catalog.js"></script>
+                        <script src="./assets/docs-current-category.js"></script>
+                        <script src="./assets/docs-sidebar.js"></script>
+                        <script src="./assets/docs-filter.js"></script>
+                        <script src="./assets/docs-outline.js"></script>
+                        <script src="./assets/docs-pager.js"></script>
+                        <script src="./assets/docs-boot.js"></script>
+                        <script src="../assets/js/i18n/phrase-registration.js"></script>
+                        <script src="./assets/docs-phrases.js"></script>
+                        <script src="./assets/docs-error-silencer.js"></script>
+                        <script src="../assets/js/i18n/idiomas.js"></script>
+                      </body>
+                    </html>

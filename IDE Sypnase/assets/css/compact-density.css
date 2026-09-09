@@ -1,0 +1,58 @@
+body {
+  font-size: 12px;
+}
+.icon {
+  width: 15px;
+  height: 15px;
+}
+.topbar {
+  height: 40px;
+  gap: 8px;
+  padding: 0 10px;
+}
+.brand .logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+.tbtn {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+.ex-head .tbtn {
+  width: 22px;
+  height: 22px;
+}
+.seg {
+  padding: 2px;
+  border-radius: 8px;
+}
+.seg button {
+  height: 23px;
+  padding: 0 8px;
+}
+.explorer {
+  width: 220px;
+}
+.ex-head {
+  padding: 8px 10px 6px;
+}
+.editor-head {
+  height: 30px;
+  padding: 0 10px;
+}
+.editor-tabs {
+  height: 30px;
+  min-height: 30px;
+}
+.etab {
+  height: 23px;
+}
+.console-head {
+  height: 30px;
+}
+.statusbar {
+  height: 22px;
+  padding: 0 10px;
+}

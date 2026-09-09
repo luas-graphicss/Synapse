@@ -1,0 +1,40 @@
+# ============================================================
+# SYNAPSE — Worker do relay MCP (NÓ DE RESERVA)
+# Pode ser conta free ou paga — o failover funciona igual.
+# Publicar (depois de logar na conta da reserva):
+#   npx wrangler logout
+#   npx wrangler login
+#   npx wrangler deploy -c wrangler-reserva.toml
+# A URL fica: https://aurora-relay.SEU-SUBDOMINIO-RESERVA.workers.dev
+#
+# Depois, registre essa URL no NÓ PRINCIPAL — de um destes dois jeitos:
+#   1) wrangler.toml do principal: RESERVAS = "https://..."; npx wrangler deploy
+#   2) Menu MCP do site → campo "Nós de reserva" (sem redeploy)
+# O conector do Notion NÃO muda: continua com a URL única do nó principal.
+# ============================================================
+name = "aurora-relay"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+[observability]
+enabled = false
+
+[[durable_objects.bindings]]
+name = "SESSOES"
+class_name = "RelaySessao"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RelaySessao"]
+
+[vars]
+# Plano da conta desta reserva: "free" ativa a proteção de limites (pacing e
+# 429 com Retry-After antes do bloqueio da plataforma); "paid" desliga o pacing.
+PLANO = "free"
+LIMITE_DIA = "300000"
+LIMITE_MIN = "6000"
+
+# Uma reserva também pode ter as próprias reservas (encadeamento):
+# RESERVAS = "https://aurora-relay.reserva-2.workers.dev"
+RESERVAS = ""

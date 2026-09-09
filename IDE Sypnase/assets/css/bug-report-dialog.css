@@ -1,0 +1,212 @@
+.bug-report-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.58);
+}
+.bug-report-dialog {
+  width: min(660px, 100%);
+  border: 1px solid var(--line-2);
+  border-radius: 0;
+  background: var(--bg-2);
+  box-shadow: var(--sh);
+}
+.bug-report-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--bg-3);
+}
+.bug-report-title {
+  margin: 0;
+  color: var(--txt);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.bug-report-subtitle {
+  margin: 5px 0 0;
+  max-width: 470px;
+  color: var(--txt-3);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.bug-report-close {
+  height: 26px;
+  min-width: 26px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--txt-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--t);
+}
+.bug-report-close:hover {
+  border-color: var(--err);
+  color: var(--err);
+}
+.bug-report-body {
+  padding: 16px;
+}
+.bug-report-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+}
+.bug-report-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.bug-report-row-wide {
+  grid-column: 1 / -1;
+}
+.bug-report-label {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  color: var(--txt-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bug-report-required {
+  color: var(--acc);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+}
+.bug-report-control {
+  width: 100%;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--sans);
+  font-size: 12.5px;
+  line-height: 1.5;
+  transition: var(--t);
+}
+textarea.bug-report-control {
+  font-family: var(--mono);
+  font-size: 12px;
+  resize: vertical;
+}
+.bug-report-control:focus {
+  outline: none;
+  border-color: var(--acc);
+}
+.bug-report-control-missing {
+  border-color: var(--err);
+}
+.bug-report-environment {
+  margin-top: 16px;
+  border-top: 1px solid var(--line-2);
+  padding-top: 12px;
+}
+.bug-report-environment-heading {
+  margin: 0 0 8px;
+  color: var(--txt-3);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.bug-report-environment-list {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.bug-report-environment-term {
+  padding: 4px 0;
+  border-top: 1px solid var(--line);
+  color: var(--txt-3);
+}
+.bug-report-environment-value {
+  margin: 0;
+  padding: 4px 0;
+  border-top: 1px solid var(--line);
+  color: var(--txt-2);
+  overflow-wrap: anywhere;
+}
+.bug-report-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line-2);
+  background: var(--bg-3);
+}
+.bug-report-status {
+  color: var(--txt-3);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+.bug-report-status.working {
+  color: var(--txt-2);
+}
+.bug-report-status.ok {
+  color: var(--ok);
+}
+.bug-report-status.error {
+  color: var(--err);
+}
+.bug-report-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+.bug-report-action {
+  height: 30px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--bg-2);
+  color: var(--txt-2);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--t);
+}
+.bug-report-action:hover {
+  border-color: var(--line-2);
+  color: var(--txt);
+}
+.bug-report-action-primary {
+  border-color: var(--acc);
+  color: var(--txt);
+}
+.bug-report-action-primary:hover {
+  background: rgba(var(--acc-rgb), 0.16);
+}
+.bug-report-action:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+@media (max-width: 720px) {
+  .bug-report-overlay {
+    padding: 16px 10px;
+  }
+  .bug-report-form {
+    grid-template-columns: 1fr;
+  }
+  .bug-report-environment-list {
+    grid-template-columns: 110px 1fr;
+  }
+}

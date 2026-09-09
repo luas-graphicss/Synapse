@@ -1,0 +1,52 @@
+# ============================================================
+# SYNAPSE v9.7 — PORTAO da URL unica (conta SEPARADA e gratis)
+# Publicar:  npx wrangler deploy -c wrangler-portao.toml
+# ============================================================
+# O portao e o novo endereco fixo do conector MCP do Notion. Ele
+# desvia cada chamada para o primeiro no VIVO de NODOS — inclusive
+# quando o no principal esta bloqueado NA BORDA (erro 1027), caso
+# em que o encaminhador interno dos nos nem chega a rodar.
+#
+# PASSO A PASSO (5 min, custo R$ 0):
+# 1) Crie uma conta Cloudflare NOVA, exclusiva do portao (o ponto e
+#    separar o dominio de falha: a conta do portao nao roda mais nada).
+# 2) npx wrangler logout
+#    npx wrangler login            (entre com a conta do portao)
+#    npx wrangler deploy -c wrangler-portao.toml
+# 3) Preencha NODOS abaixo (principal primeiro, depois reservas) e
+#    rode o deploy DE NOVO.
+# 4) No site (menu MCP), cole a URL do portao no campo "Portao" — a
+#    URL do conector exibida passa a ser a do portao; atualize o
+#    conector do Notion UMA unica vez.
+# 5) Teste no navegador: https://SEU-PORTAO.workers.dev/nodos
+#
+# CUSTO: free tier = 100k requests/dia por conta. Os saltos
+# portao->no sao subrequests e NAO contam. Sem Durable Object, sem
+# KV, sem dominio pago — nada aqui gera cobranca.
+#
+# NUNCA coloque a URL de um portao dentro de NODOS (anti-laco: o
+# portao rejeita saltos de outro portao com erro 508).
+
+name = "aurora-portao"
+main = "portao.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# Workers Logs desligado de proposito: os eventos de observabilidade
+# estouram o limite diario de logs em contas de alto volume.
+[observability]
+enabled = false
+
+[vars]
+# TODOS os nos, em ordem de prioridade (o principal PRIMEIRO).
+# Ex.: NODOS = "https://aurora-relay.SEU-SUBDOMINIO.workers.dev, https://aurora-relay.mcp-reserva.workers.dev"
+# Preencha com os seus nos (principal primeiro, depois reservas):
+# NODOS = "https://aurora-relay.SEU-SUBDOMINIO.workers.dev, https://aurora-relay.mcp-reserva.workers.dev, https://aurora-relay.palelovoy40.workers.dev"
+NODOS = "https://aurora-relay.pedrinnieeva.workers.dev, https://aurora-relay.mcp-reserva.workers.dev, https://aurora-relay.palelovoy40.workers.dev"
+
+# Ajustes finos (opcionais — os padroes ja servem):
+# PORTAO_QUARENTENA_MS  = "20000"   # tempo que um no que falhou fica fora da fila
+# PORTAO_TIMEOUT_MS     = "95000"   # teto de espera de chamadas com corpo (POST)
+# PORTAO_SONDA_MS       = "4000"    # timeout da sonda /salud
+# PORTAO_NODOS_CACHE_MS = "8000"    # cache do /nodos (economiza sondas)
+# PORTAO_MODO            = "prioridade" # desativa round-robin (padrao: balanceado)

@@ -1,0 +1,189 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Assistente de IA | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Sugestões de código em linha, chat do projeto, o que sai do navegador e como desligar tudo."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="ia">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Ferramentas / Assistente de IA</p>
+              <h1 class="docs-title">Assistente de IA</h1>
+              <p class="docs-lede">
+                A IDE tem duas ajudas de modelo: sugestão de código dentro do editor e um chat que
+                enxerga o projeto aberto. As duas são opcionais, desligáveis e passam por um proxy do
+                próprio site.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 8 min</span>
+                <span>público: todos</span>
+              </div>
+              <section>
+                <h2>Sugestão em linha</h2>
+                <p>
+                  Enquanto você digita, o editor junta duas fontes de sugestão. A primeira é local:
+                  palavras do arquivo, vocabulário da linguagem e símbolos do projeto. A segunda é do
+                  modelo, e entra apenas quando a sugestão local não resolve.
+                </p>
+                <ul>
+                  <li>A lista aparece sozinha durante a digitação.</li>
+                  <li>
+                    <span class="docs-keys">Mod + Space</span> pede sugestão na hora.</li>
+                      <li>
+                        <span class="docs-keys">Tab</span> aceita, <span class="docs-keys">Esc</span>
+                        descarta.
+                      </li>
+                      <li>Setas percorrem os itens sem sair da linha.</li>
+                    </ul>
+                    <p>
+                      A parte de modelo está marcada como beta na interface. Ela erra mais em arquivo grande
+                      e em código muito específico do seu projeto, porque recebe só um recorte do arquivo
+                      atual para caber no limite de contexto.
+                    </p>
+                  </section>
+                  <section>
+                    <h2>Chat do projeto</h2>
+                    <p>
+                      <span class="docs-keys">Mod + Alt + I</span> abre o painel de chat. Ele serve para
+                        perguntar sobre o código aberto, pedir explicação de erro do console e rascunhar
+                        mudança antes de escrever.
+                      </p>
+                      <p>
+                        O chat não grava arquivo por conta própria. Ele devolve texto e trecho de código, e a
+                        aplicação continua sendo sua. Automação que escreve no projeto vem pelo caminho dos
+                        agentes, descrito em <strong>MCP e agentes</strong>.
+                      </p>
+                    </section>
+                    <section>
+                      <h2>O que sai do seu navegador</h2>
+                      <dl class="docs-definition">
+                        <dt>sugestão em linha</dt>
+                        <dd>Trecho do arquivo ao redor do cursor, linguagem detectada e nome do arquivo.</dd>
+                        <dt>chat</dt>
+                        <dd>Sua mensagem, o histórico da conversa e o contexto que você anexar.</dd>
+                        <dt>nunca enviado</dt>
+                        <dd>O projeto inteiro, arquivos binários e conteúdo de aba que você não abriu.</dd>
+                      </dl>
+                      <p>
+                        A chamada sai do navegador para um endpoint do próprio site, que repassa ao provedor de
+                        modelo. A chave de acesso fica no servidor, nunca no cliente, e o endpoint aplica
+                        limite de requisição por origem.
+                      </p>
+                      <div class="docs-note docs-note-alert">
+                        <span class="docs-note-label">Código sensível</span>
+                        <p>
+                          Se o projeto tem segredo em arquivo de código, desligue a sugestão por modelo antes de
+                          abrir esse arquivo. Sugestão local continua funcionando normalmente.
+                        </p>
+                      </div>
+                    </section>
+                    <section>
+                      <h2>Ligar e desligar</h2>
+                      <ol class="docs-steps">
+                        <li>No cabeçalho do editor, use o interruptor de sugestão por modelo.</li>
+                        <li>
+                          Em <span class="docs-keys">Mod + ,</span>, desligue o autocomplete inteiro se quiser
+                          silêncio total.
+                        </li>
+                        <li>O painel de chat fecha com o mesmo atalho que abre.</li>
+                      </ol>
+                      <p>
+                        A escolha fica gravada nas configurações do navegador e vale para os próximos projetos
+                        abertos na mesma origem.
+                      </p>
+                    </section>
+                    <section>
+                      <h2>Limites e mensagens de erro</h2>
+                      <table class="docs-table">
+                        <thead>
+                          <tr>
+                            <th>Mensagem</th>
+                            <th>Significado</th>
+                            <th>O que fazer</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Serviço não configurado</td>
+                            <td>O ambiente está sem chave de provedor</td>
+                            <td>Uso local sem chave: siga com sugestão local.</td>
+                          </tr>
+                          <tr>
+                            <td>Limite atingido</td>
+                            <td>Muitas chamadas em pouco tempo pela mesma origem</td>
+                            <td>Espere alguns minutos. O editor volta a pedir sozinho.</td>
+                          </tr>
+                          <tr>
+                            <td>Tempo esgotado</td>
+                            <td>O provedor demorou mais que o limite da requisição</td>
+                            <td>Repita o pedido. Se repetir sempre, relate com o horário.</td>
+                          </tr>
+                          <tr>
+                            <td>Origem não permitida</td>
+                            <td>A página está servida de um endereço fora da lista aceita</td>
+                            <td>Abra a IDE pelo endereço oficial ou pelo relay local.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </section>
+                    <section>
+                      <h2>Como tirar proveito de verdade</h2>
+                      <ul>
+                        <li>Peça revisão de trecho curto. Pedido grande volta genérico.</li>
+                        <li>Cole a mensagem de erro exata do console em vez de descrever o erro.</li>
+                        <li>Depois de aceitar sugestão, rode o preview. O modelo não executa nada.</li>
+                        <li>Para tarefa repetitiva em muitos arquivos, agente por MCP é melhor que chat.</li>
+                      </ul>
+                    </section>
+                  </article>
+                  <footer class="docs-pager">
+                  </footer>
+                  <p class="docs-page-footer">
+                    Sugestão atrapalhando a digitação? Relate dizendo a linguagem do arquivo e o tamanho
+                    dele.
+                  </p>
+                </main>
+                <aside class="docs-outline" aria-label="Nesta página">
+                </aside>
+              </div>
+              <script src="./assets/docs-catalog.js"></script>
+              <script src="./assets/docs-current-category.js"></script>
+              <script src="./assets/docs-sidebar.js"></script>
+              <script src="./assets/docs-filter.js"></script>
+              <script src="./assets/docs-outline.js"></script>
+              <script src="./assets/docs-pager.js"></script>
+              <script src="./assets/docs-boot.js"></script>
+              <script src="../assets/js/i18n/phrase-registration.js"></script>
+              <script src="./assets/docs-phrases.js"></script>
+              <script src="./assets/docs-error-silencer.js"></script>
+              <script src="../assets/js/i18n/idiomas.js"></script>
+            </body>
+          </html>

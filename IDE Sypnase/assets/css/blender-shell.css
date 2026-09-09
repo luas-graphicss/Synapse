@@ -1,0 +1,394 @@
+.mod3d-corpo .mod3d-topo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  min-height: 26px;
+  padding: 0 6px;
+  background: var(--bl-window);
+  border-bottom: 1px solid var(--bl-line);
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.mod3d-corpo .mod3d-topo::-webkit-scrollbar {
+  height: 0;
+}
+.mod3d-corpo .mod3d-topo > * {
+  flex: 0 0 auto;
+}
+.mod3d-corpo .mod3d-marca {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.mod3d-corpo .mod3d-marca .blender-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--bl-text-dim);
+}
+.mod3d-corpo .mod3d-marca-nome {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--bl-text);
+  white-space: nowrap;
+}
+.mod3d-corpo .blender-topbar-right {
+  margin-left: auto;
+  gap: 6px;
+  min-width: 0;
+  padding-left: 12px;
+}
+.blender-datablock {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  padding: 0 3px 0 5px;
+  background: var(--bl-field);
+  border-radius: var(--bl-radius);
+  min-width: 0;
+}
+.blender-datablock .blender-icon {
+  width: 12px;
+  height: 12px;
+  color: #d6d6d6;
+}
+.mod3d-corpo .blender-datablock .mod3d-seletor {
+  height: 18px;
+  min-height: 18px;
+  max-width: 220px;
+  padding: 0 15px 0 1px;
+  background-color: transparent;
+  color: #ffffff;
+}
+.mod3d-corpo .blender-datablock .mod3d-seletor:hover:not(:disabled),.mod3d-corpo .blender-datablock .mod3d-seletor:disabled {
+  background-color: transparent;
+}
+.mod3d-corpo .blender-datablock .mod3d-seletor:disabled {
+  color: var(--bl-text-faint);
+  cursor: default;
+}
+.mod3d-corpo .blender-datablock:has(.mod3d-seletor:hover:not(:disabled)) {
+  background: var(--bl-field-hover);
+}
+.blender-field-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 3px 0 6px;
+  background: var(--bl-field);
+  border-radius: var(--bl-radius);
+  min-width: 0;
+}
+.blender-field-with-icon .blender-icon {
+  width: 12px;
+  height: 12px;
+  color: #d6d6d6;
+}
+.mod3d-corpo .blender-field-with-icon .mod3d-viewseletor,.mod3d-corpo .blender-field-with-icon .mod3d-seletor {
+  height: 20px;
+  min-height: 20px;
+  padding: 0 15px 0 1px;
+  background-color: transparent;
+}
+.mod3d-corpo .blender-field-with-icon .mod3d-viewseletor:hover:not(:disabled),.mod3d-corpo .blender-field-with-icon .mod3d-seletor:hover:not(:disabled),.mod3d-corpo .blender-field-with-icon .mod3d-viewseletor:disabled,.mod3d-corpo .blender-field-with-icon .mod3d-seletor:disabled {
+  background-color: transparent;
+}
+.mod3d-corpo .blender-field-with-icon .mod3d-viewseletor:disabled,.mod3d-corpo .blender-field-with-icon .mod3d-seletor:disabled {
+  color: var(--bl-text-faint);
+  cursor: default;
+}
+.mod3d-corpo .blender-field-with-icon:has(select:hover:not(:disabled)) {
+  background: var(--bl-field-hover);
+}
+.mod3d-corpo .mod3d-ligacao {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--bl-text-faint);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.mod3d-corpo .mod3d-ponto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6a6a6a;
+  box-shadow: none;
+}
+.mod3d-corpo .mod3d-ponto.on {
+  background: var(--bl-ok);
+}
+.mod3d-corpo .blender-topbar-menu-button {
+  height: 18px;
+  min-height: 18px;
+  padding: 0 7px;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bl-text-dim);
+  font-weight: 500;
+}
+.mod3d-corpo .blender-topbar-menu-button:hover:not(:disabled) {
+  background: #353535;
+  color: var(--bl-text);
+}
+.mod3d-corpo .mod3d-barra {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  background: var(--bl-header);
+  border-bottom: 1px solid var(--bl-line);
+}
+.mod3d-corpo .mod3d-rotulo {
+  color: var(--bl-text-dim);
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-workspace {
+  --blender-side-width: 318px;
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2px var(--blender-side-width);
+  gap: 0;
+  min-height: 0;
+  padding: 2px;
+  background: var(--bl-window);
+}
+.mod3d-corpo .mod3d-workspace > .mod3d-palco {
+  order: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--bl-header);
+  overflow: hidden;
+}
+.mod3d-corpo .mod3d-workspace > .mod3d-paineis {
+  order: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+.blender-area-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  min-height: 26px;
+  padding: 0 6px;
+  background: var(--bl-header);
+  border-bottom: 1px solid var(--bl-line);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.blender-area-header::-webkit-scrollbar {
+  height: 0;
+}
+.blender-header-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex: 0 0 auto;
+}
+.blender-header-separator {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 14px;
+  margin: 0;
+  background: transparent;
+}
+.blender-header-spacer {
+  flex: 1 1 auto;
+  min-width: 10px;
+}
+.blender-editor-name {
+  color: var(--bl-text-dim);
+  font-size: 10.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.blender-hidden-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.blender-mode-field {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 8px 0 7px;
+  background: var(--bl-field);
+  border-radius: var(--bl-radius);
+}
+.blender-mode-field .blender-icon {
+  width: 13px;
+  height: 13px;
+  color: #dcdcdc;
+}
+.mod3d-corpo .blender-mode-field .mod3d-botao {
+  height: 20px;
+  min-height: 20px;
+  padding: 0;
+  background: transparent;
+  color: var(--bl-text);
+  font-weight: 500;
+}
+.mod3d-corpo .blender-mode-field .mod3d-botao.on {
+  background: transparent;
+  color: var(--bl-select);
+}
+.mod3d-corpo .blender-mode-field .mod3d-botao:hover:not(:disabled),.mod3d-corpo .blender-mode-field .mod3d-botao:active:not(:disabled) {
+  background: transparent;
+  color: #ffffff;
+}
+.mod3d-corpo .blender-mode-field .mod3d-botao.on:hover:not(:disabled),.mod3d-corpo .blender-mode-field .mod3d-botao.on:active:not(:disabled) {
+  background: transparent;
+  color: var(--bl-select);
+}
+.mod3d-corpo .blender-mode-field .mod3d-botao:disabled {
+  background: transparent;
+  color: #666666;
+}
+.mod3d-corpo .blender-mode-field:has(.mod3d-botao:hover:not(:disabled)) {
+  background: var(--bl-field-hover);
+}
+.mod3d-corpo .blender-snap-toggle {
+  height: 20px;
+  width: 24px;
+  justify-content: center;
+  padding: 0;
+  border-radius: var(--bl-radius);
+  background: var(--bl-field);
+  color: var(--bl-text-dim);
+}
+.mod3d-corpo .blender-snap-toggle .blender-icon {
+  width: 13px;
+  height: 13px;
+}
+.mod3d-corpo .blender-snap-toggle input[type='checkbox'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.mod3d-corpo .blender-snap-toggle:hover {
+  background: var(--bl-field-hover);
+  color: #ffffff;
+}
+.mod3d-corpo .blender-snap-toggle:has(input:checked) {
+  background: var(--bl-accent);
+  color: #ffffff;
+}
+.mod3d-corpo .blender-orientation-button {
+  min-width: 62px;
+}
+.blender-popover-anchor {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.mod3d-corpo .blender-popover-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--bl-radius);
+  background: var(--bl-field);
+  color: var(--bl-text-dim);
+  cursor: pointer;
+}
+.mod3d-corpo .blender-popover-trigger .blender-icon {
+  width: 12px;
+  height: 12px;
+}
+.mod3d-corpo .blender-popover-trigger:hover {
+  background: var(--bl-field-hover);
+  color: #ffffff;
+}
+.blender-popover {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 168px;
+  padding: 4px;
+  background: var(--bl-region);
+  border: 1px solid var(--bl-line);
+  border-radius: 4px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+.mod3d-corpo .mod3d-estado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0 8px;
+  background: var(--bl-window);
+  border-top: 1px solid var(--bl-line);
+  color: var(--bl-text-faint);
+  font-size: 10.5px;
+}
+.blender-statusbar-left,.blender-statusbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.mod3d-corpo .mod3d-campo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mod3d-corpo .mod3d-campo-rotulo {
+  color: var(--bl-text-faint);
+}
+.mod3d-corpo .mod3d-campo-valor {
+  color: var(--bl-text-dim);
+  font-weight: 500;
+}
+.blender-statusbar-hint,.blender-statusbar-stats {
+  color: var(--bl-text-faint);
+  font-size: 10.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 1020px) {
+  .mod3d-corpo .mod3d-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

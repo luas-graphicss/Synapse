@@ -1,0 +1,194 @@
+.mod3d-corpo .mod3d-palco {
+  position: relative;
+}
+.mod3d-corpo .mod3d-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--bl-viewport);
+  overflow: hidden;
+}
+.mod3d-corpo .mod3d-tela {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bl-viewport);
+  touch-action: none;
+  outline: none;
+}
+.mod3d-corpo .mod3d-tela:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--bl-accent);
+}
+.blender-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 2px;
+  background: rgba(43, 43, 43, 0.68);
+  border-right: 1px solid rgba(0, 0, 0, 0.4);
+}
+.mod3d-corpo .blender-toolbar-button {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--bl-text-dim);
+}
+.mod3d-corpo .blender-toolbar-button .blender-icon {
+  width: 16px;
+  height: 16px;
+}
+.mod3d-corpo .blender-toolbar-button:hover:not(:disabled) {
+  background: #3d3d3d;
+  color: #ffffff;
+}
+.mod3d-corpo .blender-toolbar-button.on {
+  background: var(--bl-accent);
+  color: #ffffff;
+}
+.mod3d-corpo .blender-toolbar-button.on:hover:not(:disabled),.mod3d-corpo .blender-toolbar-button.on:active:not(:disabled) {
+  background: var(--bl-accent-hover);
+  color: #ffffff;
+}
+.mod3d-corpo .blender-toolbar-button:disabled {
+  background: transparent;
+  color: #666666;
+}
+.mod3d-corpo .mod3d-hud {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+}
+.mod3d-corpo .mod3d-hud-topo {
+  position: absolute;
+  top: 6px;
+  left: 40px;
+  right: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+}
+.mod3d-corpo .mod3d-hud-grupo {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+.mod3d-corpo .mod3d-hud-base {
+  position: absolute;
+  top: 8px;
+  left: 42px;
+  right: 108px;
+  bottom: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: none;
+}
+.mod3d-corpo .mod3d-hud-referencia {
+  position: absolute;
+  top: auto;
+  bottom: 24px;
+  left: 42px;
+  right: 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: none;
+}
+.mod3d-corpo .mod3d-medida {
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #d8d8d8;
+  font: 10.5px/1.4 var(--bl-sans);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mod3d-corpo .mod3d-viewaviso {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bl-warn);
+  font: 600 10.5px/1.4 var(--bl-sans);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+.mod3d-corpo .mod3d-contador {
+  position: absolute;
+  left: 42px;
+  bottom: 8px;
+  top: auto;
+  right: auto;
+  z-index: 4;
+  transform: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #9c9c9c;
+  font: 10px/1.3 var(--bl-sans);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+.mod3d-corpo .mod3d-viewfalha {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  z-index: 7;
+  transform: translate(-50%, -50%);
+  max-width: 320px;
+  padding: 10px 14px;
+  border: 1px solid var(--bl-line);
+  border-radius: 5px;
+  background: rgba(29, 29, 29, 0.94);
+  color: var(--bl-warn);
+  font: 600 11px/1.45 var(--bl-sans);
+  text-align: center;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.5);
+}
+.mod3d-corpo .mod3d-pincel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+}
+.mod3d-corpo .mod3d-pincel.on {
+  opacity: 1;
+}
+.mod3d-corpo .mod3d-pincel-retangulo,.mod3d-corpo .mod3d-pincel-laco {
+  fill: rgba(255, 255, 255, 0.07);
+  stroke: #ffffff;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}

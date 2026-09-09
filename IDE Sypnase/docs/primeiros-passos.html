@@ -1,0 +1,195 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Primeiros passos | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Como abrir a Synapse IDE, criar ou importar um projeto e chegar no primeiro preview."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="primeiros-passos">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Fundamentos / Primeiros passos</p>
+              <h1 class="docs-title">Primeiros passos</h1>
+              <p class="docs-lede">
+                Do primeiro carregamento até um projeto rodando no preview. Se você quer apenas testar
+                a IDE, os dois primeiros blocos bastam.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 8 min</span>
+                <span>público: iniciante</span>
+              </div>
+              <section>
+                <h2>Antes de começar</h2>
+                <p>
+                  A IDE roda em navegadores baseados em Chromium e no Firefox recente. Ela depende de
+                  armazenamento local do site, de módulos ES e de Web Workers.
+                </p>
+                <ul>
+                  <li>Evite janela anônima: o navegador descarta o projeto ao fechar a aba.</li>
+                  <li>
+                    Se você usa bloqueadores agressivos, libere a origem da IDE. Alguns bloqueiam o
+                    iframe do preview.
+                  </li>
+                  <li>
+                    Para terminal, instalação de pacotes e dev server, deixe o relay rodando na sua
+                    máquina. Detalhes em <strong>Terminal e relay</strong>.
+                  </li>
+                </ul>
+              </section>
+              <section>
+                <h2>Criar um projeto do zero</h2>
+                <ol class="docs-steps">
+                  <li>
+                    Abra a IDE. Na primeira visita aparece a tela de boas-vindas com as ações
+                    principais.
+                  </li>
+                  <li>Escolha começar um projeto vazio. A IDE cria a estrutura mínima de arquivos.</li>
+                  <li>
+                    No explorador, use o botão de adicionar para criar <code>index.html</code>,
+                    <code>styles.css</code> e <code>app.js</code>.
+                    </li>
+                    <li>
+                      Escreva algo no HTML e observe o preview. Ele reage a cada gravação, sem precisar
+                      apertar nada.
+                    </li>
+                  </ol>
+                  <p>
+                    Se o preview não reagir, force a atualização com
+                    <span class="docs-keys">Mod+S</span> e abra o console com
+                      <span class="docs-keys">Mod+`</span>.
+                      </p>
+                    </section>
+                    <section>
+                      <h2>Importar um projeto existente</h2>
+                      <p>O botão Importar aceita três caminhos:</p>
+                      <table class="docs-table">
+                        <thead>
+                          <tr>
+                            <th>Origem</th>
+                            <th>Quando usar</th>
+                            <th>Observação</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Arquivo .zip</td>
+                            <td>Projeto vindo de outro computador ou de um download.</td>
+                            <td>A IDE ignora pastas de dependência e artefatos de build.</td>
+                          </tr>
+                          <tr>
+                            <td>Pasta local</td>
+                            <td>Você quer trabalhar em algo que já está no disco.</td>
+                            <td>Depende de permissão do navegador para ler diretório.</td>
+                          </tr>
+                          <tr>
+                            <td>Arrastar e soltar</td>
+                            <td>Poucos arquivos soltos ou um zip único.</td>
+                            <td>Solte na área do editor, o overlay de importação aparece.</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div class="docs-note docs-note-alert">
+                        <span class="docs-note-label">Cuidado</span>
+                        <p>
+                          Importar substitui o conteúdo do projeto atual. Se houver trabalho não exportado,
+                          tire um snapshot antes. Veja <strong>Arquivos e persistência</strong>.
+                        </p>
+                      </div>
+                    </section>
+                    <section>
+                      <h2>Entendendo o primeiro preview</h2>
+                      <p>
+                        O preview procura um ponto de entrada HTML na raiz do projeto. Se existir mais de um,
+                        ele prioriza <code>index.html</code>. Os caminhos dentro do HTML são resolvidos contra
+                        a raiz, então prefira caminhos relativos simples.
+                      </p>
+                      <pre><code>index.html
+styles.css
+app.js
+assets/logo.png</code></pre>
+                      <p>
+                        Para projetos com build real, como Vite ou React, o caminho é outro: instale as
+                        dependências pelo terminal e suba o dev server. O preview passa a mostrar o servidor
+                        de verdade, com recarga automática.
+                      </p>
+                    </section>
+                    <section>
+                      <h2>Guardar o trabalho</h2>
+                      <p>
+                        Não existe botão de salvar manual para cada arquivo. A gravação acontece quando você
+                        para de digitar e também ao trocar de arquivo. O que você deve fazer de tempo em tempo
+                        é exportar.
+                      </p>
+                      <ul>
+                        <li>Exportar zip: cópia completa do projeto para guardar fora do navegador.</li>
+                        <li>Snapshot: ponto de restauração dentro da própria IDE, bom antes de refatorar.</li>
+                        <li>Histórico por arquivo: volta uma gravação específica sem mexer no resto.</li>
+                      </ul>
+                    </section>
+                    <section>
+                      <h2>Próximos passos sugeridos</h2>
+                      <ul>
+                        <li>
+                          Aprenda a janela por partes em
+                          <a href="./interface.html">Área de trabalho</a>.
+                          </li>
+                          <li>
+                            Deixe o editor do seu jeito em
+                            <a href="./configuracoes.html">Configurações e atalhos</a>.
+                            </li>
+                            <li>
+                              Se algo travou logo no começo, vá direto para
+                              <a href="./problemas.html">Solução de problemas</a>.
+                              </li>
+                            </ul>
+                          </section>
+                        </article>
+                        <footer class="docs-pager">
+                        </footer>
+                        <p class="docs-page-footer">
+                          Encontrou um passo que não funciona como descrito? Reporte pelo botão Ajuda na IDE.
+                        </p>
+                      </main>
+                      <aside class="docs-outline" aria-label="Nesta página">
+                      </aside>
+                    </div>
+                    <script src="./assets/docs-catalog.js"></script>
+                    <script src="./assets/docs-current-category.js"></script>
+                    <script src="./assets/docs-sidebar.js"></script>
+                    <script src="./assets/docs-filter.js"></script>
+                    <script src="./assets/docs-outline.js"></script>
+                    <script src="./assets/docs-pager.js"></script>
+                    <script src="./assets/docs-boot.js"></script>
+                    <script src="../assets/js/i18n/phrase-registration.js"></script>
+                    <script src="./assets/docs-phrases.js"></script>
+                    <script src="./assets/docs-error-silencer.js"></script>
+                    <script src="../assets/js/i18n/idiomas.js"></script>
+                  </body>
+                </html>

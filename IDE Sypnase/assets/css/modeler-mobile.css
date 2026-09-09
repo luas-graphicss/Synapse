@@ -1,0 +1,33 @@
+.mod3d-gaveta-botao {
+  white-space: nowrap;
+}
+body:not(.mod3d-movel) .mod3d-gaveta-botao {
+  display: none;
+}
+body.mod3d-movel .mod3d-paineis {
+  display: none;
+}
+body.mod3d-movel.mod3d-gaveta-aberta .mod3d-paineis {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+  display: flex;
+  max-height: 72vh;
+  overflow: auto;
+  padding: 12px;
+  border-top: 1px solid var(--mod3d-line);
+  border-radius: 14px 14px 0 0;
+  background: var(--mod3d-bg-1);
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.45);
+}
+body.mod3d-movel .mod3d-botao,body.mod3d-movel .mod3d-seletor,body.mod3d-movel .mod3d-viewbotao,body.mod3d-movel .mod3d-viewseletor {
+  min-height: 40px;
+}
+body.mod3d-movel .mod3d-viewport {
+  min-height: 320px;
+  touch-action: none;
+}
+body.mod3d-movel .mod3d-estado {
+  gap: 4px 12px;
+  font-size: 11px;
+}

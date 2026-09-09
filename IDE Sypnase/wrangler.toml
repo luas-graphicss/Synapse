@@ -1,0 +1,63 @@
+# ============================================================
+# SYNAPSE — Worker do relay MCP (NÓ PRINCIPAL)
+# Publicar:  npx wrangler deploy
+# (mantenha o nome "aurora-relay" para a sua URL atual continuar valendo)
+# ============================================================
+name = "aurora-relay"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# Workers Logs desligado de propósito: os "observability events" estouram o
+# limite diário de logs em contas de alto volume e não ajudam no relay.
+[observability]
+enabled = false
+
+# Durable Object da sessão (1 por sid/token): guarda catálogo + contadores
+[[durable_objects.bindings]]
+name = "SESSOES"
+class_name = "RelaySessao"
+
+# Em contas free os Durable Objects precisam ser SQLite-backed
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RelaySessao"]
+
+[[migrations]]
+tag = "v2"
+
+[[migrations]]
+tag = "v3"
+deleted_classes = ["AuroraSession"]
+
+[vars]
+PLANO = "free"
+LIMITE_DIA = "300000"
+LIMITE_MIN = "6000"
+
+# ============================================================
+# FAILOVER AUTOMÁTICO EM URL ÚNICA (v9.4)
+# ============================================================
+# Liste aqui os NÓS DE RESERVA (o MESMO worker.js publicado em outras contas),
+# separados por vírgula, em ordem de prioridade. Quando este nó atingir o
+# limite de capacidade, cada chamada é encaminhada internamente ao próximo nó
+# saudável — o conector do Notion continua com UMA única URL (a deste nó).
+#
+# PARA ADICIONAR UMA RESERVA DEPOIS DO DEPLOY: preencha a URL abaixo e rode
+#   npx wrangler deploy
+# de novo. Só isso — reserva adicionada. (Alternativa sem redeploy: campo
+# "Nós de reserva" no menu MCP do site.)
+#
+# Ex.: RESERVAS = "https://aurora-relay.reserva-1.workers.dev, https://aurora-relay.reserva-2.workers.dev"
+RESERVAS = "https://aurora-relay.mcp-reserva.workers.dev, https://aurora-relay.palelovoy40.workers.dev"
+
+# v9.5 — IMPORTANTE: o encaminhamento acima roda DENTRO deste worker; ele
+# cobre limite de capacidade, mas NAO cobre bloqueio total na borda (erro
+# 1027), quando este codigo nem chega a executar. Para a URL unica sobreviver
+# tambem a isso, publique o PORTAO numa conta separada e gratis:
+#   npx wrangler deploy -c wrangler-portao.toml   (veja portao.js e o LEIA-ME)
+
+# (Opcional/legado) Texto extra de instruções entregue aos agentes no
+# initialize. Com RESERVAS preenchido, o aviso de alta disponibilidade
+# já é adicionado automaticamente — deixe vazio.
+RESERVA_HINT = ""

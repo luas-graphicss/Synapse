@@ -1,0 +1,120 @@
+.blender-outliner {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 var(--blender-outliner-height, 34%);
+  min-height: 96px;
+  border-radius: 3px;
+  background: var(--bl-region);
+  overflow: hidden;
+}
+.blender-outliner-header .blender-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--bl-text-dim);
+}
+.blender-outliner-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 2px 0;
+  background: var(--bl-list);
+  overflow: auto;
+}
+.mod3d-corpo .mod3d-arvore {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+.mod3d-corpo .mod3d-arvore-vazia {
+  padding: 8px 10px;
+  color: var(--bl-text-faint);
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-no {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0 8px 0 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--bl-text-dim);
+  font-size: 11px;
+  text-align: left;
+  cursor: default;
+}
+.mod3d-corpo .mod3d-no:hover {
+  background: #333333;
+  color: var(--bl-text);
+}
+.mod3d-corpo .mod3d-no.on {
+  background: var(--bl-accent-soft);
+  color: #ffffff;
+}
+.mod3d-corpo .mod3d-no-nome {
+  order: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: inherit;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mod3d-corpo .mod3d-no.on .mod3d-no-nome {
+  color: #ffffff;
+  font-weight: 500;
+}
+.mod3d-corpo .mod3d-no-tipo {
+  order: 2;
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--bl-text-faint);
+  font: 10px/1 var(--bl-sans);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.mod3d-corpo .mod3d-no-sinal {
+  order: 3;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: #8c8c8c;
+  font: 10px/1 var(--bl-sans);
+  cursor: pointer;
+  opacity: 0.5;
+}
+.mod3d-corpo .mod3d-no:hover .mod3d-no-sinal,.mod3d-corpo .mod3d-no.on .mod3d-no-sinal,.mod3d-corpo .mod3d-no-sinal.on {
+  opacity: 1;
+}
+.mod3d-corpo .mod3d-no-sinal:hover {
+  background: #3d3d3d;
+  color: #ffffff;
+  opacity: 1;
+}
+.mod3d-corpo .mod3d-no-entrada {
+  order: 1;
+  flex: 1 1 auto;
+  height: 17px;
+  min-height: 17px;
+  padding: 0 5px;
+}

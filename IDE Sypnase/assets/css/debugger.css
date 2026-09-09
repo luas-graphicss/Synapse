@@ -1,0 +1,402 @@
+.debug-panel {
+  --debug-control-size: 30px;
+  width: clamp(240px, 22vw, 320px);
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-1);
+  color: var(--txt);
+  border-left: 1px solid var(--line);
+  font: 12px/1.6 var(--mono);
+}
+.debug-panel[hidden] {
+  display: none;
+}
+.debug-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+}
+.debug-heading h2 {
+  margin: 0;
+  font: 600 13px/1.5 var(--mono);
+}
+.debug-engine,.debug-project,.debug-help,.debug-empty,.debug-frame-location,.debug-breakpoint small {
+  color: var(--txt-2);
+}
+.debug-engine,.debug-help,.debug-empty {
+  font-size: 11.5px;
+}
+.debug-status {
+  padding: 6px 12px;
+  border-block: 1px solid var(--line);
+  font-size: 11.5px;
+}
+.debug-status::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 1px;
+  margin-right: 8px;
+  background: var(--txt-3);
+}
+.debug-status[data-state='paused'] {
+  color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 8%, transparent);
+}
+.debug-status[data-state='paused']::before {
+  background: currentColor;
+}
+.debug-status[data-state='running']::before {
+  background: var(--ok);
+}
+.debug-status[data-state='error']::before {
+  background: var(--err);
+}
+.debug-controls {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  padding: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.debug-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: var(--debug-control-size);
+  min-height: var(--debug-control-size);
+  padding: 6px 8px;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: none;
+}
+.debug-button svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.debug-button:hover:not(:disabled) {
+  background: var(--bg-3);
+}
+.debug-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.debug-controls .debug-button {
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 2px;
+  font-size: 11px;
+}
+.debug-button:focus-visible,.debug-input:focus-visible,.debug-panel summary:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+.debug-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+.debug-section {
+  border-bottom: 1px solid var(--line);
+}
+.debug-panel summary {
+  min-height: max(36px, var(--debug-control-size));
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.debug-section-content {
+  padding: 0 12px 12px;
+  min-width: 0;
+}
+.debug-project {
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.debug-label {
+  display: block;
+  margin-bottom: 6px;
+}
+.debug-input {
+  display: block;
+  min-height: var(--debug-control-size);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: var(--bg);
+  color: var(--txt);
+  font: 12px/1.6 var(--mono);
+}
+.debug-input:disabled {
+  opacity: 0.6;
+}
+.debug-primary {
+  width: 100%;
+  background: var(--acc);
+  color: var(--acc-ink);
+  margin-top: 12px;
+  font-weight: 600;
+}
+.debug-primary:hover:not(:disabled) {
+  background: var(--acc);
+  filter: brightness(1.06);
+}
+.debug-help,.debug-empty {
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+}
+.debug-advanced {
+  margin-top: 12px;
+}
+.debug-advanced summary {
+  padding: 8px 0;
+}
+.debug-advanced .debug-input {
+  margin-top: 12px;
+}
+.debug-advanced .debug-button {
+  margin-top: 8px;
+}
+.debug-notice {
+  margin: 12px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--warn);
+  background: color-mix(in srgb, var(--warn) 8%, transparent);
+  overflow-wrap: anywhere;
+}
+.debug-location {
+  margin: 12px;
+  color: var(--acc);
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+}
+.debug-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.debug-form .debug-input {
+  flex: 1;
+}
+.debug-frame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  align-items: flex-start;
+  gap: 2px;
+  overflow-wrap: anywhere;
+}
+.debug-frame[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+  border-left-color: var(--acc);
+}
+.debug-frame-location {
+  font: 11px/1.5 var(--mono);
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.debug-value {
+  min-width: 0;
+}
+.debug-value-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  min-height: 28px;
+  padding: 4px 0;
+}
+.debug-panel .debug-value > summary {
+  display: list-item;
+  min-height: var(--debug-control-size);
+  padding: 6px 0;
+  font-weight: 400;
+}
+.debug-value-name {
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+}
+.debug-value-description {
+  color: var(--acc);
+  font: 12px/1.6 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.debug-value-title .debug-value-description {
+  margin-left: 8px;
+}
+.debug-value-children {
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+.debug-watch {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0;
+}
+.debug-watch-content {
+  flex: 1;
+  min-width: 0;
+}
+.debug-watch-error .debug-value-description {
+  color: var(--txt-2);
+}
+.debug-breakpoint {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+}
+.debug-breakpoint-location {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.debug-breakpoint small {
+  font-size: 11px;
+  font-weight: 400;
+}
+.debug-breakpoint-dot {
+  display: block;
+  border: 2px solid var(--err);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.debug-breakpoint-dot[data-verified='true'] {
+  background: var(--err);
+}
+.debug-output {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 12px/1.65 var(--mono);
+  margin: 0;
+  max-height: 240px;
+  overflow: auto;
+}
+.debug-footnote {
+  padding: 12px;
+  margin: 0;
+  font-size: 11px;
+}
+.debug-launcher {
+  color: var(--txt-2);
+}
+.debug-launcher[aria-expanded='true'] {
+  color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+}
+.debug-launcher svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+#gutter.debug-gutter .gln {
+  position: relative;
+  padding-left: 14px;
+  cursor: pointer;
+}
+#gutter.debug-gutter .gln::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 9px;
+  height: 9px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  pointer-events: none;
+}
+#gutter.debug-gutter .gln:hover::before {
+  border-color: var(--err);
+}
+#gutter.debug-gutter .gln[data-debug-breakpoint]::before {
+  border: 2px solid var(--err);
+}
+#gutter.debug-gutter .gln[data-debug-breakpoint='verified']::before {
+  background: var(--err);
+}
+#gutter.debug-gutter .gln[data-debug-breakpoint='disabled']::before {
+  border-color: var(--txt-3);
+}
+#gutter.debug-gutter .gln[data-debug-current='true'] {
+  background: color-mix(in srgb, var(--warn) 18%, transparent);
+  color: var(--warn);
+  box-shadow: inset -2px 0 var(--warn);
+}
+.debug-current-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--warn) 10%, transparent);
+  border-block: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+}
+#debugStack {
+  max-height: 250px;
+  overflow-y: auto;
+}
+#debugVariables {
+  max-height: 360px;
+  overflow-y: auto;
+}
+@media (max-width: 900px) {
+  .debug-panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(320px, 100%);
+    max-width: 100%;
+    border-left: 1px solid var(--line-2);
+    z-index: 190;
+    box-shadow: var(--sh);
+  }
+}
+@media (max-width: 600px) {
+  .debug-panel {
+    width: 100%;
+  }
+  .debug-controls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .debug-controls .debug-button {
+    flex-direction: row;
+    min-height: 44px;
+  }
+}
+@media (pointer: coarse) {
+  .debug-panel {
+    --debug-control-size: 44px;
+  }
+  .debug-input {
+    font-size: 16px;
+  }
+}

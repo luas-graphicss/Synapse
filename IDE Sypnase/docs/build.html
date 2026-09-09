@@ -1,0 +1,196 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Build e compilador | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Perfis de build, adaptadores, saída de compilação e leitura de diagnósticos na Synapse IDE."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="build">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Ferramentas / Build e compilador</p>
+              <h1 class="docs-title">Build e compilador</h1>
+              <p class="docs-lede">
+                O painel de build cobre dois cenários diferentes: gerar a versão final do projeto web
+                e compilar código nativo para rodar dentro do navegador. Os dois usam o mesmo log e a
+                mesma lista de diagnósticos.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 10 min</span>
+                <span>público: dev</span>
+              </div>
+              <section>
+                <h2>Abrindo o painel</h2>
+                <p>
+                  <span class="docs-keys">Mod+Alt+B</span> abre e fecha o painel. Ele tem três partes:
+                    seleção de perfil no topo, log no centro e diagnósticos na base.
+                  </p>
+                </section>
+                <section>
+                  <h2>Perfis de build</h2>
+                  <p>
+                    Um perfil descreve o que compilar, com quais opções e onde colocar a saída. Trocar de
+                    perfil não apaga o resultado do anterior.
+                  </p>
+                  <table class="docs-table">
+                    <thead>
+                      <tr>
+                        <th>Campo</th>
+                        <th>Para que serve</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Entrada</td>
+                        <td>Arquivo ou lista de arquivos que iniciam a compilação.</td>
+                      </tr>
+                      <tr>
+                        <td>Saída</td>
+                        <td>Pasta que recebe os artefatos gerados.</td>
+                      </tr>
+                      <tr>
+                        <td>Otimização</td>
+                        <td>Nível aplicado pelo adaptador, entre depuração e release.</td>
+                      </tr>
+                      <tr>
+                        <td>Definições</td>
+                        <td>Valores injetados na compilação, como flags de recurso.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </section>
+                <section>
+                  <h2>Adaptadores</h2>
+                  <p>
+                    Cada tipo de projeto tem um adaptador que traduz o perfil em comandos concretos. O
+                    adaptador também sabe interpretar a saída bruta e transformar em diagnósticos
+                    clicáveis.
+                  </p>
+                  <dl class="docs-definition">
+                    <dt>web</dt>
+                    <dd>Empacota HTML, CSS e módulos ES do projeto, sem depender do relay.</dd>
+                    <dt>nativo em wasm</dt>
+                    <dd>
+                      Compila fontes C e C++ para WebAssembly, com interface WASI para chamadas de
+                      sistema.
+                    </dd>
+                    <dt>cmake</dt>
+                    <dd>Lê a árvore do projeto CMake, gera a configuração e executa o alvo escolhido.</dd>
+                    <dt>comando livre</dt>
+                    <dd>Executa um script do projeto pelo relay e mostra a saída no mesmo log.</dd>
+                  </dl>
+                  <div class="docs-note">
+                    <span class="docs-note-label">Requisito</span>
+                    <p>
+                      Adaptadores que chamam ferramentas de sistema precisam do relay ligado e da
+                      permissão de terminal marcada. Sem isso o build para na etapa de preparação com aviso
+                      de ambiente.
+                    </p>
+                  </div>
+                </section>
+                <section>
+                  <h2>Lendo o log</h2>
+                  <p>O log segue sempre a mesma ordem, o que facilita achar onde parou:</p>
+                  <pre><code>preparando ambiente
+resolvendo entradas
+compilando
+escrevendo saída
+concluído em 1.8s</code></pre>
+                  <p>
+                    Se a falha aparece em "resolvendo entradas", o problema é caminho de arquivo. Em
+                    "compilando", é código. Em "escrevendo saída", é permissão ou pasta ocupada.
+                  </p>
+                </section>
+                <section>
+                  <h2>Diagnósticos</h2>
+                  <p>
+                    Cada diagnóstico traz arquivo, linha, coluna e mensagem original da ferramenta. Clicar
+                    abre o arquivo na posição exata. A lista mantém a ordem em que a ferramenta reportou,
+                    porque o primeiro erro costuma explicar os seguintes.
+                  </p>
+                  <ul>
+                    <li>Erro interrompe o build.</li>
+                    <li>Aviso não interrompe, mas entra no histórico daquela execução.</li>
+                    <li>
+                      Mensagem sem arquivo associado aparece só no log, geralmente vinda da própria
+                      ferramenta.
+                    </li>
+                  </ul>
+                </section>
+                <section>
+                  <h2>Compilação de C e C++ para o navegador</h2>
+                  <p>
+                    O alvo WebAssembly serve para levar bibliotecas existentes para dentro do preview. A
+                    saída é um módulo carregável mais um arquivo de ligação em JavaScript.
+                  </p>
+                  <p>Pontos que costumam gerar dúvida:</p>
+                  <ul>
+                    <li>
+                      Acesso a arquivos passa pela camada WASI, que enxerga apenas o projeto, não o disco
+                      todo.
+                    </li>
+                    <li>Threads dependem de recursos que o navegador pode ter desligado por segurança.</li>
+                    <li>
+                      Tempo de build cresce rápido com o número de unidades de compilação. Use perfis
+                      separados para depuração e release.
+                    </li>
+                  </ul>
+                </section>
+                <section>
+                  <h2>Depois do build</h2>
+                  <p>
+                    Os artefatos aparecem no explorador junto com o resto do projeto e entram no zip de
+                    exportação. Se você não quer versionar a pasta de saída, mantenha ela fora do que
+                    você envia para outros lugares.
+                  </p>
+                </section>
+              </article>
+              <footer class="docs-pager">
+              </footer>
+              <p class="docs-page-footer">
+                Build falhando sem mensagem clara? Cole o log inteiro no relato, ele é a parte mais útil.
+              </p>
+            </main>
+            <aside class="docs-outline" aria-label="Nesta página">
+            </aside>
+          </div>
+          <script src="./assets/docs-catalog.js"></script>
+          <script src="./assets/docs-current-category.js"></script>
+          <script src="./assets/docs-sidebar.js"></script>
+          <script src="./assets/docs-filter.js"></script>
+          <script src="./assets/docs-outline.js"></script>
+          <script src="./assets/docs-pager.js"></script>
+          <script src="./assets/docs-boot.js"></script>
+          <script src="../assets/js/i18n/phrase-registration.js"></script>
+          <script src="./assets/docs-phrases.js"></script>
+          <script src="./assets/docs-error-silencer.js"></script>
+          <script src="../assets/js/i18n/idiomas.js"></script>
+        </body>
+      </html>

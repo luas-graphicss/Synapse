@@ -1,0 +1,455 @@
+.blender-properties {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 3px;
+  background: var(--bl-region);
+  overflow: hidden;
+}
+.blender-properties-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 0 0 auto;
+  padding: 3px 0 3px 3px;
+  background: var(--bl-header);
+  border-right: 1px solid var(--bl-line);
+}
+.mod3d-corpo .blender-properties-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #9a9a9a;
+  cursor: pointer;
+}
+.mod3d-corpo .blender-properties-tab .blender-icon {
+  width: 16px;
+  height: 16px;
+}
+.mod3d-corpo .blender-properties-tab:hover {
+  background: #3a3a3a;
+  color: #ffffff;
+}
+.mod3d-corpo .blender-properties-tab.on {
+  position: relative;
+  z-index: 1;
+  width: 27px;
+  margin-right: -1px;
+  border-radius: 4px 0 0 4px;
+  background: var(--bl-region);
+  color: #ffffff;
+}
+.blender-properties-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.mod3d-corpo .mod3d-painel {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 0 6px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--bl-panel);
+  color: var(--bl-text);
+  font: 11px/1.45 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-painel[hidden] {
+  display: none;
+}
+.mod3d-corpo .mod3d-painel-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 22px;
+  margin: 0 -6px 3px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px 4px 0 0;
+  background: var(--bl-panel-header);
+  color: #dcdcdc;
+  font: 500 11px/1 var(--bl-sans);
+  letter-spacing: 0;
+  text-transform: none;
+  user-select: none;
+}
+.mod3d-corpo .blender-panel-header {
+  cursor: pointer;
+}
+.mod3d-corpo .blender-panel-header::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 3.5px solid #a6a6a6;
+  border-top: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  transform: rotate(90deg);
+}
+.mod3d-corpo .blender-panel-header:hover {
+  background: #464646;
+  color: #ffffff;
+}
+.mod3d-corpo .mod3d-painel.is-closed > .blender-panel-header {
+  margin-bottom: 0;
+  border-radius: 4px;
+}
+.mod3d-corpo .mod3d-painel.is-closed > .blender-panel-header::before {
+  transform: rotate(0deg);
+}
+.mod3d-corpo .mod3d-painel.is-closed > *:not(.blender-panel-header) {
+  display: none;
+}
+.mod3d-corpo .mod3d-painel.is-closed {
+  padding-bottom: 0;
+}
+.mod3d-corpo .mod3d-painel-resumo {
+  margin-left: auto;
+  color: var(--bl-text-faint);
+  font: 10px/1 var(--bl-sans);
+  font-weight: 400;
+}
+.mod3d-corpo .mod3d-painel-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.mod3d-corpo .mod3d-propriedades {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 3px;
+  padding-top: 5px;
+  border-top: 1px solid var(--bl-line-soft);
+}
+.mod3d-corpo .mod3d-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.mod3d-corpo .mod3d-campo-entrada {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 130px;
+  min-width: 0;
+}
+.mod3d-corpo .mod3d-entrada-rotulo {
+  color: var(--bl-text-dim);
+  font-size: 10px;
+}
+.mod3d-corpo .mod3d-ferramentas:empty,.mod3d-corpo .mod3d-linha:empty,.mod3d-corpo .mod3d-painel-corpo:empty {
+  display: none;
+}
+.mod3d-corpo .mod3d-malha-contagem {
+  color: var(--bl-text-dim);
+  font: 10px/1.4 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-malha-dica {
+  color: var(--bl-text-faint);
+  font-size: 10px;
+}
+.mod3d-corpo .mod3d-malha-recado {
+  min-height: 13px;
+  color: var(--bl-warn);
+  font-size: 10px;
+}
+.mod3d-corpo .mod3d-avisos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--bl-line-soft);
+}
+.mod3d-corpo .mod3d-aviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-aviso-nome {
+  color: var(--bl-text-dim);
+}
+.mod3d-corpo .mod3d-aviso-total {
+  color: var(--bl-warn);
+  font: 10px/1 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-aviso-limpo {
+  color: var(--bl-ok);
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-resultado {
+  color: var(--bl-text-dim);
+  font-size: 10.5px;
+  overflow-wrap: anywhere;
+}
+.mod3d-corpo .mod3d-resultado.ok {
+  color: var(--bl-ok);
+}
+.mod3d-corpo .mod3d-resultado.erro {
+  color: var(--bl-error);
+}
+.mod3d-corpo .mod3d-resultado.espera {
+  color: var(--bl-text-faint);
+}
+.mod3d-corpo .mod3d-fatias {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 108px;
+  padding: 2px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--bl-list);
+  overflow-y: auto;
+}
+.mod3d-corpo .mod3d-fatia {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--bl-text-dim);
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+}
+.mod3d-corpo .mod3d-fatia:hover {
+  background: #333333;
+  color: #ffffff;
+}
+.mod3d-corpo .mod3d-fatia.on {
+  background: var(--bl-accent-soft);
+  color: #ffffff;
+}
+.mod3d-corpo .mod3d-fatia-cor {
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--bl-line);
+  border-radius: 2px;
+}
+.mod3d-corpo .mod3d-fatia-nome {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mod3d-corpo .mod3d-fatia-conta {
+  color: var(--bl-text-faint);
+  font: 10px/1 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-textura {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 3px;
+  padding-top: 5px;
+  border-top: 1px solid var(--bl-line-soft);
+}
+.mod3d-corpo .mod3d-linha-uv {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+}
+.mod3d-corpo .mod3d-uv-tela {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--bl-line);
+  border-radius: 3px;
+  background: #1d1d1d;
+  touch-action: none;
+  cursor: crosshair;
+}
+.mod3d-corpo .mod3d-glb-export {
+  padding: 0 6px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--bl-panel);
+  color: var(--bl-text);
+  font: 11px/1.45 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-painel-titulo {
+  margin: 0 -6px 3px;
+  padding: 0 8px;
+  font: 600 11px/1 var(--bl-sans);
+  color: #dcdcdc;
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-glb-description {
+  margin: 0 0 5px;
+  color: var(--bl-text-faint);
+  font-size: 10px;
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-glb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 4px;
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-glb-label {
+  color: var(--bl-text-dim);
+  font-size: 10px;
+  font-weight: 500;
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-entrada,.mod3d-corpo .mod3d-glb-export .mod3d-seletor {
+  height: 20px;
+  min-height: 20px;
+  border: 0;
+  border-radius: var(--bl-radius);
+  font: 11px/1 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-glb-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+  margin: 0 0 3px;
+  color: var(--bl-text-dim);
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-botao {
+  width: 100%;
+  height: 22px;
+  min-height: 22px;
+  margin-top: 5px;
+  border: 0;
+  font: 600 11px/1 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-glb-export .mod3d-resultado {
+  margin-top: 5px;
+  font: 10.5px/1.45 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-glb-report {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--bl-line-soft);
+}
+.mod3d-corpo .mod3d-glb-report-title {
+  margin: 0 0 4px;
+  color: var(--bl-text-dim);
+  font: 600 10.5px/1 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-glb-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+.mod3d-corpo .mod3d-glb-metric dt {
+  color: var(--bl-text-faint);
+  font-size: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.mod3d-corpo .mod3d-glb-metric dd {
+  margin: 2px 0 0;
+  color: var(--bl-text);
+  font: 10.5px/1.3 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-project {
+  padding: 0 6px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--bl-panel);
+  color: var(--bl-text);
+  font: 11px/1.45 var(--bl-sans);
+  gap: 3px;
+}
+.mod3d-corpo .mod3d-project h2 {
+  font-size: 11px;
+}
+.mod3d-corpo .mod3d-project h3 {
+  color: var(--bl-text-dim);
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.mod3d-corpo .mod3d-project-identity {
+  color: var(--bl-text-dim);
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-project-status {
+  min-height: 14px;
+  color: var(--bl-text-faint);
+  font-size: 10px;
+}
+.mod3d-corpo .mod3d-recovery-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px;
+  border: 1px solid var(--bl-line-soft);
+  border-radius: 4px;
+  background: #2f2f2f;
+}
+.mod3d-corpo .mod3d-atalhos-fundo {
+  background: rgba(12, 12, 12, 0.6);
+}
+.mod3d-corpo .mod3d-atalhos {
+  width: min(460px, 100%);
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--bl-line);
+  border-radius: 4px;
+  background: var(--bl-region);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+.mod3d-corpo .mod3d-atalhos-titulo {
+  font: 600 12px/1 var(--bl-sans);
+  color: var(--bl-text);
+}
+.mod3d-corpo .mod3d-atalho-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 22px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--bl-line-soft);
+}
+.mod3d-corpo .mod3d-atalho-acao {
+  color: var(--bl-text-dim);
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-atalho-tecla {
+  padding: 1px 6px;
+  border: 0;
+  border-radius: 3px;
+  background: var(--bl-field);
+  color: #ffffff;
+  font: 10.5px/1.4 var(--bl-mono);
+}
+.mod3d-corpo .mod3d-atalhos-aviso {
+  color: var(--bl-text-faint);
+  font-size: 10px;
+}

@@ -1,0 +1,332 @@
+.build-dialog {
+  --build-surface: var(--bg-1);
+  --build-raised: var(--bg-2);
+  --build-foreground: var(--txt);
+  --build-muted: var(--txt-2);
+  --build-border: var(--line);
+  --build-control-size: 32px;
+  box-sizing: border-box;
+  width: min(860px, calc(100vw - 40px));
+  max-height: calc(100dvh - 40px);
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: var(--build-surface);
+  color: var(--build-foreground);
+  font: 12px/1.6 var(--mono);
+  overflow: auto;
+  box-shadow: var(--sh);
+}
+.build-dialog::backdrop {
+  background: var(--scrim);
+}
+.build-dialog *,.build-dialog *::before,.build-dialog *::after {
+  box-sizing: border-box;
+}
+.build-dialog :is(button, input, select, textarea) {
+  font: inherit;
+  color: var(--build-foreground);
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+  border-radius: 2px;
+  min-height: var(--build-control-size);
+}
+.build-dialog :is(button, select, summary) {
+  cursor: pointer;
+}
+.build-dialog button {
+  padding: 6px 12px;
+  background: var(--build-raised);
+}
+.build-dialog button:hover:not(:disabled) {
+  background: var(--bg-3);
+  border-color: var(--txt-2);
+}
+.build-dialog :is(button, input, select, textarea):disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.build-dialog :focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+.build-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--build-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.build-header h2 {
+  font: 600 14px/1.5 var(--mono);
+  margin: 0 0 4px;
+}
+.build-header p {
+  color: var(--build-muted);
+  margin: 0;
+  font-size: 11.5px;
+}
+.build-header button {
+  flex: 0 0 auto;
+}
+.build-content {
+  padding: 20px;
+  display: grid;
+  gap: 16px;
+}
+.build-context {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.build-project {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.build-project strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+.build-project small {
+  color: var(--build-muted);
+  font-size: 11.5px;
+}
+.build-profile {
+  display: grid;
+  gap: 6px;
+  flex: 0 1 360px;
+  max-width: 100%;
+}
+.build-profile select {
+  width: 100%;
+  padding: 6px 10px;
+  text-overflow: ellipsis;
+}
+.build-help {
+  margin: 0;
+  color: var(--build-muted);
+  overflow-wrap: anywhere;
+}
+.build-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.build-actions [data-action='build'] {
+  color: var(--acc-ink);
+  background: var(--acc);
+  border-color: var(--acc);
+  font-weight: 600;
+}
+.build-actions [data-action='build']:hover:not(:disabled) {
+  background: var(--acc);
+  filter: brightness(1.06);
+}
+.build-actions [data-action='stop'] {
+  margin-left: auto;
+}
+.build-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--build-border);
+  border-left: 2px solid var(--line-2);
+  border-radius: 2px;
+  background: var(--build-raised);
+}
+.build-status[data-phase='failed'] {
+  border-left-color: var(--err);
+}
+.build-status[data-phase='succeeded'] {
+  border-left-color: var(--ok);
+}
+.build-status:is([data-phase='building'], [data-phase='running'], [data-phase='cleaning']) {
+  border-left-color: var(--acc);
+}
+.build-status span {
+  color: var(--build-muted);
+}
+.build-settings {
+  border-block: 1px solid var(--build-border);
+  padding: 0;
+}
+.build-settings summary {
+  min-height: max(40px, var(--build-control-size));
+  padding: 10px 0;
+  font-weight: 600;
+}
+.build-settings-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 0 16px;
+}
+.build-settings-body label {
+  display: grid;
+  gap: 6px;
+}
+.build-settings-body textarea {
+  width: 100%;
+  padding: 8px 10px;
+  resize: vertical;
+  font: 12px/1.6 var(--mono);
+  min-height: 64px;
+}
+.build-filter-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.build-filter-row h3 {
+  margin: 0 auto 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.build-filter-row select {
+  padding: 6px 10px;
+  max-width: 100%;
+}
+.build-filter-row input {
+  width: 210px;
+  max-width: 100%;
+  padding: 6px 10px;
+}
+.build-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  color: var(--build-muted);
+  margin-top: 12px;
+  font-size: 11.5px;
+}
+.build-diagnostics {
+  display: grid;
+  gap: 0;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 280px;
+  overflow: auto;
+}
+.build-diagnostic {
+  padding: 10px 12px;
+  border: 1px solid var(--build-border);
+  border-left: 2px solid var(--info);
+  border-radius: 0;
+  min-width: 0;
+}
+.build-diagnostic + .build-diagnostic {
+  border-top: 0;
+}
+.build-diagnostic[data-severity='error'] {
+  border-left-color: var(--err);
+}
+.build-diagnostic[data-severity='warning'] {
+  border-left-color: var(--warn);
+}
+.build-diagnostic p {
+  margin: 4px 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.build-diagnostic small {
+  display: block;
+  color: var(--build-muted);
+  font-size: 11.5px;
+}
+.build-diagnostic button {
+  max-width: 100%;
+  height: auto;
+  text-align: left;
+  overflow-wrap: anywhere;
+  color: var(--build-foreground);
+  text-decoration: underline;
+  margin-top: 8px;
+}
+.build-empty {
+  color: var(--build-muted);
+  padding: 12px;
+  border: 1px dashed var(--build-border);
+  border-radius: 2px;
+}
+.build-output h3 {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+.build-output pre {
+  background: var(--bg);
+  border: 1px solid var(--build-border);
+  border-radius: 2px;
+  padding: 12px;
+  margin: 0;
+  min-height: 80px;
+  max-height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 12px/1.65 var(--mono);
+}
+.build-footer {
+  font-size: 11.5px;
+  color: var(--build-muted);
+}
+#buildSystemBtn {
+  font-weight: 600;
+  padding-inline: 12px;
+  width: auto;
+  flex-shrink: 0;
+  gap: 6px;
+}
+@media (max-width: 600px) {
+  .build-dialog {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+  .build-header,	.build-content {
+    padding: 16px;
+  }
+  .build-header p {
+    display: none;
+  }
+  .build-context {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .build-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .build-actions [data-action='stop'] {
+    margin-left: 0;
+    grid-column: 1 / -1;
+  }
+  .build-filter-row input {
+    width: 100%;
+  }
+  .build-counts {
+    gap: 4px 12px;
+  }
+}
+@media (pointer: coarse) {
+  .build-dialog {
+    --build-control-size: 44px;
+  }
+  .build-dialog :is(input, select, textarea) {
+    font-size: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .build-dialog * {
+    scroll-behavior: auto;
+  }
+}

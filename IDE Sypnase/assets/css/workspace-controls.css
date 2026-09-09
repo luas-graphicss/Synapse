@@ -1,0 +1,82 @@
+:root {
+  --workspace-control-size: 32px;
+  --workspace-icon-size: 16px;
+}
+.top-ico,.tbtn,.eh-btn,.ex-head .tbtn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--workspace-control-size);
+  height: var(--workspace-control-size);
+  min-width: var(--workspace-control-size);
+  min-height: var(--workspace-control-size);
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm, 4px);
+  line-height: 1;
+}
+.topbar-actions > #langBtn,.topbar-actions > .menu-wrap > #langBtn,.topbar-actions > .cmake-trigger {
+  width: auto;
+  padding-inline: 8px;
+  gap: 6px;
+}
+.topbar-actions > .btn,.topbar-actions > .menu-wrap > .btn,.seg button {
+  box-sizing: border-box;
+  min-height: var(--workspace-control-size);
+}
+:is(.topbar-actions, .toolbar, .ex-actions, .editor-head)	button:is(.btn, .top-ico, .tbtn, .eh-btn):is(:hover, :active) {
+  transform: none;
+}
+.top-ico .icon,.tbtn .icon,.eh-btn .icon,.ex-head .tbtn .icon {
+  width: var(--workspace-icon-size);
+  height: var(--workspace-icon-size);
+  flex: 0 0 var(--workspace-icon-size);
+}
+.icon {
+  display: block;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.top-ico:focus-visible,.tbtn:focus-visible,.eh-btn:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+.ex-head {
+  gap: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.ex-actions {
+  gap: 2px;
+}
+.editor-head {
+  min-height: calc(var(--workspace-control-size) + 8px);
+}
+.workspace-tools-menu .workspace-menu-action {
+  width: 100%;
+  height: auto;
+  min-height: max(36px, var(--workspace-control-size));
+  justify-content: flex-start;
+  padding: 8px 10px;
+  line-height: 1.5;
+}
+.workspace-tools-menu .workspace-menu-action > .icon,.workspace-tools-menu .workspace-menu-action > span[class^='i-'] {
+  flex: 0 0 var(--workspace-icon-size);
+}
+@media (pointer: coarse) {
+  :root {
+    --workspace-control-size: 44px;
+  }
+  .editor-tabs {
+    height: 48px;
+    min-height: 48px;
+  }
+  .editor-tabs .etab,	.editor-tabs .etselect,	.editor-tabs .etclose,	.intellisense-button,	.intellisense-problems-heading button {
+    min-height: 44px;
+  }
+  .editor-tabs .etclose {
+    min-width: 44px;
+  }
+}

@@ -1,0 +1,43 @@
+:root[data-theme='solar'] {
+  color-scheme: light;
+  --bg: #fff8e7;
+  --bg-1: #fbf2dc;
+  --bg-2: #f4e9cf;
+  --bg-3: #eadcbb;
+  --line: #dfd1af;
+  --line-2: #918365;
+  --txt: #3d392e;
+  --txt-2: #5e5746;
+  --txt-3: #6b624e;
+  --acc: #805800;
+  --acc-2: #684600;
+  --acc-grad: #805800;
+  --acc-rgb: 128, 88, 0;
+  --acc-ink: #ffffff;
+  --ok: #38662d;
+  --warn: #805800;
+  --err: #a83429;
+  --info: #205f7d;
+  --tk-key: #893767;
+  --tk-str: #466416;
+  --tk-num: #a14118;
+  --tk-com: #70644d;
+  --tk-tag: #18655e;
+  --tk-attr: #805800;
+  --tk-punc: #645b48;
+  --tk-fn: #205f7d;
+  --preview-a: #fbf2dc;
+  --preview-b: #f4e9cf;
+  --preview-veil: rgba(251, 242, 220, 0.96);
+  --sh: 0 1px 2px rgba(70, 53, 16, 0.06), 0 12px 28px rgba(70, 53, 16, 0.12);
+  --hard: var(--sh);
+  --hard-sm: none;
+  --scrim: rgba(58, 47, 27, 0.38);
+  --grain: 0;
+}
+:root[data-theme='solar'] .code-ta::selection {
+  background: rgba(128, 88, 0, 0.18);
+}
+:root[data-theme='solar'] .tm-th.on {
+  box-shadow: inset 0 0 0 1px var(--acc);
+}

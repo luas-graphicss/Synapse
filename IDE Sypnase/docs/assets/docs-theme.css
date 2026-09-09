@@ -1,0 +1,13 @@
+:root {
+  --docs-paper: var(--bg, #0f1113);
+  --docs-panel: var(--bg-1, #14171a);
+  --docs-panel-strong: var(--bg-2, #191d21);
+  --docs-rule: var(--line, #23282d);
+  --docs-rule-strong: var(--line-2, #333b42);
+  --docs-ink: var(--txt, #e3e8eb);
+  --docs-ink-2: var(--txt-2, #a9b2b9);
+  --docs-ink-3: var(--txt-3, #757e86);
+  --docs-mark: var(--acc, #d98a2b);
+  --docs-mark-soft: rgba(var(--acc-rgb, 217, 138, 43), 0.12);
+  --docs-alert: var(--err, #c9614f);
+}

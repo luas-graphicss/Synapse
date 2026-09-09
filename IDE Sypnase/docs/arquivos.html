@@ -1,0 +1,215 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Arquivos e persistência | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Onde o projeto fica guardado, histórico de versões, snapshots, espelho no disco e exportação."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="arquivos">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Plataforma / Arquivos e persistência</p>
+              <h1 class="docs-title">Arquivos e persistência</h1>
+              <p class="docs-lede">
+                O projeto vive no armazenamento do navegador. Essa decisão explica quase tudo o que
+                você precisa saber sobre salvar, recuperar, exportar e sobre o que acontece quando duas
+                abas disputam o mesmo projeto.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 10 min</span>
+                <span>público: dev</span>
+              </div>
+              <section>
+                <h2>Onde o projeto fica</h2>
+                <p>
+                  A fonte da verdade é um banco local do navegador, por origem. Não existe conta, não
+                  existe upload automático e não existe cópia no servidor. Abrir a IDE em outro navegador
+                  ou outro perfil significa começar de um espaço vazio.
+                </p>
+                <dl class="docs-definition">
+                  <dt>arquivo de texto</dt>
+                  <dd>Guardado como texto, com histórico de versões por arquivo.</dd>
+                  <dt>arquivo binário</dt>
+                  <dd>Guardado como bytes. Imagem, áudio, modelo e fonte entram aqui.</dd>
+                  <dt>sessão</dt>
+                  <dd>Lista de projetos, projeto ativo, abas abertas e layout da tela.</dd>
+                </dl>
+                <div class="docs-note docs-note-alert">
+                  <span class="docs-note-label">Limpar dados do site apaga tudo</span>
+                  <p>
+                    Limpar dados de navegação, usar aba privada ou desinstalar o navegador remove o
+                    projeto. Exporte um zip sempre que terminar algo que doeria perder.
+                  </p>
+                </div>
+              </section>
+              <section>
+                <h2>Uma aba escreve por vez</h2>
+                <p>
+                  Duas abas gravando no mesmo banco corromperiam o projeto. Para evitar isso, a IDE elege
+                  uma aba como dona da sessão e usa uma trava de escrita compartilhada. As outras abas
+                  continuam abertas em modo de leitura e avisam na tela.
+                </p>
+                <p>
+                  Se você fechar a aba dona, outra assume em seguida. Quando aparecer aviso de sessão em
+                  outra aba, feche as duplicadas e recarregue a que você quer usar.
+                </p>
+              </section>
+              <section>
+                <h2>Histórico por arquivo</h2>
+                <p>
+                  Cada gravação guarda a versão anterior do arquivo. O painel de histórico
+                  (<span class="docs-keys">Mod + H</span>) mostra as versões, permite ler uma versão
+                  antiga, comparar com a atual e restaurar.
+                </p>
+                <ul>
+                  <li>Restaurar cria uma nova versão, então você nunca perde o estado atual.</li>
+                  <li>O histórico é por arquivo e não segue renomeação como se fosse commit.</li>
+                  <li>Arquivo binário não entra no comparador de texto.</li>
+                </ul>
+              </section>
+              <section>
+                <h2>Snapshot do projeto inteiro</h2>
+                <p>
+                  Snapshot congela o projeto todo em um ponto. Ele existe para mudança grande:
+                  refatoração ampla, troca de biblioteca ou trabalho de agente automatizado.
+                </p>
+                <ol class="docs-steps">
+                  <li>Tire o snapshot com um rótulo que explique o marco.</li>
+                  <li>Faça a mudança.</li>
+                  <li>Compare com o snapshot para ver o resumo do que mudou.</li>
+                  <li>Restaure tudo ou apenas um arquivo se algo saiu do controle.</li>
+                </ol>
+                <p>
+                  Apagar arquivo também cria snapshot automático de segurança, e restaurar cria outro
+                  antes de sobrescrever. Você sempre tem um passo atrás disponível.
+                </p>
+              </section>
+              <section>
+                <h2>Espelho no disco e proteção contra apagar demais</h2>
+                <p>
+                  Com o relay ligado, o projeto também existe numa pasta do seu computador. A regra de
+                  sincronização é conservadora de propósito: o site manda no conteúdo, e o disco só apaga
+                  arquivo que nasceu no disco.
+                </p>
+                <ul>
+                  <li>
+                    Remoção em lote tem limite: o maior valor entre oito arquivos e um quarto do projeto.
+                  </li>
+                  <li>O que passa do limite é recusado e registrado, em vez de ser apagado.</li>
+                  <li>
+                    Arquivo de texto removido pela sincronização vai para uma lixeira em memória e pode
+                    voltar para o editor.
+                  </li>
+                  <li>Arquivo binário removido não guarda conteúdo na lixeira, apenas o registro.</li>
+                </ul>
+                <p>
+                  Depois de restaurar da lixeira, rode qualquer comando no terminal para o site reescrever
+                  os arquivos no disco.
+                </p>
+              </section>
+              <section>
+                <h2>Importar e exportar</h2>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Operação</th>
+                      <th>Comportamento</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Importar zip</td>
+                      <td>
+                        Cria um projeto novo com a árvore do arquivo, ignorando entradas suspeitas de
+                        caminho.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Importar pasta</td>
+                      <td>Lê a pasta escolhida e monta o projeto com os mesmos caminhos relativos.</td>
+                    </tr>
+                    <tr>
+                      <td>Importar assets</td>
+                      <td>Adiciona arquivos soltos ao projeto atual, sem trocar de projeto.</td>
+                    </tr>
+                    <tr>
+                      <td>Exportar zip</td>
+                      <td>
+                        Gera o projeto inteiro como arquivo único, pronto para backup ou para outro
+                        computador.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  Importação rejeita caminho que tenta sair da raiz do projeto. Isso protege contra zip
+                  malicioso e por isso um pacote estranho pode entrar com menos arquivos do que você
+                  esperava.
+                </p>
+              </section>
+              <section>
+                <h2>Espaço cheio e projeto grande</h2>
+                <p>
+                  O navegador reserva uma cota por origem. Projeto com muito binário grande chega perto
+                  desse teto e a gravação passa a falhar. Sinais típicos: aviso de falha ao salvar,
+                  histórico parando de crescer e importação incompleta.
+                </p>
+                <ul>
+                  <li>Apague projetos antigos que você já exportou.</li>
+                  <li>
+                    Tire vídeo e textura pesada do projeto e sirva por endereço externo durante o
+                    desenvolvimento.
+                  </li>
+                  <li>Prefira poucos snapshots com rótulo bom a muitos snapshots sem critério.</li>
+                </ul>
+              </section>
+            </article>
+            <footer class="docs-pager">
+            </footer>
+            <p class="docs-page-footer">
+              Perdeu arquivo? No relato, diga se o relay estava ligado e se havia outra aba aberta.
+            </p>
+          </main>
+          <aside class="docs-outline" aria-label="Nesta página">
+          </aside>
+        </div>
+        <script src="./assets/docs-catalog.js"></script>
+        <script src="./assets/docs-current-category.js"></script>
+        <script src="./assets/docs-sidebar.js"></script>
+        <script src="./assets/docs-filter.js"></script>
+        <script src="./assets/docs-outline.js"></script>
+        <script src="./assets/docs-pager.js"></script>
+        <script src="./assets/docs-boot.js"></script>
+        <script src="../assets/js/i18n/phrase-registration.js"></script>
+        <script src="./assets/docs-phrases.js"></script>
+        <script src="./assets/docs-error-silencer.js"></script>
+        <script src="../assets/js/i18n/idiomas.js"></script>
+      </body>
+    </html>

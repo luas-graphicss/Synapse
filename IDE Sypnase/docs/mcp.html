@@ -1,0 +1,168 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>MCP e agentes | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Como agentes externos leem e escrevem no projeto pela ponte MCP, com equipes, travas e testes visuais."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="mcp">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Plataforma / MCP e agentes</p>
+              <h1 class="docs-title">MCP e agentes</h1>
+              <p class="docs-lede">
+                A IDE expõe uma ponte para agentes externos. Por ela um assistente pode ler arquivos,
+                gravar mudanças, tirar captura do preview, clicar em elementos e rodar cenários de
+                teste, sempre no mesmo projeto que você está vendo.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 10 min</span>
+                <span>público: dev avançado</span>
+              </div>
+              <section>
+                <h2>O modelo mental</h2>
+                <p>
+                  O agente não roda dentro da IDE. Ele conversa com um servidor que atua como controle
+                  remoto do editor. Toda operação é explícita: ler um caminho, gravar um conteúdo,
+                  capturar a tela do preview. Não existe acesso implícito a nada fora do projeto.
+                </p>
+                <p>
+                  Cada gravação feita por agente passa pelo mesmo caminho de uma gravação sua: validação
+                  de sintaxe, histórico de versão e atualização do preview.
+                </p>
+              </section>
+              <section>
+                <h2>Grupos de operações</h2>
+                <dl class="docs-definition">
+                  <dt>arquivos</dt>
+                  <dd>Listar, ler em lote, gravar em lote, editar por substituição e apagar.</dd>
+                  <dt>leitura assistida</dt>
+                  <dd>Busca por texto ou regex e mapa de símbolos com número de linha.</dd>
+                  <dt>visão</dt>
+                  <dd>Captura do preview, sequência de quadros, consulta ao DOM e execução de JS.</dd>
+                  <dt>interação</dt>
+                  <dd>Clique, digitação, teclas, arraste, toque e gamepad virtual.</dd>
+                  <dt>verificação</dt>
+                  <dd>Checagem de sintaxe, espera por estado, asserts e cenários completos.</dd>
+                  <dt>histórico</dt>
+                  <dd>Versões por arquivo, diff e snapshots do projeto inteiro.</dd>
+                  <dt>coordenação</dt>
+                  <dd>Identidade do agente, travas de projeto, mensagens e feed de atividade.</dd>
+                </dl>
+              </section>
+              <section>
+                <h2>Vários agentes ao mesmo tempo</h2>
+                <p>
+                  Todas as operações aceitam um projeto de destino, então um agente pode trabalhar num
+                  projeto que não está na tela. Isso permite dividir tarefas entre vários agentes sem que
+                  um troque a tela do outro.
+                </p>
+                <ul>
+                  <li>Cada agente se identifica com um nome fixo em todas as chamadas.</li>
+                  <li>
+                    A trava de projeto impede que outro agente grave por cima do trabalho em andamento.
+                  </li>
+                  <li>O feed de atividade mostra quem alterou o que e quando.</li>
+                  <li>O quadro de mensagens serve para pedir liberação ou avisar que terminou.</li>
+                </ul>
+                <div class="docs-note">
+                  <span class="docs-note-label">Travas automáticas</span>
+                  <p>
+                    A IDE já aplica e libera trava sozinha durante gravações. Trava manual é um recurso
+                    para sessões longas com muitos agentes, e não algo necessário no uso comum.
+                  </p>
+                </div>
+              </section>
+              <section>
+                <h2>Preview em segundo plano</h2>
+                <p>
+                  Para testar um projeto que não está ativo na tela, a IDE monta um preview invisível em
+                  segundo plano. Captura de tela, consulta ao DOM e interação funcionam igual.
+                </p>
+                <p>
+                  Há um detalhe de desempenho: em segundo plano o navegador pode reduzir a taxa de
+                  quadros, então animações ficam mais lentas do que na realidade. Para medir tempo real,
+                  deixe o projeto ativo na tela.
+                </p>
+              </section>
+              <section>
+                <h2>Testes sem humano na frente</h2>
+                <p>
+                  A combinação mais eficiente é um cenário único com passos de interação, esperas por
+                  estado e verificações, terminando com captura. Assim o agente confirma o resultado em
+                  vez de supor.
+                </p>
+                <ul>
+                  <li>Espere por seletor ou por expressão verdadeira em vez de esperar tempo fixo.</li>
+                  <li>Use sequência de quadros para avaliar animação e travamento.</li>
+                  <li>Consulte o registro de rede quando um recurso não aparece.</li>
+                  <li>Zere o estado do app antes de testar fluxo de usuário novo.</li>
+                </ul>
+              </section>
+              <section>
+                <h2>Riscos e boas práticas</h2>
+                <ul>
+                  <li>
+                    Tire um snapshot antes de refatoração grande feita por agente. Restaurar depois é
+                    barato.
+                  </li>
+                  <li>
+                    Prefira edição por substituição de trecho a reescrita de arquivo inteiro: o diff fica
+                    legível.
+                  </li>
+                  <li>
+                    Se o agente tem permissão de terminal, ele executa comandos reais. Trate isso com o
+                    mesmo cuidado de rodar um script baixado.
+                  </li>
+                </ul>
+              </section>
+            </article>
+            <footer class="docs-pager">
+            </footer>
+            <p class="docs-page-footer">
+              Comportamento estranho com agente conectado? Diga no relato qual operação estava rodando.
+            </p>
+          </main>
+          <aside class="docs-outline" aria-label="Nesta página">
+          </aside>
+        </div>
+        <script src="./assets/docs-catalog.js"></script>
+        <script src="./assets/docs-current-category.js"></script>
+        <script src="./assets/docs-sidebar.js"></script>
+        <script src="./assets/docs-filter.js"></script>
+        <script src="./assets/docs-outline.js"></script>
+        <script src="./assets/docs-pager.js"></script>
+        <script src="./assets/docs-boot.js"></script>
+        <script src="../assets/js/i18n/phrase-registration.js"></script>
+        <script src="./assets/docs-phrases.js"></script>
+        <script src="./assets/docs-error-silencer.js"></script>
+        <script src="../assets/js/i18n/idiomas.js"></script>
+      </body>
+    </html>

@@ -1,0 +1,136 @@
+(function (root, factory) {
+	'use strict';
+	const api = factory();
+	if (typeof module === 'object' && module.exports) module.exports = api;
+	else root.SYNAPSE_BUILD_TEXT = api;
+})(globalThis, function () {
+	'use strict';
+	const text = {
+		pt: {
+			wasiHelp: 'C: compila com WCC no navegador. Binário WASI: valida sem recompilar fontes. Run executa em Worker; Clean preserva arquivos e cache. Sem C++, GUI nativa, rede ou arquivos do sistema.',
+			wasiRelayHelp: 'Build compila pelo Relay e importa WASI antes do preview. Rust exige wasm32-wasip1; C/C++ exige presets configure/build chamados wasi usando WASI SDK. Run não executa comandos nativos. Selecione o binário em synapse.preview.json.',
+			title: 'Build & Run',
+			subtitle: 'Compilação, execução e diagnósticos por projeto',
+			open: 'Abrir Build & Run',
+			close: 'Fechar',
+			project: 'Projeto',
+			emptyProject: 'Abra um projeto para começar.',
+			profile: 'Compilador',
+			automatic: 'Detectar automaticamente',
+			settings: 'Configurar comandos',
+			settingsHelp:
+				'Um comando por linha, executado na raiz do projeto. Exige Relay e permissão de terminal. Instale as dependências pelo Terminal. Nenhum comando é executado ao alterar estes campos.',
+			browserHelp:
+				'Verifica HTML, CSS e JavaScript e transpila TS/JSX. Não executa o projeto nem faz checagem de tipos ou bundle de produção.',
+			relayHelp:
+				'Comandos reais no computador conectado. Build deve terminar antes de Run; servidores contínuos pertencem ao comando Run.',
+			build: 'Build',
+			run: 'Run',
+			clean: 'Clean',
+			rebuild: 'Rebuild',
+			stop: 'Parar',
+			buildTitle: 'Verificar e compilar sem executar',
+			runTitle: 'Compilar e executar somente se não houver erros',
+			cleanTitle: 'Limpar resultados ou executar o comando Clean configurado',
+			rebuildTitle: 'Clean seguido de Build; interrompe se Clean falhar',
+			diagnostics: 'Diagnósticos',
+			output: 'Saída',
+			all: 'Todos',
+			error: 'Erros',
+			warning: 'Warnings',
+			info: 'Informações',
+			filter: 'Filtrar diagnósticos',
+			noDiagnostics: 'Nenhum diagnóstico nesta operação.',
+			noMatches: 'Nenhum diagnóstico corresponde aos filtros atuais.',
+			diagnosticLimit:
+				'Exibindo até 500 diagnósticos; erros têm prioridade sobre warnings e informações.',
+			invalidSettings: 'Corrija a configuração antes de executar',
+			projectChanged: 'O projeto ativo mudou. Confira os comandos e repita a ação.',
+			noOutput: 'A saída de compilação aparecerá aqui.',
+			idle: 'Pronto para compilar',
+			preparing: 'Preparando',
+			building: 'Compilando',
+			cleaning: 'Limpando',
+			running: 'Executando',
+			stopping: 'Interrompendo',
+			finalizing: 'Finalizando',
+			succeeded: 'Concluído',
+			failed: 'Falhou',
+			canceled: 'Cancelado',
+			seconds: 's',
+			noCommand: 'Nenhum comando configurado',
+			browser: 'Navegador',
+			relay: 'Relay local',
+			openFile: 'Abrir arquivo na linha do diagnóstico',
+			shortcuts: 'Ctrl/⌘ Shift B · Build',
+			cleanHint:
+				'O Clean do navegador preserva fontes e preview. No Relay, somente o comando Clean configurado é executado.',
+			unsaved: 'Configuração salva neste navegador',
+		},
+		en: {
+			wasiHelp: 'C: compiles with WCC in the browser. WASI binary: validates without compiling sources. Run executes in a Worker; Clean preserves files and cache. No C++, native GUI, network or host filesystem.',
+			wasiRelayHelp: 'Build compiles through Relay and imports WASI before preview. Rust needs wasm32-wasip1; C/C++ needs configure/build presets named wasi using WASI SDK. Run executes no native command. Select the binary in synapse.preview.json.',
+			title: 'Build & Run',
+			subtitle: 'Per-project compilation, execution and diagnostics',
+			open: 'Open Build & Run',
+			close: 'Close',
+			project: 'Project',
+			emptyProject: 'Open a project to get started.',
+			profile: 'Compiler',
+			automatic: 'Detect automatically',
+			settings: 'Configure commands',
+			settingsHelp:
+				'One command per line, executed at the project root. Requires Relay and terminal permission. Install dependencies in Terminal. Editing these fields never executes commands.',
+			browserHelp:
+				'Checks HTML, CSS and JavaScript and transpiles TS/JSX. Does not execute the project, check types or create a production bundle.',
+			relayHelp:
+				'Real commands on the connected computer. Build must finish before Run; long-running servers belong in the Run command.',
+			build: 'Build',
+			run: 'Run',
+			clean: 'Clean',
+			rebuild: 'Rebuild',
+			stop: 'Stop',
+			buildTitle: 'Check and compile without running',
+			runTitle: 'Build and run only if no errors were found',
+			cleanTitle: 'Clear build results or execute the configured Clean command',
+			rebuildTitle: 'Clean then Build; stops if Clean fails',
+			diagnostics: 'Diagnostics',
+			output: 'Output',
+			all: 'All',
+			error: 'Errors',
+			warning: 'Warnings',
+			info: 'Information',
+			filter: 'Filter diagnostics',
+			noDiagnostics: 'No diagnostics for this operation.',
+			noMatches: 'No diagnostics match the current filters.',
+			diagnosticLimit:
+				'Showing up to 500 diagnostics; errors take priority over warnings and information.',
+			invalidSettings: 'Fix the configuration before running',
+			projectChanged: 'The active project changed. Review its commands and repeat the action.',
+			noOutput: 'Compiler output will appear here.',
+			idle: 'Ready to build',
+			preparing: 'Preparing',
+			building: 'Building',
+			cleaning: 'Cleaning',
+			running: 'Running',
+			stopping: 'Stopping',
+			finalizing: 'Finalizing',
+			succeeded: 'Completed',
+			failed: 'Failed',
+			canceled: 'Canceled',
+			seconds: 's',
+			noCommand: 'No command configured',
+			browser: 'Browser',
+			relay: 'Local Relay',
+			openFile: 'Open file at diagnostic location',
+			shortcuts: 'Ctrl/⌘ Shift B · Build',
+			cleanHint:
+				'Browser Clean preserves source files and preview. Relay Clean runs only the configured Clean command.',
+			unsaved: 'Configuration saved in this browser',
+		},
+	};
+	function get(language) {
+		return text[String(language || '').startsWith('pt') ? 'pt' : 'en'];
+	}
+	return { get };
+});

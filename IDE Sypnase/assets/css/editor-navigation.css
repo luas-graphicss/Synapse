@@ -1,0 +1,133 @@
+.editor {
+  position: relative;
+  --editor-minimap-width: 78px;
+}
+.editor-minimap-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0;
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.editor-minimap-layout.editor-minimap-visible {
+  grid-template-columns: minmax(0, 1fr) var(--editor-minimap-width);
+}
+.editor-minimap-layout > .editor-scroll {
+  grid-area: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+}
+.editor-minimap-layout > #miniMap {
+  box-sizing: border-box;
+  grid-area: 1 / 2;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  contain: size;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: var(--bg);
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+  z-index: 7;
+}
+#miniMap:focus-visible,#foldBtn:focus-visible,#miniBtn:focus-visible,.gln .foldctl:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -2px;
+}
+.editor-grid {
+  grid-template-columns: max-content minmax(0, 1fr);
+  width: max-content;
+  min-width: 100%;
+}
+.editor-grid > .gutter {
+  min-width: 0;
+  width: max-content;
+}
+.editor-grid > .code-wrap {
+  min-width: 0;
+}
+.editor-grid .gln {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-start;
+}
+.gln .foldn.fold-empty {
+  display: none;
+}
+.gln .foldctl,.gln .fold-spacer {
+  flex: none;
+  width: 22px;
+  height: 20px;
+}
+.gln .foldctl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: 14px/1 var(--mono);
+  color: var(--txt-2);
+  opacity: 1;
+  border-radius: 3px;
+}
+.gln .foldctl:hover,.gln .foldctl:focus-visible {
+  background: rgba(var(--acc-rgb), 0.16);
+  color: var(--acc);
+}
+.gln .gnum {
+  min-width: 3ch;
+  flex: 1;
+  text-align: right;
+}
+.gln .foldn {
+  min-width: 18px;
+  justify-content: center;
+}
+.code-ta.folded {
+  cursor: text;
+  caret-color: var(--txt);
+}
+.code-ta {
+  padding: 0;
+}
+#foldBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+@media (max-width: 600px) {
+  .editor {
+    --editor-minimap-width: 52px;
+  }
+}
+@media (pointer: coarse) {
+  #foldBtn,	#miniBtn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .editor-head {
+    min-height: 48px;
+  }
+  .editor-grid,	.editor-grid > .gutter,	.editor-grid .code-hl,	.editor-grid .code-ta {
+    line-height: 44px;
+  }
+  .editor-grid .gln,	.editor-grid .foldctl,	.editor-grid .fold-spacer {
+    height: 44px;
+  }
+  .editor-grid .foldctl,	.editor-grid .fold-spacer {
+    width: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editor-minimap-layout > #miniMap,	.gln .foldctl {
+    transition: none;
+  }
+}

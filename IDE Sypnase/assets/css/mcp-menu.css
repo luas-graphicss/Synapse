@@ -1,0 +1,66 @@
+html:not(.aurora-mobile) .mcp-menu {
+  max-height: calc(100vh - 58px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+@supports (height: 100dvh) {
+  html:not(.aurora-mobile) .mcp-menu {
+    max-height: calc(100dvh - 58px);
+  }
+}
+html .mcp-menu #mcpAcoes {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin-top: 8px;
+  padding: 7px 0 2px;
+  background: var(--bg-2);
+  border-top: 1px solid var(--line);
+}
+html .mcp-menu .mcp-log {
+  max-height: 84px;
+  overscroll-behavior: contain;
+}
+html .mcp-menu .mcp-btn-wide {
+  flex: 1;
+}
+html .mcp-menu #mcpAgents {
+  overflow: hidden;
+}
+html .mcp-menu .mcp-adv {
+  margin-top: 7px;
+}
+html .mcp-menu .mcp-adv > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--txt-3);
+}
+html .mcp-menu .mcp-adv > summary::-webkit-details-marker {
+  display: none;
+}
+html .mcp-menu .mcp-adv > summary::after {
+  content: '+';
+  opacity: 0.7;
+}
+html .mcp-menu .mcp-adv[open] > summary::after {
+  content: '−';
+}
+html .mcp-menu .mcp-adv > summary:hover {
+  color: var(--txt-2);
+}
+html .mcp-menu .mcp-mono {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 30px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+}

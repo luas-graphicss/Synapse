@@ -1,0 +1,154 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      <title>Blepse 3D • Synapse</title>
+      <link rel="stylesheet" href="./assets/css/estudio-3d-modelador.css" />
+      <link rel="stylesheet" href="./assets/css/modeler-glb-export.css" />
+      <link rel="stylesheet" href="./assets/css/modeler-project.css" />
+      <link rel="stylesheet" href="./assets/css/modeler-shortcuts.css" />
+      <link rel="stylesheet" href="./assets/css/modeler-mobile.css" />
+      <link rel="stylesheet" href="./assets/css/modeler-accessibility.css" />
+      <link rel="stylesheet" href="./assets/css/number-inputs.css" />
+      <link rel="stylesheet" href="./assets/css/scrollbars.css" />
+      <link rel="stylesheet" href="./assets/css/modeler-navigation-gizmo.css" />
+      <link rel="stylesheet" href="./assets/css/blender-modal-header.css" />
+      <link rel="stylesheet" href="./assets/css/blender-shell.css" />
+      <link rel="stylesheet" href="./assets/css/blender-widgets.css" />
+      <link rel="stylesheet" href="./assets/css/blender-viewport.css" />
+      <link rel="stylesheet" href="./assets/css/blender-outliner.css" />
+      <link rel="stylesheet" href="./assets/css/blender-properties.css" />
+      <link rel="stylesheet" href="./assets/css/blender-area-resize.css" />
+    </head>
+    <body class="mod3d-corpo">
+      <script src="./assets/js/nucleo/diagnostico.js"></script>
+      <script src="./assets/js/i18n/idiomas.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-tab-base-url.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-tab-address.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-tab-boot.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-tab-toast-fallback.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-channel-guard.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-editor-host.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/canal.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-performance-budget.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-binary-writer.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-mesh-optimizer.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-scene-snapshot.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-texture-resources.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-material-writer.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/exportador-glb.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/exportador-minimo.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-open-project.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/ponte-de-gravacao.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-source-validation.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-project-paths.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-source-codec.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/material-texture-maps.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/material-texture-map-bindings.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/image-file-to-png-bytes.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/texture-file-import.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-texture-coordinate-flip.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-texture-document.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-document-transport.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/primitivas.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/normais.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/malha.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/editable-mesh-geometry.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/mesh-shrink-fatten.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/mesh-extrude-modal.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/mesh-loop-cut.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/uv.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/materiais.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/texturas.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/material-texture-map-panel.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/verificador.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-default-object-color.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/cena.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/historico.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/selecao.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/operacoes-malha.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/mesh-shader-source.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/line-shader-source.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/handle-scale.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/transform-gizmo-shapes.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/navigation-gizmo.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/transformar.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/camera.js"></script>
+      <script src="./assets/js/estudio-3d/webgl-context-factory.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/render-gl.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/grid-visibility-preference.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/grid-geometry.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/grid-fog.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/grid-levels.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/viewport.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/editor-uv.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/painel-estrutura.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/painel-malha.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/foreign-modal-state.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/interaction-mode-state.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-select-mode-state.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/transform-pivot-state.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/transform-orientation-state.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/three-d-cursor-state.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/transform-axis-constraint.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/numeric-transform-input.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/modal-transform-session.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/modal-transform-key-intent.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/transform-space-math.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/modal-transform-values.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/modal-transform-header-text.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/modal-transform-header-view.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-modal-operator-definitions.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-modal-operator-session.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-modal-operator-header-text.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-modal-key-intent.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-modal-operator-runner.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/viewpoint-operators.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/operator-registry.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/default-keymap.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/keymap-event-resolver.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/object-transform-apply.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-transform-apply.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/modal-transform-controller.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/transform-operator-bindings.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/object-operator-bindings.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/mesh-operator-bindings.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/view-operator-bindings.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/viewport-interaction-bridge.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/uv-operator-bindings.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender/public-operator-api.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-export-i18n.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-export-panel.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/glb-export-controller.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-scene-document.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-history-document.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/autosave.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-project-i18n.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-project-panel.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/modeler-project-choice.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/projeto-modelador.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/aba.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/atalhos.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/celular.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-icons.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-icon-assignments.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-controls.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-popover.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-topbar.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-viewport-header.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-viewport-toolbar.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-properties.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-outliner.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-panel-collapse.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-status-bar.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-slider-fill.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-clamp-size.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-area-size-store.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-area-splitter.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-workspace-width-resize.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-side-stack-resize.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-header-scroll.js"></script>
+      <script src="./assets/js/estudio-3d/modelador/blender-layout.js"></script>
+    </body>
+  </html>

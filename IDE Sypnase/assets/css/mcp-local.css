@@ -1,0 +1,78 @@
+.mcp-modo {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 2px;
+  margin: 0 0 7px;
+}
+.mcp-modo-b {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 7px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--txt-2);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--t);
+}
+.mcp-modo-b:hover {
+  background: var(--bg-3);
+}
+.mcp-modo-b.on {
+  background: var(--bg-2);
+  border-color: rgba(var(--acc-rgb), 0.55);
+  color: var(--acc);
+}
+.mcp-chk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-top: 7px;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--txt-2);
+}
+.mcp-chk input {
+  accent-color: var(--acc);
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+.mcp-chk.off {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.mcp-teste {
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--txt-3);
+  margin-top: 4px;
+  word-break: break-word;
+}
+.mcp-teste.ok {
+  color: var(--ok);
+}
+.mcp-teste.err {
+  color: var(--err);
+}
+#mcpBlocoLocal code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+body.mcp-movel #mcpModo,body.mcp-movel #mcpBlocoLocal {
+  display: none !important;
+}

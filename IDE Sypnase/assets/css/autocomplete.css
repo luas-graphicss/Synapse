@@ -1,0 +1,136 @@
+.code-hl,.code-ta {
+  font-variant-ligatures: none;
+}
+.code-ta {
+  padding: 0;
+}
+.editor-caret-mirror {
+  position: fixed;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+  border-style: solid;
+  border-color: transparent;
+  height: 0;
+  overflow: hidden;
+  contain: layout style paint;
+}
+.editor-autocomplete {
+  position: fixed;
+  z-index: 2100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: var(--bg-1);
+  color: var(--txt);
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  box-shadow: var(--sh);
+  font: 12px/1.5 var(--mono);
+}
+.editor-autocomplete[hidden],.editor-autocomplete-detail[hidden] {
+  display: none;
+}
+.editor-autocomplete-list {
+  position: relative;
+  min-height: 40px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding: 4px;
+}
+.editor-autocomplete-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+}
+.editor-autocomplete-option:hover {
+  background: var(--bg-2);
+}
+.editor-autocomplete-option[aria-selected='true'] {
+  background: rgba(var(--acc-rgb), 0.1);
+  border-color: transparent;
+  box-shadow: inset 2px 0 0 var(--acc);
+}
+.editor-autocomplete-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editor-autocomplete-label strong {
+  color: var(--acc);
+  font-weight: 700;
+}
+.editor-autocomplete-kind {
+  flex: none;
+  color: var(--txt-2);
+  font: 11px/1.4 var(--mono);
+}
+.editor-autocomplete-detail {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 112px;
+  overflow: auto;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+}
+.editor-autocomplete-detail pre,.editor-autocomplete-detail p {
+  margin: 0;
+  font: 12px/1.5 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.editor-autocomplete-detail p:not(:empty) {
+  margin-top: 6px;
+  color: var(--txt-2);
+}
+.editor-autocomplete-footer {
+  flex: none;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  color: var(--txt-2);
+  font: 11px/1.4 var(--mono);
+}
+.editor-autocomplete-status {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.editor-autocomplete-trigger {
+  font: 600 11px/1 var(--mono);
+  min-width: var(--workspace-control-size, 32px);
+  min-height: var(--workspace-control-size, 32px);
+}
+#editorHead:has(#autocompleteBtn) {
+  min-height: max(40px, calc(var(--workspace-control-size, 32px) + 8px));
+}
+@media (pointer: coarse) {
+  .editor-autocomplete-option,	.editor-autocomplete-trigger {
+    min-height: 44px;
+  }
+  .editor-autocomplete-trigger {
+    min-width: 44px;
+  }
+}
+@media (forced-colors: active) {
+  .code-ta {
+    color: CanvasText;
+    background: Canvas;
+  }
+  .editor-autocomplete-option[aria-selected='true'] {
+    border-color: Highlight;
+  }
+}

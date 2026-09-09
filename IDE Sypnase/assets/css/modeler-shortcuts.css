@@ -1,0 +1,85 @@
+.mod3d-atalhos-botao {
+  white-space: nowrap;
+}
+.mod3d-atalhos-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(6, 8, 13, 0.72);
+}
+.mod3d-atalhos {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(520px, 100%);
+  max-height: 82vh;
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--mod3d-line);
+  border-radius: var(--mod3d-r);
+  background: var(--mod3d-bg-1);
+  color: var(--mod3d-txt);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+.mod3d-atalhos-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.mod3d-atalhos-titulo {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 650;
+}
+.mod3d-atalhos-mapa {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mod3d-atalhos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mod3d-atalho-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: var(--mod3d-bg-2);
+}
+.mod3d-atalho-acao {
+  color: var(--mod3d-txt-2);
+}
+.mod3d-atalho-tecla {
+  padding: 3px 8px;
+  border: 1px solid var(--mod3d-line);
+  border-radius: 6px;
+  background: var(--mod3d-bg);
+  color: var(--mod3d-txt);
+  font-family: var(--mod3d-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.mod3d-atalhos-aviso {
+  margin: 0;
+  color: var(--mod3d-txt-3);
+  line-height: 1.5;
+}
+@media (max-width: 620px) {
+  .mod3d-atalhos {
+    max-height: 88vh;
+  }
+  .mod3d-atalho-linha {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

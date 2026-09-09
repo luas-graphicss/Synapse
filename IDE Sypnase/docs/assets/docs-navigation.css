@@ -1,0 +1,109 @@
+.docs-sidebar {
+  position: sticky;
+  top: var(--docs-topbar-height);
+  align-self: start;
+  max-height: calc(100vh - var(--docs-topbar-height));
+  overflow-y: auto;
+  padding: 20px 0 40px;
+  background: var(--docs-panel);
+}
+.docs-filter {
+  margin: 0 16px 18px;
+}
+.docs-filter-input {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--docs-rule-strong);
+  border-radius: 0;
+  background: var(--docs-paper);
+  color: var(--docs-ink);
+  font-family: var(--docs-mono);
+  font-size: 11.5px;
+}
+.docs-filter-input::placeholder {
+  color: var(--docs-ink-3);
+}
+.docs-filter-input:focus {
+  outline: none;
+  border-color: var(--docs-mark);
+}
+.docs-nav-group {
+  margin-bottom: 20px;
+}
+.docs-nav-group-title {
+  margin: 0 16px 7px;
+  font-family: var(--docs-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--docs-ink-3);
+}
+.docs-nav-item {
+  display: block;
+  padding: 6px 16px 6px 15px;
+  border-left: 1px solid transparent;
+  color: var(--docs-ink-2);
+  font-size: 13px;
+}
+.docs-nav-item:hover {
+  border-left-color: var(--docs-rule-strong);
+  background: var(--docs-panel-strong);
+  color: var(--docs-ink);
+}
+.docs-nav-item-current {
+  border-left-color: var(--docs-mark);
+  background: var(--docs-mark-soft);
+  color: var(--docs-ink);
+  font-weight: 600;
+}
+.docs-nav-item-hidden {
+  display: none;
+}
+.docs-nav-empty {
+  margin: 0 16px;
+  font-family: var(--docs-mono);
+  font-size: 11px;
+  color: var(--docs-ink-3);
+}
+.docs-outline {
+  position: sticky;
+  top: var(--docs-topbar-height);
+  align-self: start;
+  max-height: calc(100vh - var(--docs-topbar-height));
+  overflow-y: auto;
+  padding: 34px 18px 40px;
+}
+.docs-outline-title {
+  margin: 0 0 10px;
+  font-family: var(--docs-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--docs-ink-3);
+}
+.docs-outline-link {
+  display: block;
+  padding: 4px 0 4px 11px;
+  border-left: 1px solid var(--docs-rule);
+  color: var(--docs-ink-3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.docs-outline-link-nested {
+  padding-left: 22px;
+}
+.docs-outline-link:hover {
+  border-left-color: var(--docs-rule-strong);
+  color: var(--docs-ink-2);
+}
+.docs-outline-link-current {
+  border-left-color: var(--docs-mark);
+  color: var(--docs-ink);
+}
+@media (max-width: 900px) {
+  .docs-sidebar {
+    position: static;
+    max-height: none;
+    border-bottom: 1px solid var(--docs-rule-strong);
+  }
+}

@@ -1,0 +1,152 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Terminal e relay | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Como o relay executa comandos reais, sincroniza arquivos no disco e serve o dev server."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="terminal">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Plataforma / Terminal e relay</p>
+              <h1 class="docs-title">Terminal e relay</h1>
+              <p class="docs-lede">
+                O navegador não executa processos do sistema. Para rodar npm, node ou um build de
+                verdade, a IDE fala com um processo local chamado relay, que trabalha numa pasta
+                espelhada do projeto.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 9 min</span>
+                <span>público: dev</span>
+              </div>
+              <section>
+                <h2>O que o relay faz</h2>
+                <ul>
+                  <li>Mantém uma cópia do projeto em disco, sincronizada a cada gravação.</li>
+                  <li>Executa comandos nessa pasta e devolve a saída em tempo real.</li>
+                  <li>Sobe o dev server e vira proxy para o preview.</li>
+                  <li>Traz de volta arquivos gerados por ferramentas externas.</li>
+                </ul>
+                <p>
+                  Sem relay, a IDE segue útil para editar e ver preview interno. O que fica
+                  indisponível é tudo que exige processo de sistema.
+                </p>
+              </section>
+              <section>
+                <h2>Permissão de terminal</h2>
+                <p>
+                  Execução de comandos vem desligada. Você precisa marcar a permissão de terminal no
+                  menu de integrações antes da primeira execução. Essa é uma barreira intencional:
+                  comando executado no relay tem o mesmo poder de um comando digitado no seu terminal.
+                </p>
+                <div class="docs-note docs-note-alert">
+                  <span class="docs-note-label">Segurança</span>
+                  <p>
+                    Nunca deixe a permissão de terminal ligada com um projeto de origem desconhecida
+                    aberto. Scripts do projeto podem ser executados por ações automatizadas.
+                  </p>
+                </div>
+              </section>
+              <section>
+                <h2>Comandos longos</h2>
+                <p>
+                  Comandos que não terminam rápido continuam rodando em segundo plano e recebem um
+                  identificador de processo. Você acompanha a saída por esse identificador e encerra
+                  quando quiser.
+                </p>
+                <pre><code>npm install
+npm run build
+node scripts/gerar-assets.js</code></pre>
+                <p>
+                  Processos que ficam vivos por natureza, como servidores e observadores de arquivo,
+                  devem ser iniciados como serviço e não como comando comum, senão o painel fica preso
+                  esperando o fim.
+                </p>
+              </section>
+              <section>
+                <h2>Dev server</h2>
+                <ol class="docs-steps">
+                  <li>Instale as dependências com <code>npm install</code>.</li>
+                  <li>Inicie o servidor, normalmente <code>npm run dev</code>.</li>
+                  <li>Aguarde a porta ser detectada na saída do comando.</li>
+                  <li>O preview passa a mostrar o dev server, com recarga automática.</li>
+                </ol>
+                <p>
+                  Se a porta não aparecer sozinha, consulte o estado do dev server: ele informa porta,
+                  situação e as últimas linhas de log. Encerre o servidor antes de trocar de projeto
+                  para não deixar processo órfão.
+                </p>
+              </section>
+              <section>
+                <h2>Sincronização com o disco</h2>
+                <p>
+                  Gravações feitas na IDE descem para a pasta espelhada. O caminho inverso também
+                  existe: arquivos criados por comandos voltam para a IDE e para o preview.
+                </p>
+                <p>
+                  Editar o mesmo arquivo ao mesmo tempo na IDE e num editor externo pode gerar conflito.
+                  Escolha um lado por vez.
+                </p>
+              </section>
+              <section>
+                <h2>Quando o relay cai</h2>
+                <p>
+                  A IDE detecta a queda e marca as ferramentas dependentes como indisponíveis. O projeto
+                  em si não é afetado, porque a fonte da verdade continua no armazenamento do navegador.
+                  Religue o relay e a sincronização retoma do ponto atual.
+                </p>
+                <p>
+                  Sintomas típicos de relay fora do ar: terminal sem resposta, dev server inacessível e
+                  build parando na preparação do ambiente.
+                </p>
+              </section>
+            </article>
+            <footer class="docs-pager">
+            </footer>
+            <p class="docs-page-footer">
+              Problema com comando específico? Inclua o comando exato e a saída completa no relato.
+            </p>
+          </main>
+          <aside class="docs-outline" aria-label="Nesta página">
+          </aside>
+        </div>
+        <script src="./assets/docs-catalog.js"></script>
+        <script src="./assets/docs-current-category.js"></script>
+        <script src="./assets/docs-sidebar.js"></script>
+        <script src="./assets/docs-filter.js"></script>
+        <script src="./assets/docs-outline.js"></script>
+        <script src="./assets/docs-pager.js"></script>
+        <script src="./assets/docs-boot.js"></script>
+        <script src="../assets/js/i18n/phrase-registration.js"></script>
+        <script src="./assets/docs-phrases.js"></script>
+        <script src="./assets/docs-error-silencer.js"></script>
+        <script src="../assets/js/i18n/idiomas.js"></script>
+      </body>
+    </html>

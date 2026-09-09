@@ -1,0 +1,331 @@
+.mod3d-corpo .blender-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  display: block;
+}
+.mod3d-corpo .mod3d-botao,.mod3d-corpo .mod3d-viewbotao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--bl-radius);
+  background: var(--bl-field);
+  color: var(--bl-text);
+  font: 11px/1 var(--bl-sans);
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.mod3d-corpo .mod3d-botao:hover:not(:disabled),.mod3d-corpo .mod3d-viewbotao:hover:not(:disabled) {
+  background: var(--bl-field-hover);
+  color: #ffffff;
+}
+.mod3d-corpo .mod3d-botao:active:not(:disabled),.mod3d-corpo .mod3d-viewbotao:active:not(:disabled) {
+  background: #454545;
+}
+.mod3d-corpo .mod3d-botao.on,.mod3d-corpo .mod3d-viewbotao.on {
+  background: var(--bl-accent);
+  color: #ffffff;
+}
+.mod3d-corpo .mod3d-botao.on:hover:not(:disabled),.mod3d-corpo .mod3d-viewbotao.on:hover:not(:disabled) {
+  background: var(--bl-accent-hover);
+}
+.mod3d-corpo .mod3d-botao:disabled,.mod3d-corpo .mod3d-viewbotao:disabled {
+  background: #444444;
+  color: #757575;
+  cursor: default;
+}
+.mod3d-corpo .mod3d-botao-forte {
+  background: var(--bl-accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+.mod3d-corpo .mod3d-botao-forte:hover:not(:disabled) {
+  background: var(--bl-accent-hover);
+}
+.mod3d-corpo .blender-icon-button {
+  width: 24px;
+  padding: 0;
+}
+.mod3d-corpo .blender-area-header .mod3d-viewbotao,.mod3d-corpo .blender-area-header .blender-icon-button {
+  background: transparent;
+  color: var(--bl-text-dim);
+}
+.mod3d-corpo .blender-area-header .mod3d-viewbotao:hover:not(:disabled),.mod3d-corpo .blender-area-header .blender-icon-button:hover:not(:disabled) {
+  background: #3d3d3d;
+  color: #ffffff;
+}
+.mod3d-corpo .blender-area-header .mod3d-viewbotao.on,.mod3d-corpo .blender-area-header .blender-icon-button.on {
+  background: var(--bl-accent);
+  color: #ffffff;
+}
+.mod3d-corpo .blender-area-header .mod3d-viewbotao:disabled,.mod3d-corpo .blender-area-header .blender-icon-button:disabled {
+  background: transparent;
+  color: #666666;
+}
+.mod3d-corpo .mod3d-ferramentas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1px;
+}
+.mod3d-corpo .mod3d-ferramentas:empty {
+  display: none;
+}
+.mod3d-corpo .blender-header-group > .mod3d-botao,.mod3d-corpo .blender-header-group > .mod3d-viewbotao {
+  border-radius: 0;
+}
+.mod3d-corpo .blender-header-group > .mod3d-botao:first-child,.mod3d-corpo .blender-header-group > .mod3d-viewbotao:first-child {
+  border-top-left-radius: var(--bl-radius);
+  border-bottom-left-radius: var(--bl-radius);
+}
+.mod3d-corpo .blender-header-group > .mod3d-botao:last-child,.mod3d-corpo .blender-header-group > .mod3d-viewbotao:last-child {
+  border-top-right-radius: var(--bl-radius);
+  border-bottom-right-radius: var(--bl-radius);
+}
+.mod3d-corpo .mod3d-seletor,.mod3d-corpo .mod3d-viewseletor {
+  height: 20px;
+  min-height: 20px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0 17px 0 7px;
+  border: 0;
+  border-radius: var(--bl-radius);
+  background-color: var(--bl-field);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23d4d4d4' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  background-size: 8px 5px;
+  color: var(--bl-text);
+  font: 11px/1 var(--bl-sans);
+  appearance: none;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+.mod3d-corpo .mod3d-seletor:hover:not(:disabled),.mod3d-corpo .mod3d-viewseletor:hover:not(:disabled) {
+  background-color: var(--bl-field-hover);
+}
+.mod3d-corpo .mod3d-seletor:disabled,.mod3d-corpo .mod3d-viewseletor:disabled {
+  background-color: #444444;
+  color: #757575;
+  cursor: default;
+}
+.mod3d-corpo .mod3d-seletor-curto {
+  max-width: 96px;
+}
+.mod3d-corpo .mod3d-viewseletor-largo {
+  min-width: 132px;
+  max-width: 190px;
+}
+.mod3d-corpo option,.mod3d-corpo optgroup {
+  background: var(--bl-region);
+  color: var(--bl-text);
+}
+.mod3d-corpo .mod3d-entrada,.mod3d-corpo .mod3d-no-entrada {
+  height: 20px;
+  min-height: 20px;
+  width: 100%;
+  min-width: 0;
+  padding: 0 7px;
+  border: 0;
+  border-radius: var(--bl-radius);
+  background: var(--bl-field-active);
+  color: var(--bl-text);
+  font: 11px/1 var(--bl-sans);
+}
+.mod3d-corpo .mod3d-entrada:focus,.mod3d-corpo .mod3d-no-entrada:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--bl-accent);
+}
+.mod3d-corpo .mod3d-numero {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: var(--bl-radius);
+  background: var(--bl-field);
+  cursor: text;
+  overflow: hidden;
+}
+.mod3d-corpo .mod3d-numero:hover {
+  background: var(--bl-field-hover);
+}
+.mod3d-corpo .mod3d-numero:focus-within {
+  background: var(--bl-field-active);
+  box-shadow: inset 0 0 0 1px var(--bl-accent);
+}
+.mod3d-corpo .mod3d-numero-rotulo {
+  color: #e0e0e0;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.mod3d-corpo .mod3d-numero-campo {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font: 11px/1 var(--bl-sans);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.mod3d-corpo .mod3d-numero-campo:focus {
+  outline: none;
+}
+.mod3d-corpo .mod3d-trio {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+}
+.mod3d-corpo .mod3d-trio-rotulo {
+  padding: 3px 0 1px;
+  color: var(--bl-text-dim);
+  font-size: 10px;
+}
+.mod3d-corpo .mod3d-trio > .mod3d-numero {
+  border-radius: 0;
+}
+.mod3d-corpo .mod3d-trio > .mod3d-numero:first-of-type {
+  border-top-left-radius: var(--bl-radius);
+  border-top-right-radius: var(--bl-radius);
+}
+.mod3d-corpo .mod3d-trio > .mod3d-numero:last-of-type {
+  border-bottom-left-radius: var(--bl-radius);
+  border-bottom-right-radius: var(--bl-radius);
+}
+.mod3d-corpo .mod3d-trio-largo {
+  grid-template-columns: minmax(0, 1fr);
+}
+.mod3d-corpo .mod3d-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  min-height: 20px;
+  color: var(--bl-text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+.mod3d-corpo input[type='checkbox'] {
+  flex: 0 0 13px;
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--bl-field);
+  appearance: none;
+  position: relative;
+  cursor: pointer;
+}
+.mod3d-corpo input[type='checkbox']:hover {
+  background: var(--bl-field-hover);
+}
+.mod3d-corpo input[type='checkbox']:checked {
+  background: var(--bl-accent);
+}
+.mod3d-corpo input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-top: 0;
+  border-left: 0;
+  transform: rotate(40deg);
+}
+.mod3d-corpo input[type='checkbox']:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.mod3d-corpo .mod3d-faixa {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: var(--bl-radius);
+  background: linear-gradient(		to right,		var(--bl-accent) 0 var(--blender-slider-fill, 0%),		var(--bl-field) var(--blender-slider-fill, 0%) 100%	);
+  overflow: hidden;
+  cursor: ew-resize;
+}
+.mod3d-corpo .mod3d-faixa-rotulo {
+  position: relative;
+  z-index: 1;
+  color: #f2f2f2;
+  font-size: 10.5px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.mod3d-corpo .mod3d-faixa-valor {
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.mod3d-corpo .mod3d-faixa-campo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  opacity: 0;
+  cursor: ew-resize;
+}
+.mod3d-corpo .mod3d-cor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 20px;
+  min-height: 20px;
+  padding: 0 5px 0 7px;
+  border-radius: var(--bl-radius);
+  background: var(--bl-field);
+  color: #e0e0e0;
+  font-size: 10.5px;
+}
+.mod3d-corpo .mod3d-cor-campo {
+  width: 52px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+}
+.mod3d-corpo input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.mod3d-corpo input[type='color']::-webkit-color-swatch {
+  border: 0;
+  border-radius: 3px;
+}
+.mod3d-corpo :focus-visible {
+  outline: 1px solid var(--bl-accent);
+  outline-offset: 0;
+}

@@ -1,0 +1,15 @@
+@media (min-width: 640px) {
+  .menu-wrap > .menu:not(.workspace-tools-menu) {
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+}
+@supports (height: 100dvh) {
+  @media (min-width: 640px) {
+    .menu-wrap > .menu:not(.workspace-tools-menu) {
+      max-height: calc(100dvh - 96px);
+    }
+  }
+}

@@ -1,0 +1,261 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Editor de código | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Linguagens, IntelliSense, diagnósticos, formatação, busca e navegação no editor da Synapse IDE."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="editor">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Ferramentas / Editor de código</p>
+              <h1 class="docs-title">Editor de código</h1>
+              <p class="docs-lede">
+                O editor da Synapse não usa um componente de terceiros. Ele tem tokenizador próprio,
+                serviço de sugestões em worker separado e formatador integrado. Esta página explica o
+                que cada parte cobre e onde ela para.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 11 min</span>
+                <span>público: dev</span>
+              </div>
+              <section>
+                <h2>Linguagens reconhecidas</h2>
+                <p>
+                  A linguagem é escolhida pela extensão do arquivo. Cada linguagem tem uma gramática
+                  própria para o realce e um conjunto de regras de indentação.
+                </p>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Linguagem</th>
+                      <th>Extensões</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>JavaScript</td>
+                      <td>
+                        <code>js</code>
+                        <code>mjs</code>
+                        <code>cjs</code>
+                        <code>jsx</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>TypeScript</td>
+                      <td>
+                        <code>ts</code>
+                        <code>tsx</code>
+                        <code>mts</code>
+                        <code>cts</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>HTML e marcação</td>
+                      <td>
+                        <code>html</code>
+                        <code>htm</code>
+                        <code>xml</code>
+                        <code>svg</code>
+                        <code>vue</code>
+                        <code>svelte</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>CSS</td>
+                      <td>
+                        <code>css</code>
+                        <code>scss</code>
+                        <code>less</code>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>JSON</td>
+                      <td>
+                        <code>json</code>
+                        <code>jsonc</code>
+                        <code>webmanifest</code>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  Arquivos com extensão desconhecida abrem como texto simples. O realce fica desligado,
+                  mas edição, busca e gravação continuam normais.
+                </p>
+              </section>
+              <section>
+                <h2>Sugestões e IntelliSense</h2>
+                <p>
+                  As sugestões vêm de duas fontes. A primeira é a análise local do arquivo, que coleta
+                  símbolos declarados, propriedades usadas e palavras do próprio documento. A segunda é
+                  o serviço de linguagem que roda em worker, fora da thread da interface, para não
+                  travar a digitação.
+                </p>
+                <ul>
+                  <li>A lista abre sozinha enquanto você digita identificadores.</li>
+                  <li>
+                    <span class="docs-keys">Mod+Space</span> força a abertura, útil depois de um ponto
+                      ou dentro de string.
+                    </li>
+                    <li>
+                      <span class="docs-keys">Enter</span> ou <span class="docs-keys">Tab</span> aceitam,
+                        <span class="docs-keys">Esc</span> descarta.
+                        </li>
+                        <li>Em HTML e CSS a lista também cobre tags, atributos e propriedades conhecidas.</li>
+                      </ul>
+                      <p>
+                        A sugestão não substitui um projeto TypeScript completo. Ela não resolve tipos vindos
+                        de dependências instaladas no disco, só o que está dentro do projeto aberto.
+                      </p>
+                    </section>
+                    <section>
+                      <h2>Diagnósticos</h2>
+                      <p>
+                        Erros de sintaxe aparecem sublinhados na linha e listados no painel de build. Cada
+                        gravação roda uma validação rápida do arquivo salvo, e o resultado diz se o arquivo
+                        quebrou.
+                      </p>
+                      <div class="docs-note">
+                        <span class="docs-note-label">Detalhe importante</span>
+                        <p>
+                          O arquivo é gravado mesmo com erro de sintaxe. A IDE avisa em vez de bloquear, para
+                          você não perder o que digitou. Corrija antes de continuar, porque o preview vai
+                          falhar ao carregar aquele módulo.
+                        </p>
+                      </div>
+                      <p>
+                        Diagnósticos de tipo, quando disponíveis, aparecem em cinza e não impedem execução.
+                        Diagnósticos de sintaxe aparecem em vermelho.
+                      </p>
+                    </section>
+                    <section>
+                      <h2>Formatação</h2>
+                      <p>
+                        <span class="docs-keys">Alt+Shift+F</span> formata o arquivo ativo. A formatação
+                          respeita a linguagem detectada e mantém a posição do cursor sempre que possível.
+                        </p>
+                        <p>
+                          Para formatar vários arquivos, use a ação de formatar projeto pela paleta. Ela mostra
+                          progresso e pode ser interrompida no meio sem deixar arquivo pela metade.
+                        </p>
+                      </section>
+                      <section>
+                        <h2>Busca e substituição</h2>
+                        <table class="docs-table">
+                          <thead>
+                            <tr>
+                              <th>Ação</th>
+                              <th>Atalho</th>
+                              <th>Escopo</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Localizar</td>
+                              <td>
+                                <span class="docs-keys">Mod+F</span>
+                              </td>
+                              <td>Arquivo ativo</td>
+                            </tr>
+                            <tr>
+                              <td>Substituir</td>
+                              <td>
+                                <span class="docs-keys">Mod+Shift+H</span>
+                              </td>
+                              <td>Arquivo ativo</td>
+                            </tr>
+                            <tr>
+                              <td>Localizar no projeto</td>
+                              <td>
+                                <span class="docs-keys">Mod+Shift+F</span>
+                              </td>
+                              <td>Todos os arquivos de texto</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <p>
+                          A busca no projeto ignora binários e pastas de dependência. Os resultados são
+                          agrupados por arquivo e cada linha leva direto para a posição exata.
+                        </p>
+                      </section>
+                      <section>
+                        <h2>Navegação entre símbolos</h2>
+                        <p>
+                          O editor mantém um mapa de funções, classes e blocos de cada arquivo aberto. Esse mapa
+                          alimenta a lista de símbolos, o salto para definição e o breadcrumb acima do código.
+                          Em arquivos grandes, prefira o mapa à rolagem manual.
+                        </p>
+                      </section>
+                      <section>
+                        <h2>Arquivos grandes</h2>
+                        <p>
+                          Acima de aproximadamente 250 mil caracteres ou 7 mil linhas, o editor entra em modo
+                          reduzido: realce de sintaxe e análise pesada saem de cena e sobra edição de texto
+                          puro. É proposital, para a rolagem continuar utilizável.
+                        </p>
+                        <p>
+                          Se você trabalha sempre com arquivos desse tamanho, vale quebrá-los em módulos
+                          menores. Isso melhora também o tempo de recompilação do preview.
+                        </p>
+                      </section>
+                      <section>
+                        <h2>Limites atuais</h2>
+                        <ul>
+                          <li>Sem renomeação de símbolo em vários arquivos de uma vez.</li>
+                          <li>Sem suporte a linguagens de backend com realce dedicado.</li>
+                          <li>Múltiplos cursores cobrem seleção vertical, mas não seleção por padrão regex.</li>
+                        </ul>
+                      </section>
+                    </article>
+                    <footer class="docs-pager">
+                    </footer>
+                    <p class="docs-page-footer">
+                      Se o editor se comportou diferente do descrito aqui, mande o trecho de código junto no
+                      relato de bug.
+                    </p>
+                  </main>
+                  <aside class="docs-outline" aria-label="Nesta página">
+                  </aside>
+                </div>
+                <script src="./assets/docs-catalog.js"></script>
+                <script src="./assets/docs-current-category.js"></script>
+                <script src="./assets/docs-sidebar.js"></script>
+                <script src="./assets/docs-filter.js"></script>
+                <script src="./assets/docs-outline.js"></script>
+                <script src="./assets/docs-pager.js"></script>
+                <script src="./assets/docs-boot.js"></script>
+                <script src="../assets/js/i18n/phrase-registration.js"></script>
+                <script src="./assets/docs-phrases.js"></script>
+                <script src="./assets/docs-error-silencer.js"></script>
+                <script src="../assets/js/i18n/idiomas.js"></script>
+              </body>
+            </html>

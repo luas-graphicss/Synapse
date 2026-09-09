@@ -1,0 +1,79 @@
+.toolbar {
+  height: 32px;
+  gap: 6px;
+  padding: 0 8px;
+}
+.toolbar .icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+}
+.toolbar .tbtn,.toolbar .top-ico {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 6px;
+}
+.toolbar .tbtn .badge {
+  top: -3px;
+  right: -3px;
+  min-width: 13px;
+  height: 13px;
+  font-size: 9px;
+  line-height: 13px;
+}
+.toolbar .seg {
+  gap: 2px;
+  padding: 2px;
+  border-radius: 7px;
+}
+.toolbar .seg button {
+  height: 20px;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 0 7px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.toolbar .seg button .icon {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+}
+.toolbar .dims {
+  gap: 4px;
+  font-size: 11px;
+}
+.toolbar .dims input {
+  width: 44px;
+  height: 21px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+.toolbar .zoom {
+  min-width: 36px;
+  font-size: 11px;
+}
+.toolbar .tdiv {
+  height: 16px;
+  margin: 0 2px;
+}
+@media (pointer: coarse) {
+  .toolbar {
+    height: 38px;
+  }
+  .toolbar .tbtn,	.toolbar .top-ico {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+  }
+  .toolbar .seg button {
+    height: 26px;
+    min-height: 26px;
+  }
+  .toolbar .dims input {
+    height: 26px;
+  }
+}

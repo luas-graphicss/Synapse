@@ -1,0 +1,130 @@
+.mod3d-glb-export {
+  min-width: 0;
+  padding: 16px;
+  background: var(--bg-1);
+  color: var(--txt);
+  font: 12px/1.5 var(--mono);
+}
+.mod3d-glb-export .mod3d-painel-titulo {
+  margin: 0 0 8px;
+  padding: 0;
+  font: 600 14px/1.5 var(--mono);
+}
+.mod3d-glb-description {
+  margin: 0 0 16px;
+  color: var(--txt-2);
+}
+.mod3d-glb-field {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+.mod3d-glb-label {
+  font-weight: 600;
+}
+.mod3d-glb-export .mod3d-entrada,.mod3d-glb-export .mod3d-seletor {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  padding: 6px 8px;
+  background: var(--bg);
+  color: var(--txt);
+  font: inherit;
+}
+.mod3d-glb-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+.mod3d-glb-check input {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--acc);
+}
+.mod3d-glb-export .mod3d-botao {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  margin-top: 12px;
+  border: 1px solid var(--acc);
+  border-radius: 2px;
+  padding: 6px 12px;
+  background: var(--acc);
+  color: var(--acc-ink);
+  font: 600 12px/1.5 var(--mono);
+  cursor: pointer;
+}
+.mod3d-glb-export :focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+.mod3d-glb-export :disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+.mod3d-glb-export .mod3d-resultado {
+  display: block;
+  margin: 12px 0 0;
+  max-width: 100%;
+  color: var(--txt-2);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.mod3d-glb-export .mod3d-resultado.erro {
+  color: var(--err);
+}
+.mod3d-glb-export .mod3d-resultado.ok,.mod3d-glb-validation {
+  color: var(--ok);
+}
+.mod3d-glb-report {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.mod3d-glb-report[hidden] {
+  display: none;
+}
+.mod3d-glb-report-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+}
+.mod3d-glb-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.mod3d-glb-metric dt {
+  color: var(--txt-2);
+  overflow-wrap: anywhere;
+}
+.mod3d-glb-metric dd {
+  margin: 4px 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.mod3d-glb-warnings {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  color: var(--warn);
+  overflow-wrap: anywhere;
+}
+.mod3d-glb-warnings li + li {
+  margin-top: 8px;
+}
+@media (pointer: coarse) {
+  .mod3d-glb-export .mod3d-entrada,	.mod3d-glb-export .mod3d-seletor {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .mod3d-glb-export .mod3d-botao,	.mod3d-glb-check {
+    min-height: 44px;
+  }
+}

@@ -1,0 +1,7 @@
+.brand .logo::before,.wl-logo::before {
+  background: none;
+  -webkit-mask: none;
+  mask: none;
+  width: auto;
+  height: auto;
+}

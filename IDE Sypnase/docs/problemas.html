@@ -1,0 +1,303 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Solução de problemas | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Sintomas comuns da Synapse IDE, causa provável e o que fazer em cada caso, separados por camada."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="problemas">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Suporte / Solução de problemas</p>
+              <h1 class="docs-title">Solução de problemas</h1>
+              <p class="docs-lede">
+                Quase todo problema na IDE pertence a uma camada: armazenamento, editor, preview, build,
+                relay, 3D ou agentes. Achar a camada certa resolve metade do caminho, porque cada uma
+                tem sintoma e ferramenta de diagnóstico próprios.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 12 min</span>
+                <span>público: todos</span>
+              </div>
+              <section>
+                <h2>Antes de qualquer coisa</h2>
+                <ol class="docs-steps">
+                  <li>
+                    Abra o console (<span class="docs-keys">Mod + `</span>) e leia o primeiro erro, não o
+                    último. O primeiro geralmente causa os outros.
+                  </li>
+                  <li>Confira se o problema aparece também num projeto novo e vazio.</li>
+                  <li>
+                    Confira se o relay está ligado, quando o problema envolve terminal, build ou dev
+                    server.
+                  </li>
+                  <li>
+                    Recarregue a página antes de investigar mais fundo. Estado velho de aba explica muito
+                    comportamento estranho.
+                  </li>
+                </ol>
+                <p>
+                  Se você já sabe reproduzir o problema, anote a sequência exata. Ela vale mais que
+                  qualquer descrição no relato de bug.
+                </p>
+              </section>
+              <section>
+                <h2>Projeto, arquivos e abas</h2>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Sintoma</th>
+                      <th>Causa provável</th>
+                      <th>O que fazer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Projeto sumiu ao abrir a IDE</td>
+                      <td>Outro navegador, outro perfil, aba privada ou dados do site limpos</td>
+                      <td>Abra na mesma origem de antes. Sem backup exportado, o projeto não volta.</td>
+                    </tr>
+                    <tr>
+                      <td>Aviso de sessão em outra aba</td>
+                      <td>Duas abas da IDE disputando a mesma sessão</td>
+                      <td>Feche as abas duplicadas e recarregue a que você quer usar.</td>
+                    </tr>
+                    <tr>
+                      <td>Falha ao salvar</td>
+                      <td>Cota de armazenamento do navegador perto do limite</td>
+                      <td>Exporte e apague projetos antigos, e tire binário pesado do projeto.</td>
+                    </tr>
+                    <tr>
+                      <td>Importação trouxe menos arquivos</td>
+                      <td>Entradas com caminho inválido foram recusadas</td>
+                      <td>Reempacote o zip sem caminho absoluto e sem <code>..</code>.</td>
+                    </tr>
+                    <tr>
+                      <td>Arquivo apagado por engano</td>
+                      <td>Remoção manual ou sincronização com o disco</td>
+                      <td>Use o histórico do arquivo ou o snapshot automático criado na exclusão.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <section>
+                <h2>Editor</h2>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Sintoma</th>
+                      <th>Causa provável</th>
+                      <th>O que fazer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Digitação travando</td>
+                      <td>Arquivo muito grande com realce e sugestão ativos</td>
+                      <td>Desligue o realce nas configurações ou divida o arquivo.</td>
+                    </tr>
+                    <tr>
+                      <td>Sem sugestão de código</td>
+                      <td>Autocomplete desligado ou linguagem sem perfil</td>
+                      <td>Revise as configurações e teste <span class="docs-keys">Mod + Space</span>.</td>
+                    </tr>
+                    <tr>
+                      <td>Formatação não roda</td>
+                      <td>Extensão sem formatador ou arquivo com erro de sintaxe</td>
+                      <td>Corrija o erro apontado no editor e formate de novo.</td>
+                    </tr>
+                    <tr>
+                      <td>Busca no projeto lenta</td>
+                      <td>Projeto com muitos arquivos e binários grandes</td>
+                      <td>Restrinja o escopo da busca a uma pasta.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <section>
+                <h2>Preview</h2>
+                <p>
+                  Preview em branco quase nunca é culpa do editor. Na ordem, verifique: erro de sintaxe no
+                  arquivo de entrada, caminho de recurso errado e erro em tempo de execução no console.
+                </p>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Sintoma</th>
+                      <th>Causa provável</th>
+                      <th>O que fazer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Tela branca</td>
+                      <td>Erro logo no início do script principal</td>
+                      <td>Leia o primeiro erro do console e corrija antes dos demais.</td>
+                    </tr>
+                    <tr>
+                      <td>Imagem ou fonte não carrega</td>
+                      <td>Caminho com barra inicial ou nome com diferença de maiúscula</td>
+                      <td>Use caminho relativo simples e confira o registro de rede do preview.</td>
+                    </tr>
+                    <tr>
+                      <td>Mudança não aparece</td>
+                      <td>Preview pausado ou dev server servindo build antigo</td>
+                      <td>
+                        Atualize com <span class="docs-keys">Mod + S</span> e confira o estado do dev server.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Estado antigo do app persistindo</td>
+                      <td>Dados guardados no armazenamento local do preview</td>
+                      <td>Zere o estado do preview e recarregue como usuário novo.</td>
+                    </tr>
+                    <tr>
+                      <td>Som não toca</td>
+                      <td>Autoplay bloqueado sem interação do usuário</td>
+                      <td>Dispare o áudio depois de um clique ou tecla.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <section>
+                <h2>Build e compilador</h2>
+                <ul>
+                  <li>Build que para na preparação do ambiente costuma ser relay fora do ar.</li>
+                  <li>
+                    Toolchain ausente aparece como aviso de perfil indisponível, e o build cai para o
+                    caminho do navegador quando existe alternativa.
+                  </li>
+                  <li>
+                    Erro de compilação chega no painel com arquivo e linha. Clique para abrir no ponto
+                    exato.
+                  </li>
+                  <li>
+                    Se o mesmo código compila fora da IDE, compare a versão da toolchain usada nos dois
+                    lados.
+                  </li>
+                </ul>
+              </section>
+              <section>
+                <h2>Terminal e relay</h2>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Sintoma</th>
+                      <th>Causa provável</th>
+                      <th>O que fazer</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Comando não executa</td>
+                      <td>Permissão de terminal desmarcada</td>
+                      <td>Marque a permissão no menu de integrações e tente de novo.</td>
+                    </tr>
+                    <tr>
+                      <td>Painel preso esperando</td>
+                      <td>Processo que não termina, como servidor ou observador</td>
+                      <td>Encerre o processo e inicie como serviço em vez de comando comum.</td>
+                    </tr>
+                    <tr>
+                      <td>Dev server inacessível</td>
+                      <td>Porta não detectada na saída do comando</td>
+                      <td>Consulte o estado do dev server e confira a porta no log.</td>
+                    </tr>
+                    <tr>
+                      <td>Arquivo do disco não aparece na IDE</td>
+                      <td>Relay caiu depois da geração</td>
+                      <td>Religue o relay e rode qualquer comando para forçar a sincronização.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+              <section>
+                <h2>Blepse 3D e agentes</h2>
+                <ul>
+                  <li>
+                    Viewport preta indica contexto WebGL perdido. Recarregue a aba do modelador e feche
+                    outras abas 3D.
+                  </li>
+                  <li>
+                    Modelo que não aparece na cena costuma ser diferença entre o caminho gravado e o
+                    caminho carregado.
+                  </li>
+                  <li>Gravação de agente recusada normalmente é trava de projeto ativa de outro agente.</li>
+                  <li>
+                    Agente que enxerga conteúdo velho quase sempre está em outro projeto. Confira o projeto
+                    informado na chamada.
+                  </li>
+                </ul>
+              </section>
+              <section>
+                <h2>Quando nada disso resolve</h2>
+                <p>
+                  Use o botão <strong>Ajuda</strong> na barra superior da IDE, à esquerda de Importar, e
+                  envie um relato. Um bom relato encurta muito o tempo de correção.
+                </p>
+                <ul>
+                  <li>Título curto que descreve o comportamento errado, não a sua teoria da causa.</li>
+                  <li>Passos numerados para reproduzir, começando de projeto novo quando possível.</li>
+                  <li>O que você esperava e o que aconteceu.</li>
+                  <li>Erros do console colados como texto.</li>
+                  <li>Se o relay estava ligado e se havia agente trabalhando no projeto.</li>
+                </ul>
+                <div class="docs-note">
+                  <span class="docs-note-label">O que vai junto automaticamente</span>
+                  <p>
+                    O formulário anexa dados técnicos do ambiente: endereço da página, tema, tamanho da
+                    janela, densidade de pixel, idioma, fuso horário, navegador e o momento do relato. Não
+                    vai nenhum arquivo do seu projeto.
+                  </p>
+                </div>
+              </section>
+            </article>
+            <footer class="docs-pager">
+            </footer>
+            <p class="docs-page-footer">
+              Não achou o seu sintoma aqui? Relate mesmo assim: sintoma novo entra nesta página.
+            </p>
+          </main>
+          <aside class="docs-outline" aria-label="Nesta página">
+          </aside>
+        </div>
+        <script src="./assets/docs-catalog.js"></script>
+        <script src="./assets/docs-current-category.js"></script>
+        <script src="./assets/docs-sidebar.js"></script>
+        <script src="./assets/docs-filter.js"></script>
+        <script src="./assets/docs-outline.js"></script>
+        <script src="./assets/docs-pager.js"></script>
+        <script src="./assets/docs-boot.js"></script>
+        <script src="../assets/js/i18n/phrase-registration.js"></script>
+        <script src="./assets/docs-phrases.js"></script>
+        <script src="./assets/docs-error-silencer.js"></script>
+        <script src="../assets/js/i18n/idiomas.js"></script>
+      </body>
+    </html>

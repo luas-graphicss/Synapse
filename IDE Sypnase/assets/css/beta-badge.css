@@ -1,0 +1,67 @@
+.has-beta-badge {
+  position: relative;
+}
+.beta-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 3;
+  padding: 0 4px;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: var(--bg-3);
+  color: var(--txt-3);
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 500;
+  line-height: 12px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.top-ico.has-beta-badge .beta-badge,.tbtn.has-beta-badge .beta-badge,.eh-btn.has-beta-badge .beta-badge {
+  top: 4px;
+  right: 4px;
+  width: 4px;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--txt-3);
+  box-shadow: none;
+  opacity: 0.75;
+}
+.top-ico.has-beta-badge .beta-badge-text,.tbtn.has-beta-badge .beta-badge-text,.eh-btn.has-beta-badge .beta-badge-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+.workspace-tools-menu .workspace-menu-action.has-beta-badge .beta-badge {
+  position: static;
+  top: auto;
+  right: auto;
+  width: auto;
+  height: auto;
+  margin-left: auto;
+  padding: 0 5px;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: var(--bg-3);
+  color: var(--txt-3);
+  box-shadow: none;
+  opacity: 1;
+}
+.workspace-tools-menu .workspace-menu-action.has-beta-badge .beta-badge-text {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+}

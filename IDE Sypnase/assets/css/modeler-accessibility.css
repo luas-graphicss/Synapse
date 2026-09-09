@@ -1,0 +1,14 @@
+.mod3d-corpo :focus-visible {
+  outline: 2px solid var(--mod3d-acc);
+  outline-offset: 2px;
+}
+.mod3d-corpo .mod3d-botao,.mod3d-corpo .mod3d-seletor,.mod3d-corpo .mod3d-viewbotao {
+  min-height: 30px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mod3d-corpo * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

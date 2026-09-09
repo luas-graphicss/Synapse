@@ -1,0 +1,54 @@
+.format-button-group {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+}
+.format-menu-trigger {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: 50%;
+  background: var(--txt-3);
+  opacity: 0.65;
+  cursor: pointer;
+  transition: var(--t);
+}
+.format-menu-trigger::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+.format-button-group:hover .format-menu-trigger {
+  opacity: 1;
+}
+.format-menu-trigger:hover,.format-menu-trigger[aria-expanded='true'] {
+  background: var(--acc);
+  border-color: var(--acc);
+  opacity: 1;
+}
+.format-menu-trigger:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+  opacity: 1;
+}
+.ctxmenu.format-context-menu {
+  min-width: 268px;
+}
+@media (pointer: coarse) {
+  .format-menu-trigger {
+    width: 9px;
+    height: 9px;
+    bottom: 2px;
+  }
+  .format-menu-trigger::after {
+    inset: -12px;
+  }
+}

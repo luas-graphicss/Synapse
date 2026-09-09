@@ -1,0 +1,251 @@
+.editor-tabs {
+  min-height: 36px;
+  height: 36px;
+  flex: none;
+}
+.editor-tabs .etab {
+  height: 34px;
+  max-width: 320px;
+  padding: 0;
+  gap: 0;
+  color: var(--txt-2);
+}
+.etselect {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 10px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+.editor-tabs .etclose {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--txt-2);
+}
+.etselect:focus-visible,.editor-tabs .etclose:focus-visible,#frBack button:focus-visible,#frScope:focus-visible,#findInFileBtn:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -3px;
+}
+.editor-tabs .etab.active {
+  color: var(--txt);
+}
+#frBack {
+  padding: 16px;
+  align-items: center;
+}
+.editor-grid .code-hl,.editor-grid .code-ta,.editor-grid .intellisense-diagnostics-overlay {
+  font-size: var(--editor-code-font-size, 12.5px);
+  font-kerning: none;
+  font-variant-ligatures: none;
+  font-variant-numeric: normal;
+  letter-spacing: normal;
+  word-spacing: normal;
+  text-transform: none;
+  text-indent: 0;
+  direction: ltr;
+}
+.aurora-mobile .editor-grid {
+  --editor-code-font-size: 16px;
+}
+.code-ta {
+  padding: 0;
+}
+.code-ta:focus,.code-ta:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+#frBack .fr {
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-1);
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  box-shadow: var(--sh);
+  font: 12px/1.5 var(--mono);
+}
+#frBack .fr-head {
+  padding: 8px 16px;
+  gap: 12px;
+  font-size: 14px;
+  flex: none;
+}
+#frClose {
+  margin-left: auto;
+  min-width: 32px;
+  min-height: 32px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--txt-2);
+  font-size: 20px;
+  cursor: pointer;
+}
+#frBack .fr-row {
+  padding: 12px 16px 0;
+  flex: none;
+}
+.fr-row label,.fr-scope-label {
+  display: block;
+  margin-bottom: 4px;
+  font: 400 12px/1.5 var(--mono);
+  color: var(--txt-2);
+}
+#frBack input,#frScope {
+  min-height: 32px;
+  font: 12px/1.5 var(--mono);
+  border-radius: 2px;
+}
+#frBack input[aria-invalid='true'] {
+  border-color: var(--err);
+}
+.fr-scope-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.fr-scope-label {
+  margin: 0;
+}
+#frScope {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1;
+  padding: 0 10px;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+  color: var(--txt);
+  font-family: var(--mono);
+}
+#frBack .fr-opts {
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  gap: 8px;
+  flex: none;
+}
+#frBack .fr-opt,#frBack .fr-btn {
+  min-height: 32px;
+  min-width: 32px;
+  font: 12px/1.5 var(--mono);
+  border-radius: 2px;
+  transform: none;
+}
+#frBack .fr-opt {
+  width: auto;
+  padding: 0 10px;
+  color: var(--txt-2);
+}
+#frBack .fr-opt.on {
+  color: var(--acc);
+  background: rgba(var(--acc-rgb), 0.1);
+  border: 1px solid var(--acc);
+}
+#frBack .fr-count {
+  display: block;
+  margin: 0;
+  padding: 0 16px 12px;
+  font: 400 11.5px/1.5 var(--mono);
+  color: var(--txt-2);
+  flex: none;
+}
+.fr-result-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+#frBack .fr-btn.secondary {
+  color: var(--txt);
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+}
+#frBack button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+#frBack .cmdk-list {
+  min-height: 0;
+  max-height: 42dvh;
+  overflow: auto;
+  border-top: 1px solid var(--line);
+  padding: 4px;
+}
+#frBack .fr-match {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px 12px;
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  text-align: left;
+}
+#frBack .fr-match.selected {
+  background: rgba(var(--acc-rgb), 0.1);
+  border-color: var(--acc);
+}
+#frBack .ff-name,.fr-snippet {
+  min-width: 0;
+  font: 400 12px/1.5 var(--mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fr-location,.fr-snippet {
+  color: var(--txt-2);
+}
+.fr-location {
+  margin-left: 4px;
+}
+.editor-head {
+  min-height: 40px;
+}
+#findInFileBtn {
+  width: var(--workspace-control-size, 32px);
+  height: var(--workspace-control-size, 32px);
+}
+#frBack .cmdk-empty {
+  font-size: 12px;
+}
+@media (max-width: 600px) {
+  #frBack {
+    padding-top: 16px;
+    align-items: flex-start;
+  }
+  .fr-result-actions {
+    margin-left: 0;
+    width: 100%;
+  }
+  .fr-result-actions .fr-btn {
+    flex: 1;
+  }
+  #frBack .cmdk-list {
+    max-height: 32dvh;
+  }
+}
+@media (pointer: coarse) {
+  #frClose,	#frBack .fr-opt,	#frBack .fr-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  #frBack input,	#frScope {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  #frBack .fr-match {
+    min-height: 64px;
+  }
+}

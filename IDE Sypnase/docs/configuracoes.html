@@ -1,0 +1,329 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Configurações e atalhos | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Aparência, fontes, temas de sintaxe, idioma e a lista completa de atalhos da Synapse IDE."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="configuracoes">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Plataforma / Configurações e atalhos</p>
+              <h1 class="docs-title">Configurações e atalhos</h1>
+              <p class="docs-lede">
+                O painel de configurações abre com <span class="docs-keys">Mod + ,</span> e muda apenas
+                o seu ambiente: nada do que está aqui altera o conteúdo do projeto.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 8 min</span>
+                <span>público: todos</span>
+              </div>
+              <section>
+                <h2>Aparência</h2>
+                <p>
+                  A IDE tem tema claro e escuro, com cor de destaque configurável. O seletor de tema fica
+                  na barra superior e também responde a <span class="docs-keys">Mod + Alt + L</span>. A
+                  cor de destaque aceita valor personalizado por matiz, saturação e luminosidade.
+                </p>
+                <dl class="docs-definition">
+                  <dt>fonte da interface</dt>
+                  <dd>De 11 a 17 pixels, em passos de meio ponto. Padrão 12.</dd>
+                  <dt>fonte do editor</dt>
+                  <dd>De 9 a 22 pixels, em passos de meio ponto. Padrão 11,5.</dd>
+                  <dt>espaçamento de linha</dt>
+                  <dd>Compacto, normal ou espaçoso. Muda a altura da linha do editor.</dd>
+                </dl>
+              </section>
+              <section>
+                <h2>Editor</h2>
+                <p>
+                  A família de fonte do editor pode seguir o padrão da IDE ou usar uma das monoespaçadas
+                  conhecidas: JetBrains Mono, Fira Code, Consolas, Courier New ou a mono do sistema. Se a
+                  fonte escolhida não estiver instalada, o navegador cai na próxima da lista.
+                </p>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Ajuste</th>
+                      <th>Padrão</th>
+                      <th>Efeito</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Tema de sintaxe</td>
+                      <td>Aurora</td>
+                      <td>Cinco paletas: Aurora, Neon, Solar, Pastel e Monocromático.</td>
+                    </tr>
+                    <tr>
+                      <td>Realce de sintaxe</td>
+                      <td>Ligado</td>
+                      <td>Desligar acelera arquivo muito grande.</td>
+                    </tr>
+                    <tr>
+                      <td>Autocomplete</td>
+                      <td>Ligado</td>
+                      <td>Desligar remove a lista de sugestões, inclusive a de modelo.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  As preferências ficam gravadas no navegador, por origem. Trocar de máquina ou limpar
+                  dados do site devolve todos os valores para o padrão.
+                </p>
+              </section>
+              <section>
+                <h2>Idioma</h2>
+                <p>
+                  A interface tem tradução completa e o idioma pode ser trocado a qualquer momento, sem
+                  recarregar. Texto do seu projeto nunca é traduzido: a troca vale apenas para rótulos,
+                  menus e mensagens da IDE.
+                </p>
+                <p>
+                  Esta documentação acompanha as duas escolhas: ela abre no mesmo tema e no mesmo idioma
+                  que a IDE está usando no momento.
+                </p>
+                <div class="docs-note">
+                  <span class="docs-note-label">Vai mudar no próximo update</span>
+                  <p>
+                    O sistema de idiomas está sendo reescrito para carregar frases por módulo, sob demanda.
+                    O comportamento visível continua o mesmo, o carregamento inicial fica mais leve.
+                    Detalhe em <strong>Atualizações</strong>.
+                  </p>
+                </div>
+              </section>
+              <section>
+                <h2>Atalhos</h2>
+                <p>
+                  Todos os atalhos abaixo podem ser reatribuídos no painel de configurações.
+                  <span class="docs-keys">Mod</span> é <span class="docs-keys">Ctrl</span> no Windows e
+                    Linux e <span class="docs-keys">Cmd</span> no macOS.
+                  </p>
+                  <h3>Área de trabalho</h3>
+                  <table class="docs-table">
+                    <thead>
+                      <tr>
+                        <th>Atalho</th>
+                        <th>Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + K</span>
+                        </td>
+                        <td>Paleta de comandos</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + P</span>
+                        </td>
+                        <td>Abertura rápida de arquivo</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + H</span>
+                        </td>
+                        <td>Histórico do projeto</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + ,</span>
+                        </td>
+                        <td>Abrir configurações</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + B</span>
+                        </td>
+                        <td>Mostrar ou ocultar o explorador</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + Alt + L</span>
+                        </td>
+                        <td>Alternar tema claro e escuro</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <h3>Editor</h3>
+                  <table class="docs-table">
+                    <thead>
+                      <tr>
+                        <th>Atalho</th>
+                        <th>Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + F</span>
+                        </td>
+                        <td>Localizar no arquivo</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + Shift + F</span>
+                        </td>
+                        <td>Localizar no projeto</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + Shift + H</span>
+                        </td>
+                        <td>Substituir no projeto</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Alt + Shift + F</span>
+                        </td>
+                        <td>Formatar arquivo atual</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Mod + Space</span>
+                        </td>
+                        <td>Pedir sugestões de código</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <h3>Arquivos, painéis e layout</h3>
+                  <table class="docs-table">
+                    <thead>
+                      <tr>
+                        <th>Atalho</th>
+                        <th>Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="docs-keys">Alt + Seta esquerda</span> /
+                            <span class="docs-keys">Alt + Seta direita</span>
+                          </td>
+                          <td>Arquivo aberto anterior e próximo</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Alt + W</span>
+                          </td>
+                          <td>Fechar arquivo atual</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + S</span>
+                          </td>
+                          <td>Atualizar preview</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + `</span>
+                          </td>
+                          <td>Console e DevTools</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + Alt + T</span>
+                          </td>
+                          <td>Terminal</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + Shift + D</span>
+                          </td>
+                          <td>Depurador</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + Alt + B</span>
+                          </td>
+                          <td>Build e Run</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + Alt + I</span>
+                          </td>
+                          <td>Assistente de IA</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + Alt + M</span>
+                          </td>
+                          <td>Painel MCP</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <span class="docs-keys">Mod + 1</span> / <span class="docs-keys">Mod + 2</span> /
+                              <span class="docs-keys">Mod + 3</span>
+                            </td>
+                            <td>Layout dividido, somente editor, somente preview</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </section>
+                    <section>
+                      <h2>Conflito de atalho</h2>
+                      <p>
+                        Parte dos atalhos funciona mesmo com sobreposição aberta, como paleta de comandos e
+                        busca. Outros ficam de fora de propósito para não disparar ação invisível enquanto você
+                        digita num campo.
+                      </p>
+                      <ul>
+                        <li>Atalho tomado pelo navegador não chega na IDE. Escolha outra combinação.</li>
+                        <li>
+                          Atalho duplicado é recusado na hora de gravar, com aviso de qual ação já usa a
+                          combinação.
+                        </li>
+                        <li>Extensão do navegador também pode capturar tecla antes da página.</li>
+                      </ul>
+                    </section>
+                  </article>
+                  <footer class="docs-pager">
+                  </footer>
+                  <p class="docs-page-footer">
+                    Atalho que não responde? No relato, diga o sistema, o navegador e a combinação exata.
+                  </p>
+                </main>
+                <aside class="docs-outline" aria-label="Nesta página">
+                </aside>
+              </div>
+              <script src="./assets/docs-catalog.js"></script>
+              <script src="./assets/docs-current-category.js"></script>
+              <script src="./assets/docs-sidebar.js"></script>
+              <script src="./assets/docs-filter.js"></script>
+              <script src="./assets/docs-outline.js"></script>
+              <script src="./assets/docs-pager.js"></script>
+              <script src="./assets/docs-boot.js"></script>
+              <script src="../assets/js/i18n/phrase-registration.js"></script>
+              <script src="./assets/docs-phrases.js"></script>
+              <script src="./assets/docs-error-silencer.js"></script>
+              <script src="../assets/js/i18n/idiomas.js"></script>
+            </body>
+          </html>

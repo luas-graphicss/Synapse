@@ -1,0 +1,129 @@
+.mod3d-corpo {
+  height: 100dvh;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.mod3d-workspace {
+  display: grid;
+  grid-template-columns: minmax(290px, 370px) minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+.mod3d-workspace > .mod3d-paineis {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  border-right: 1px solid var(--mod3d-line, var(--line, #262c3a));
+  padding: 12px;
+  gap: 12px;
+}
+.mod3d-workspace > .mod3d-palco {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+.mod3d-project {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--mod3d-line, var(--line, #262c3a));
+  border-radius: var(--mod3d-r, 10px);
+  background: var(--mod3d-bg-1, var(--bg-1, #11141b));
+  color: var(--mod3d-txt, var(--txt, #e7ebf3));
+  font-size: 12px;
+}
+.mod3d-project h2,.mod3d-project h3,.mod3d-project p {
+  margin: 0;
+}
+.mod3d-project h2 {
+  font-size: 15px;
+}
+.mod3d-project h3 {
+  font-size: 12px;
+}
+.mod3d-project-identity,.mod3d-project-status,.mod3d-recovery-row strong {
+  overflow-wrap: anywhere;
+}
+.mod3d-project-identity {
+  color: var(--mod3d-txt-2, var(--txt-2, #aab2c5));
+}
+.mod3d-project-status {
+  min-height: 30px;
+  line-height: 1.5;
+}
+.mod3d-project-status[data-state='error'] {
+  color: var(--mod3d-err, var(--err, #fb7185));
+}
+.mod3d-project-status[data-state='saved'] {
+  color: var(--mod3d-ok, var(--ok, #34d399));
+}
+.mod3d-document-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.mod3d-project .mod3d-seletor {
+  width: 100%;
+  min-width: 0;
+}
+.mod3d-project-recovery,.mod3d-source-options {
+  display: grid;
+  gap: 8px;
+}
+.mod3d-recovery-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--mod3d-line, var(--line, #262c3a));
+  border-radius: 8px;
+}
+.mod3d-recovery-row strong,.mod3d-recovery-row small {
+  width: 100%;
+}
+.mod3d-recovery-row small {
+  color: var(--mod3d-txt-2, var(--txt-2, #aab2c5));
+}
+.mod3d-source-options {
+  padding: 10px 0;
+}
+@media (max-width: 1020px) {
+  .mod3d-corpo {
+    height: auto;
+    min-height: 100dvh;
+    overflow: auto;
+  }
+  .mod3d-workspace {
+    display: flex;
+    flex-direction: column;
+  }
+  .mod3d-workspace > .mod3d-palco {
+    order: -1;
+    flex: none;
+    height: min(52dvh, 480px);
+    min-height: 300px;
+  }
+  .mod3d-workspace > .mod3d-paineis {
+    overflow: visible;
+    border-right: none;
+  }
+}
+.mod3d-project-status.error {
+  color: var(--mod3d-err, var(--err, #fb7185));
+}
+.mod3d-project-note {
+  color: var(--mod3d-txt-2, var(--txt-2, #aab2c5));
+  font-size: 12px;
+  line-height: 1.5;
+}
+.mod3d-recovery-row > span {
+  width: 100%;
+  overflow-wrap: anywhere;
+}

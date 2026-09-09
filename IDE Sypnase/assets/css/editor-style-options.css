@@ -1,0 +1,60 @@
+body {
+  font-size: var(--interface-font-size, 12px);
+}
+.editor-grid .code-hl,.editor-grid .code-ta,.editor-grid .gln {
+  font-family: var(--editor-code-font-family, var(--mono));
+}
+:root[data-syntax-theme='neon'] {
+  --tk-key: #ff5cf1;
+  --tk-str: #7dffb4;
+  --tk-num: #ffd166;
+  --tk-com: #6b7a99;
+  --tk-tag: #5cc8ff;
+  --tk-attr: #ffb86c;
+  --tk-punc: #9aa7bd;
+  --tk-fn: #7cf0ff;
+}
+:root[data-syntax-theme='solar'] {
+  --tk-key: #cb8b00;
+  --tk-str: #2aa198;
+  --tk-num: #cb4b16;
+  --tk-com: #93a1a1;
+  --tk-tag: #268bd2;
+  --tk-attr: #6c71c4;
+  --tk-punc: #839496;
+  --tk-fn: #d33682;
+}
+:root[data-syntax-theme='pastel'] {
+  --tk-key: #c792ea;
+  --tk-str: #a5e6a5;
+  --tk-num: #f7c9a3;
+  --tk-com: #8b93a7;
+  --tk-tag: #89ddff;
+  --tk-attr: #f8c7d0;
+  --tk-punc: #9fa8bd;
+  --tk-fn: #b8e0ff;
+}
+:root[data-syntax-theme='mono'] {
+  --tk-key: var(--txt);
+  --tk-str: var(--txt-2);
+  --tk-num: var(--txt-2);
+  --tk-com: var(--txt-3);
+  --tk-tag: var(--txt);
+  --tk-attr: var(--txt-2);
+  --tk-punc: var(--txt-3);
+  --tk-fn: var(--txt);
+}
+:root[data-syntax-highlight='off'] {
+  --tk-key: var(--txt);
+  --tk-str: var(--txt);
+  --tk-num: var(--txt);
+  --tk-com: var(--txt);
+  --tk-tag: var(--txt);
+  --tk-attr: var(--txt);
+  --tk-punc: var(--txt);
+  --tk-fn: var(--txt);
+}
+:root[data-syntax-highlight='off'] .code-hl span {
+  font-style: normal;
+  font-weight: inherit;
+}

@@ -1,0 +1,94 @@
+#modelador3dBtn.on {
+  border-color: var(--acc, #4772b3);
+  color: var(--acc, #4772b3);
+}
+.mod3d-corpo {
+  --bl-window: #1d1d1d;
+  --bl-header: #2b2b2b;
+  --bl-region: #303030;
+  --bl-panel: #383838;
+  --bl-panel-header: #3f3f3f;
+  --bl-list: #282828;
+  --bl-field: #545454;
+  --bl-field-hover: #656565;
+  --bl-field-active: #1d1d1d;
+  --bl-line: #161616;
+  --bl-line-soft: #2b2b2b;
+  --bl-text: #e6e6e6;
+  --bl-text-dim: #a5a5a5;
+  --bl-text-faint: #7b7b7b;
+  --bl-accent: #4772b3;
+  --bl-accent-hover: #5983c4;
+  --bl-accent-soft: rgba(71, 114, 179, 0.38);
+  --bl-select: #ed9e5c;
+  --bl-ok: #7fb653;
+  --bl-warn: #d9a13b;
+  --bl-error: #e06c5f;
+  --bl-axis-x: #fc5d5d;
+  --bl-axis-y: #8dc63f;
+  --bl-axis-z: #4b91e6;
+  --bl-viewport: #393939;
+  --bl-radius: 4px;
+  --bl-row: 20px;
+  --bl-sans: 'Inter', 'DejaVu Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --bl-mono: 'JetBrains Mono', 'DejaVu Sans Mono', 'SFMono-Regular', Consolas, monospace;
+  --bg: var(--bl-window);
+  --bg-1: var(--bl-region);
+  --bg-2: var(--bl-panel);
+  --line: var(--bl-line);
+  --line-2: #4a4a4a;
+  --txt: var(--bl-text);
+  --txt-2: var(--bl-text-dim);
+  --txt-3: var(--bl-text-faint);
+  --acc: var(--bl-accent);
+  --acc-ink: #ffffff;
+  --ok: var(--bl-ok);
+  --warn: var(--bl-warn);
+  --err: var(--bl-error);
+  --mono: var(--bl-mono);
+  --mod3d-bg: var(--bl-window);
+  --mod3d-bg-1: var(--bl-region);
+  --mod3d-bg-2: var(--bl-panel);
+  --mod3d-line: var(--bl-line);
+  --mod3d-txt: var(--bl-text);
+  --mod3d-txt-2: var(--bl-text-dim);
+  --mod3d-txt-3: var(--bl-text-faint);
+  --mod3d-acc: var(--bl-accent);
+  --mod3d-ok: var(--bl-ok);
+  --mod3d-warn: var(--bl-warn);
+  --mod3d-err: var(--bl-error);
+  --mod3d-r: var(--bl-radius);
+  --mod3d-mono: var(--bl-mono);
+}
+body.mod3d-corpo {
+  margin: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bl-window);
+  color: var(--bl-text);
+  font: 11px/1.45 var(--bl-sans);
+  -webkit-font-smoothing: antialiased;
+}
+.mod3d-corpo * {
+  box-sizing: border-box;
+}
+.mod3d-corpo [hidden] {
+  display: none !important;
+}
+.mod3d-corpo ::selection {
+  background: var(--bl-accent);
+  color: #ffffff;
+}
+.mod3d-corpo h1,.mod3d-corpo h2,.mod3d-corpo h3 {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+}
+.mod3d-corpo p {
+  margin: 0;
+}
+.mod3d-corpo canvas {
+  display: block;
+}

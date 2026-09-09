@@ -1,0 +1,199 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Preview ao vivo | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Como o preview da Synapse IDE é montado, quando ele recompila, console, rede e viewport."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="preview">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Ferramentas / Preview ao vivo</p>
+              <h1 class="docs-title">Preview ao vivo</h1>
+              <p class="docs-lede">
+                O preview é o coração do ciclo de trabalho na Synapse. Ele monta o projeto na hora,
+                roda dentro de um iframe isolado e devolve console, erros e requisições para a IDE.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 10 min</span>
+                <span>público: dev</span>
+              </div>
+              <section>
+                <h2>Como o preview é montado</h2>
+                <p>
+                  Quando o projeto não tem dev server, a IDE trabalha em modo interno. Ela lê a árvore
+                  de arquivos em memória, gera endereços temporários para cada recurso e reescreve as
+                  referências do HTML para apontar para esses endereços. O resultado é injetado no
+                  iframe.
+                </p>
+                <ol class="docs-steps">
+                  <li>Encontrar o ponto de entrada HTML.</li>
+                  <li>Resolver <code>script</code>, <code>link</code>, imagens e mídias do projeto.</li>
+                  <li>Publicar cada arquivo num endereço temporário da própria sessão.</li>
+                  <li>Injetar o documento final e ligar a captura de console e de erros.</li>
+                </ol>
+                <p>
+                  Importações entre módulos ES continuam funcionando porque os caminhos relativos
+                  também são reescritos. Import de pacote instalado, sem caminho relativo, não funciona
+                  no modo interno: para isso use dev server.
+                </p>
+              </section>
+              <section>
+                <h2>Quando ele atualiza</h2>
+                <table class="docs-table">
+                  <thead>
+                    <tr>
+                      <th>Evento</th>
+                      <th>Efeito</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Gravação de arquivo</td>
+                      <td>Remontagem agrupada, para várias gravações seguidas gerarem um refresh.</td>
+                    </tr>
+                    <tr>
+                      <td>Somente CSS mudou</td>
+                      <td>Troca de folha de estilo sem recarregar o documento.</td>
+                    </tr>
+                    <tr>
+                      <td>Arquivo criado ou removido</td>
+                      <td>Remontagem completa.</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="docs-keys">Mod+S</span>
+                      </td>
+                      <td>Força a remontagem imediata.</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="docs-note">
+                  <span class="docs-note-label">Por que agrupar</span>
+                  <p>
+                    Sem agrupamento, digitar rápido em três arquivos dispararia três montagens e o
+                    preview piscaria sem parar. A IDE espera a rajada terminar antes de remontar.
+                  </p>
+                </div>
+              </section>
+              <section>
+                <h2>Console e erros</h2>
+                <p>
+                  A IDE intercepta as chamadas de console dentro do iframe e também escuta erros não
+                  tratados e promessas rejeitadas. Cada linha guarda origem, nível e horário.
+                </p>
+                <ul>
+                  <li>Erros de sintaxe aparecem antes de qualquer log do seu código.</li>
+                  <li>Erro de recurso ausente aparece como falha de carregamento, não como exceção.</li>
+                  <li>O painel guarda um limite de linhas e descarta as mais antigas.</li>
+                </ul>
+                <p>
+                  Se o console fica vazio depois de uma mudança que deveria logar algo, quase sempre o
+                  módulo não chegou a executar. Procure a primeira linha vermelha e resolva ela
+                  primeiro.
+                </p>
+              </section>
+              <section>
+                <h2>Rede</h2>
+                <p>
+                  O registro de rede lista <code>fetch</code>, <code>XHR</code> e recursos estáticos com
+                  status e tempo. Ele é o lugar certo quando uma imagem não aparece ou uma API responde
+                  diferente do esperado.
+                </p>
+                <p>
+                  Requisições para domínios externos seguem as regras de CORS do navegador. O preview
+                  não contorna isso: é uma limitação da plataforma e não da IDE.
+                </p>
+              </section>
+              <section>
+                <h2>Tamanho de tela</h2>
+                <p>
+                  O preview aceita tamanhos fixos para testar layout responsivo, com presets de celular,
+                  tablet, notebook e desktop, além de largura e altura manuais. A densidade de pixel
+                  também pode ser emulada.
+                </p>
+                <p>
+                  Valores usados com frequência: 390 por 844 para celular, 820 por 1180 para tablet e
+                  1920 por 1080 para desktop. Volte para o tamanho padrão antes de medir desempenho,
+                  porque o viewport reduzido altera o custo de renderização.
+                </p>
+              </section>
+              <section>
+                <h2>Estado do aplicativo</h2>
+                <p>
+                  O preview compartilha armazenamento com a sessão anterior do seu app. Se você está
+                  testando fluxo de primeiro acesso, limpe o estado antes: isso apaga
+                  <code>localStorage</code>, <code>sessionStorage</code>, bases IndexedDB e caches do app
+                    e recarrega o preview.
+                  </p>
+                  <div class="docs-note docs-note-alert">
+                    <span class="docs-note-label">Atenção</span>
+                    <p>
+                      Limpar o estado do preview apaga dados do app em teste, não os arquivos do projeto.
+                      Mesmo assim, se o seu app guarda algo que você quer manter, exporte antes.
+                    </p>
+                  </div>
+                </section>
+                <section>
+                  <h2>Preview com dev server</h2>
+                  <p>
+                    Projetos com build real trocam o modo interno pelo servidor de desenvolvimento. O
+                    relay funciona como proxy e o preview passa a mostrar exatamente o que o dev server
+                    serve, com recarga automática própria da ferramenta.
+                  </p>
+                  <p>
+                    Nesse modo, as ferramentas de inspeção continuam valendo: console, rede, captura de
+                    tela e execução de expressões. O passo a passo está em
+                    <a href="./terminal.html">Terminal e relay</a>.
+                    </p>
+                  </section>
+                </article>
+                <footer class="docs-pager">
+                </footer>
+                <p class="docs-page-footer">
+                  Preview em branco ou congelado? Copie as linhas do console no relato de bug, ajuda muito.
+                </p>
+              </main>
+              <aside class="docs-outline" aria-label="Nesta página">
+              </aside>
+            </div>
+            <script src="./assets/docs-catalog.js"></script>
+            <script src="./assets/docs-current-category.js"></script>
+            <script src="./assets/docs-sidebar.js"></script>
+            <script src="./assets/docs-filter.js"></script>
+            <script src="./assets/docs-outline.js"></script>
+            <script src="./assets/docs-pager.js"></script>
+            <script src="./assets/docs-boot.js"></script>
+            <script src="../assets/js/i18n/phrase-registration.js"></script>
+            <script src="./assets/docs-phrases.js"></script>
+            <script src="./assets/docs-error-silencer.js"></script>
+            <script src="../assets/js/i18n/idiomas.js"></script>
+          </body>
+        </html>

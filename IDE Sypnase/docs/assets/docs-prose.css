@@ -1,0 +1,186 @@
+.docs-article section {
+  margin-top: 42px;
+}
+.docs-article h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0 0 14px;
+  border-top: 1px solid var(--docs-rule-strong);
+  padding-top: 14px;
+  color: var(--docs-ink);
+  font-size: 19px;
+  font-weight: 640;
+  letter-spacing: -0.008em;
+}
+.docs-article h2::before {
+  counter-increment: docs-section;
+  content: counter(docs-section, decimal-leading-zero);
+  font-family: var(--docs-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--docs-mark);
+}
+.docs-article h3 {
+  margin: 26px 0 8px;
+  color: var(--docs-ink);
+  font-size: 14.5px;
+  font-weight: 640;
+}
+.docs-article p {
+  margin: 0 0 14px;
+  max-width: 74ch;
+}
+.docs-article ul,.docs-article ol {
+  margin: 0 0 16px;
+  padding-left: 20px;
+  max-width: 74ch;
+}
+.docs-article li {
+  margin-bottom: 6px;
+}
+.docs-article li::marker {
+  color: var(--docs-ink-3);
+}
+.docs-article strong {
+  color: var(--docs-ink);
+  font-weight: 620;
+}
+.docs-article code {
+  padding: 1px 5px;
+  border: 1px solid var(--docs-rule);
+  background: var(--docs-panel);
+  color: var(--docs-ink);
+  font-family: var(--docs-mono);
+  font-size: 12px;
+}
+.docs-article pre {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--docs-rule);
+  border-left: 2px solid var(--docs-rule-strong);
+  background: var(--docs-panel);
+  color: var(--docs-ink-2);
+  font-family: var(--docs-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+.docs-article pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 12px;
+}
+.docs-table {
+  width: 100%;
+  margin: 0 0 18px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.docs-table th {
+  padding: 7px 10px 7px 0;
+  border-bottom: 1px solid var(--docs-rule-strong);
+  color: var(--docs-ink-3);
+  font-family: var(--docs-mono);
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.docs-table td {
+  padding: 8px 10px 8px 0;
+  border-bottom: 1px solid var(--docs-rule);
+  vertical-align: top;
+}
+.docs-table td:first-child {
+  color: var(--docs-ink);
+}
+.docs-table code {
+  white-space: nowrap;
+}
+.docs-note {
+  margin: 0 0 18px;
+  border-left: 2px solid var(--docs-mark);
+  background: var(--docs-panel);
+  padding: 11px 14px;
+  max-width: 74ch;
+}
+.docs-note-alert {
+  border-left-color: var(--docs-alert);
+}
+.docs-note-label {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--docs-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--docs-mark);
+}
+.docs-note-alert .docs-note-label {
+  color: var(--docs-alert);
+}
+.docs-note p:last-child {
+  margin-bottom: 0;
+}
+.docs-keys {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--docs-rule-strong);
+  border-bottom-width: 2px;
+  background: var(--docs-panel-strong);
+  color: var(--docs-ink);
+  font-family: var(--docs-mono);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.docs-steps {
+  counter-reset: docs-step;
+  list-style: none;
+  padding-left: 0;
+}
+.docs-steps li {
+  position: relative;
+  padding-left: 34px;
+  margin-bottom: 10px;
+}
+.docs-steps li::before {
+  counter-increment: docs-step;
+  content: counter(docs-step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-family: var(--docs-mono);
+  font-size: 11px;
+  color: var(--docs-mark);
+}
+.docs-definition {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  margin: 0 0 18px;
+  font-size: 13px;
+}
+.docs-definition dt {
+  padding: 8px 12px 8px 0;
+  border-top: 1px solid var(--docs-rule);
+  color: var(--docs-ink);
+  font-family: var(--docs-mono);
+  font-size: 11.5px;
+}
+.docs-definition dd {
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--docs-rule);
+}
+@media (max-width: 700px) {
+  .docs-definition {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .docs-definition dd {
+    border-top: 0;
+    padding-top: 0;
+  }
+}

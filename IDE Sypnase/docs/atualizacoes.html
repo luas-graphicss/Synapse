@@ -1,0 +1,198 @@
+<!doctype html>
+  <html lang="pt-BR">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>Atualizações | Documentação da Synapse IDE</title>
+      <meta
+        name="description"
+        content="Último update publicado na Synapse IDE e o próximo em desenvolvimento, com data aproximada."
+        />
+        <link rel="stylesheet" href="../assets/css/tema.css" />
+        <link rel="stylesheet" href="./assets/docs-shell.css" />
+        <link rel="stylesheet" href="./assets/docs-navigation.css" />
+        <link rel="stylesheet" href="./assets/docs-prose.css" />
+        <link rel="stylesheet" href="./assets/docs-release.css" />
+        <link rel="stylesheet" href="./assets/docs-theme.css" />
+        <link rel="stylesheet" href="./assets/docs-typography.css" />
+        <script src="./assets/docs-ide-preference.js"></script>
+        <script src="./assets/docs-theme-sync.js"></script>
+      </head>
+      <body data-docs-category="atualizacoes">
+        <header class="docs-topbar">
+          <a class="docs-brand" href="./index.html">
+            <span class="docs-brand-mark">SYNAPSE</span>
+            <span class="docs-brand-text">Documentação oficial</span>
+          </a>
+          <nav class="docs-topbar-links">
+            <span class="docs-topbar-version">build 2026.09</span>
+            <a class="docs-topbar-link" href="./problemas.html">Solução de problemas</a>
+            <a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+          </nav>
+        </header>
+        <div class="docs-frame">
+          <nav class="docs-sidebar" aria-label="Categorias da documentação">
+          </nav>
+          <main class="docs-main">
+            <article class="docs-article">
+              <p class="docs-kicker">Suporte / Atualizações</p>
+              <h1 class="docs-title">Atualizações</h1>
+              <p class="docs-lede">
+                Esta página registra o que acabou de entrar na IDE e o que está sendo escrito agora. Data
+                de update em desenvolvimento é estimativa: se algo escorregar, o valor aqui muda antes da
+                publicação.
+              </p>
+              <div class="docs-meta">
+                <span>revisado em 09/09/2026</span>
+                <span>leitura 5 min</span>
+                <span>público: todos</span>
+              </div>
+              <section>
+                <h2>Último update publicado</h2>
+                <div class="docs-release docs-release-current">
+                  <div class="docs-release-head">
+                    <span class="docs-release-state">publicado</span>
+                    <h3 class="docs-release-name">Blepse 3D adicionado</h3>
+                    <span class="docs-release-stamp">build 2026.09 / 09/09/2026</span>
+                  </div>
+                  <div class="docs-release-body">
+                    <p>
+                      A IDE passou a ter modelador 3D próprio. O Blepse abre em aba separada, trabalha no
+                      mesmo projeto do editor e grava o modelo direto como arquivo do projeto, sem etapa de
+                      importação manual.
+                    </p>
+                    <ul class="docs-release-items">
+                      <li>
+                        <span class="docs-release-item-name">viewport</span>
+                        <span>
+                          Órbita, vistas fixas pelo teclado numérico, alternância entre perspectiva e
+                          ortográfica.
+                        </span>
+                      </li>
+                      <li>
+                        <span class="docs-release-item-name">modos</span>
+                        <span>Modo objeto e modo edição com seleção por vértice, aresta e face.</span>
+                      </li>
+                      <li>
+                        <span class="docs-release-item-name">malha</span>
+                        <span>
+                          Extrudar, inset, bevel, loop cut, engrossar pela normal, mesclar e correção de
+                          normais.
+                        </span>
+                      </li>
+                      <li>
+                        <span class="docs-release-item-name">material e UV</span>
+                        <span>
+                          Material no padrão GLB, texturas vindas do projeto e unwrap com editor de UV.
+                        </span>
+                      </li>
+                      <li>
+                        <span class="docs-release-item-name">saída</span>
+                        <span>
+                          Exportação para <code>.glb</code> no caminho escolhido, com arquivo de fonte da
+                          cena ao lado.
+                        </span>
+                      </li>
+                    </ul>
+                    <p>
+                      Detalhe de uso, atalhos e limites estão na categoria
+                      <a href="./blepse-3d.html">Blepse 3D</a>.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+                <section>
+                  <h2>Próximo update em desenvolvimento</h2>
+                  <div class="docs-release docs-release-planned">
+                    <div class="docs-release-head">
+                      <span class="docs-release-state">em desenvolvimento</span>
+                      <h3 class="docs-release-name">Explorer virtualizado, idiomas e extensões</h3>
+                      <span class="docs-release-stamp">previsão aproximada: 24/10/2026</span>
+                    </div>
+                    <div class="docs-release-body">
+                      <p>
+                        São três frentes que mexem em partes diferentes da IDE e vão sair juntas, porque as
+                        três tocam na forma como a interface é montada.
+                      </p>
+                      <ul class="docs-release-items">
+                        <li>
+                          <span class="docs-release-item-name">explorer virtualizado</span>
+                          <span>
+                            A árvore de arquivos passa a desenhar apenas as linhas visíveis. Projeto com
+                            milhares de arquivos deixa de travar na rolagem, na busca e ao abrir pasta grande.
+                          </span>
+                        </li>
+                        <li>
+                          <span class="docs-release-item-name">idiomas</span>
+                          <span>
+                            Mudança arquitetural: as frases saem de um arquivo único gigante e passam a ser
+                            registradas por módulo, carregadas sob demanda. Menos peso no primeiro carregamento
+                            e tradução mais fácil de manter.
+                          </span>
+                        </li>
+                        <li>
+                          <span class="docs-release-item-name">extensões</span>
+                          <span>
+                            Primeira versão do sistema de extensões: ponto de entrada declarado, permissões
+                            explícitas e acesso a comandos, painéis e eventos do projeto.
+                          </span>
+                        </li>
+                      </ul>
+                      <p>
+                        Nada disso pede migração de projeto. Projetos abertos hoje continuam abrindo igual
+                        depois do update.
+                      </p>
+                    </div>
+                  </div>
+                  <div class="docs-note docs-note-alert">
+                    <span class="docs-note-label">A data é estimativa</span>
+                    <p>
+                      24/10/2026 é a meta atual, não um compromisso. O sistema de extensões é a parte com
+                      maior risco de atraso, porque envolve decidir o que uma extensão pode e não pode fazer
+                      antes de abrir a superfície para todo mundo.
+                    </p>
+                  </div>
+                </section>
+                <section>
+                  <h2>Como o update chega até você</h2>
+                  <ol class="docs-steps">
+                    <li>A IDE é servida como site, então a versão nova chega ao recarregar a página.</li>
+                    <li>Seus projetos ficam no armazenamento do navegador e não são tocados pelo update.</li>
+                    <li>Se a interface ficar estranha depois de um update, recarregue ignorando cache.</li>
+                  </ol>
+                  <p>
+                    O número de build no canto da barra superior desta documentação segue o formato ano.mês.
+                    Ele serve para você dizer no relato de bug qual versão estava rodando.
+                  </p>
+                </section>
+                <section>
+                  <h2>Pedido de recurso</h2>
+                  <p>
+                    O canal é o mesmo do relato de bug: o botão <strong>Ajuda</strong> na barra superior da
+                    IDE, à esquerda de Importar. Descreva o problema que você quer resolver, não apenas a
+                    solução que imaginou. Isso costuma render uma implementação melhor.
+                  </p>
+                </section>
+              </article>
+              <footer class="docs-pager">
+              </footer>
+              <p class="docs-page-footer">
+                Algo que entrou no último update quebrou seu projeto? Relate citando a data desta página.
+              </p>
+            </main>
+            <aside class="docs-outline" aria-label="Nesta página">
+            </aside>
+          </div>
+          <script src="./assets/docs-catalog.js"></script>
+          <script src="./assets/docs-current-category.js"></script>
+          <script src="./assets/docs-sidebar.js"></script>
+          <script src="./assets/docs-filter.js"></script>
+          <script src="./assets/docs-outline.js"></script>
+          <script src="./assets/docs-pager.js"></script>
+          <script src="./assets/docs-boot.js"></script>
+          <script src="../assets/js/i18n/phrase-registration.js"></script>
+          <script src="./assets/docs-phrases.js"></script>
+          <script src="./assets/docs-error-silencer.js"></script>
+          <script src="../assets/js/i18n/idiomas.js"></script>
+        </body>
+      </html>

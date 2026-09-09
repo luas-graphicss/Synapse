@@ -1,0 +1,42 @@
+.mod3d-corpo .blender-area-splitter {
+  position: relative;
+  flex: 0 0 auto;
+  background: var(--bl-window);
+  touch-action: none;
+  z-index: 9;
+}
+.mod3d-corpo .blender-area-splitter::after {
+  content: '';
+  position: absolute;
+}
+.mod3d-corpo .blender-area-splitter-vertical {
+  width: 2px;
+  cursor: col-resize;
+}
+.mod3d-corpo .blender-area-splitter-vertical::after {
+  inset: 0 -3px;
+}
+.mod3d-corpo .blender-area-splitter-horizontal {
+  height: 2px;
+  cursor: row-resize;
+}
+.mod3d-corpo .blender-area-splitter-horizontal::after {
+  inset: -3px 0;
+}
+.mod3d-corpo .blender-workspace-splitter {
+  order: 2;
+}
+.mod3d-corpo .blender-area-splitter:hover {
+  background: #5a5a5a;
+}
+.mod3d-corpo .blender-area-splitter.is-dragging {
+  background: #787878;
+}
+@media (max-width: 1020px) {
+  .mod3d-corpo .blender-workspace-splitter {
+    display: none;
+  }
+}
+body.mod3d-movel .blender-area-splitter {
+  display: none;
+}

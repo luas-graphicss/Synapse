@@ -1,0 +1,49 @@
+.hover-tooltip {
+  position: fixed;
+  z-index: 4000;
+  max-width: 210px;
+  padding: 4px 7px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--bg-3);
+  color: var(--txt);
+  font-family: var(--sans);
+  font-size: 10.5px;
+  line-height: 1.35;
+  letter-spacing: 0.1px;
+  box-shadow: var(--sh);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition:		opacity 0.12s ease,		transform 0.12s ease;
+}
+.hover-tooltip[data-visible='true'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hover-tooltip-title {
+  display: block;
+  font-weight: 600;
+}
+.hover-tooltip-shortcut {
+  display: inline-block;
+  margin-top: 3px;
+  padding: 0 4px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--bg-2);
+  color: var(--txt-2);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hover-tooltip {
+    transition: none;
+  }
+}
+@media (pointer: coarse) {
+  .hover-tooltip {
+    display: none;
+  }
+}
