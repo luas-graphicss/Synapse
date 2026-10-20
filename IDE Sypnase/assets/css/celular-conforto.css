@@ -1,0 +1,429 @@
+:root {
+	--kbd-h: 0px;
+	--vv-top: 0px;
+	--touch-target: 44px;
+}
+
+html[data-mobile-mode='desktop'] #auroraPaneBar,
+html[data-mobile-mode='desktop'] #auroraExpBackdrop,
+html[data-mobile-mode='desktop'] #auroraExpToggle,
+html[data-mobile-mode='desktop'] #auroraCodeKeys {
+	display: none !important;
+}
+
+.aurora-touch button,
+.aurora-touch .row,
+.aurora-touch .tab,
+.aurora-touch .menu-item {
+	-webkit-tap-highlight-color: transparent;
+}
+
+.aurora-touch .explorer,
+.aurora-touch .editor-scroll,
+.aurora-touch .code-ta,
+.aurora-touch .console-body,
+.aurora-touch .settings-content,
+.aurora-touch .menu {
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+.aurora-touch .code-ta {
+	caret-color: var(--acc);
+}
+
+.aurora-touch .code-ta::selection {
+	background: rgba(var(--acc-rgb), 0.35);
+}
+
+#auroraPaneBar button:active {
+	background: var(--bg-3);
+}
+
+.aurora-narrow #auroraExpToggle {
+	width: 38px;
+	height: 38px;
+	min-width: 38px;
+}
+
+.aurora-narrow .explorer {
+	padding-bottom: calc(var(--mpane-bar-h) + var(--mpane-safe-b) + 8px);
+}
+
+#auroraCodeKeys {
+	display: none;
+}
+
+.code-keys-on.aurora-touch #auroraCodeKeys {
+	display: flex;
+	flex: none;
+	align-items: stretch;
+	height: 44px;
+	background: var(--bg-2);
+	border-top: 1px solid var(--line-2);
+	padding-left: env(safe-area-inset-left);
+	padding-right: env(safe-area-inset-right);
+}
+
+#auroraCodeKeys .ck-scroll {
+	display: flex;
+	flex: 1 1 auto;
+	align-items: center;
+	gap: 5px;
+	padding: 0 8px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	touch-action: pan-x;
+	overscroll-behavior-x: contain;
+}
+
+#auroraCodeKeys .ck-scroll::-webkit-scrollbar {
+	display: none;
+}
+
+#auroraCodeKeys .ck-key {
+	flex: none;
+	min-width: 40px;
+	height: 34px;
+	padding: 0 10px;
+	border: 1px solid var(--line);
+	border-radius: var(--r-sm);
+	background: var(--bg-3);
+	color: var(--txt);
+	font-family: var(--editor-code-font-family, var(--mono, ui-monospace, monospace));
+	font-size: 14.5px;
+	line-height: 1;
+	cursor: pointer;
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+#auroraCodeKeys .ck-key:active {
+	background: var(--acc);
+	border-color: var(--acc);
+	color: var(--acc-ink);
+}
+
+#auroraCodeKeys .ck-wide {
+	font-family: inherit;
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	padding: 0 12px;
+}
+
+#auroraCodeKeys .ck-key[data-key='tab'] {
+	border-color: var(--line-2);
+}
+
+.aurora-mobile.kbd-open .app {
+	height: calc(var(--app-vh, 1vh) * 100) !important;
+	padding-bottom: 0 !important;
+	transform: translateY(var(--vv-top));
+}
+
+.aurora-narrow.kbd-open #auroraPaneBar,
+.aurora-narrow.kbd-open .statusbar,
+.aurora-narrow.kbd-open.code-keys-on .toolbar,
+.aurora-narrow.kbd-open.code-keys-on .editor-tabs,
+.aurora-narrow.kbd-open.code-keys-on .console.open {
+	display: none !important;
+}
+
+.aurora-narrow.kbd-open .toasts,
+.aurora-narrow.kbd-open .menu,
+.aurora-narrow.kbd-open .support-menu {
+	bottom: 0 !important;
+}
+
+.aurora-touch[data-touch-targets='large'] {
+	--mpane-bar-h: 54px;
+}
+
+.aurora-touch[data-touch-targets='large'] #auroraPaneBar button {
+	font-size: 10px;
+	gap: 3px;
+}
+
+.aurora-touch[data-touch-targets='large'] #auroraPaneBar button .icon {
+	width: 20px;
+	height: 20px;
+}
+
+.aurora-touch[data-touch-targets='large'] .topbar {
+	min-height: 48px;
+}
+
+.aurora-touch[data-touch-targets='large'] .topbar-actions .btn,
+.aurora-touch[data-touch-targets='large'] .topbar-actions .top-ico,
+.aurora-touch[data-touch-targets='large'] .topbar-actions > *,
+.aurora-touch[data-touch-targets='large'] .topbar-actions .menu-wrap > .btn,
+.aurora-touch[data-touch-targets='large'] .topbar-actions .menu-wrap > .top-ico,
+.aurora-touch[data-touch-targets='large'] .topbar-actions .support-menu-wrap > .top-ico,
+.aurora-touch[data-touch-targets='large'] .topbar-actions .support-menu-wrap > .btn {
+	height: 38px;
+	min-height: 38px;
+}
+
+.aurora-touch[data-touch-targets='large'] .topbar-actions .top-ico {
+	width: 38px;
+	min-width: 38px;
+}
+
+.aurora-touch[data-touch-targets='large'] .tabs {
+	height: 40px;
+	min-height: 40px;
+	gap: 5px;
+}
+
+.aurora-touch[data-touch-targets='large'] .tab {
+	height: 34px;
+	padding: 0 8px 0 12px;
+	font-size: 12.5px;
+}
+
+.aurora-touch[data-touch-targets='large'] .tab .tclose {
+	width: 28px;
+	height: 28px;
+	opacity: 1;
+}
+
+.aurora-touch[data-touch-targets='large'] .toolbar {
+	height: 48px;
+	min-height: 48px;
+	gap: 8px;
+}
+
+.aurora-touch[data-touch-targets='large'] .toolbar .tbtn,
+.aurora-touch[data-touch-targets='large'] #auroraExpToggle {
+	width: 40px;
+	height: 40px;
+	min-width: 40px;
+}
+
+.aurora-touch[data-touch-targets='large'] .toolbar .seg button {
+	height: 36px;
+	min-width: 40px;
+	padding: 0 10px;
+}
+
+.aurora-touch[data-touch-targets='large'] .toolbar .dims input {
+	height: 36px;
+	width: 56px;
+	font-size: 14px;
+}
+
+.aurora-touch[data-touch-targets='large'] .editor-head {
+	height: 40px;
+	min-height: 40px;
+	gap: 4px;
+}
+
+.aurora-touch[data-touch-targets='large'] .editor-head .eh-btn {
+	width: 36px;
+	height: 36px;
+}
+
+.aurora-touch[data-touch-targets='large'] .editor-tabs {
+	height: 38px;
+	min-height: 38px;
+}
+
+.aurora-touch[data-touch-targets='large'] .editor-tabs > * {
+	height: 32px;
+	min-height: 32px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.aurora-touch[data-touch-targets='large'] .explorer .row {
+	min-height: 40px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.aurora-touch[data-touch-targets='large'] .menu-item,
+.aurora-touch[data-touch-targets='large'] .support-menu-item {
+	min-height: var(--touch-target);
+	font-size: 13.5px;
+}
+
+.aurora-touch[data-touch-targets='large'] .console-head button,
+.aurora-touch[data-touch-targets='large'] .console-head .tbtn {
+	min-height: 36px;
+	min-width: 36px;
+}
+
+.aurora-touch[data-touch-targets='large'] .console.open {
+	height: min(50vh, 380px) !important;
+}
+
+.aurora-touch[data-touch-targets='large'] .gutter {
+	min-width: 34px;
+}
+
+.aurora-narrow .settings-body {
+	flex-direction: column;
+}
+
+.aurora-narrow .settings-nav {
+	flex-direction: row;
+	width: auto;
+	gap: 4px;
+	padding: 6px 8px;
+	overflow-x: auto;
+	overflow-y: hidden;
+	border-right: 0;
+	border-bottom: 1px solid var(--line);
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+}
+
+.aurora-narrow .settings-nav::-webkit-scrollbar {
+	display: none;
+}
+
+.aurora-narrow .settings-nav-item {
+	height: 36px;
+	padding: 0 14px;
+	border-radius: var(--r-sm);
+	white-space: nowrap;
+	font-size: 13px;
+}
+
+.aurora-narrow .settings-head {
+	height: 46px;
+	padding: 0 8px 0 14px;
+	padding-top: env(safe-area-inset-top);
+}
+
+.aurora-narrow .settings-head-title {
+	font-size: 14px;
+}
+
+.aurora-narrow .settings-close {
+	width: 38px;
+	height: 38px;
+}
+
+.aurora-narrow .settings-close .icon {
+	width: 18px;
+	height: 18px;
+}
+
+.aurora-narrow .settings-content {
+	padding: 12px 14px calc(24px + env(safe-area-inset-bottom));
+}
+
+.aurora-narrow .settings-row {
+	grid-template-columns: minmax(0, 1fr);
+	gap: 10px;
+	padding: 12px 0;
+}
+
+.aurora-narrow .settings-row:has(.settings-checkbox) {
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+}
+
+.aurora-narrow .settings-row-label {
+	font-size: 13.5px;
+}
+
+.aurora-narrow .settings-row-description {
+	font-size: 12px;
+	line-height: 1.45;
+}
+
+.aurora-narrow .settings-row-control {
+	justify-content: flex-start;
+}
+
+.aurora-narrow .settings-dropdown,
+.aurora-narrow .settings-dropdown-input {
+	width: 100%;
+	min-width: 0;
+}
+
+.aurora-narrow .settings-dropdown-input,
+.aurora-narrow .settings-number {
+	height: 40px;
+	font-size: 15px;
+}
+
+.aurora-narrow .settings-number .settings-number-input {
+	width: 56px;
+	font-size: 15px;
+}
+
+.aurora-narrow .settings-number-steppers {
+	width: 28px;
+}
+
+.aurora-narrow .settings-checkbox {
+	width: 26px;
+	height: 26px;
+}
+
+.aurora-narrow .settings-checkbox::after {
+	width: 12px;
+	height: 7px;
+}
+
+.aurora-narrow .settings-foot {
+	gap: 8px;
+	padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+}
+
+.aurora-narrow .settings-foot .settings-button {
+	flex: 1 1 auto;
+	min-height: 42px;
+	font-size: 13.5px;
+}
+
+.settings-mobile-status {
+	font-size: 12.5px;
+	color: var(--txt-2);
+	padding: 6px 10px;
+	border: 1px dashed var(--line-2);
+	border-radius: var(--r-sm);
+	background: var(--bg-1);
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+	.code-keys-on.aurora-touch #auroraCodeKeys {
+		height: 38px;
+	}
+
+	#auroraCodeKeys .ck-key {
+		height: 30px;
+		min-width: 36px;
+		font-size: 13.5px;
+	}
+
+	.aurora-touch[data-touch-targets='large'] {
+		--mpane-bar-h: 44px;
+	}
+
+	.aurora-touch[data-touch-targets='large'] .toolbar {
+		height: 40px;
+		min-height: 40px;
+	}
+
+	.aurora-touch[data-touch-targets='large'] .toolbar .tbtn,
+	.aurora-touch[data-touch-targets='large'] #auroraExpToggle {
+		width: 34px;
+		height: 34px;
+		min-width: 34px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.aurora-narrow .explorer,
+	.aurora-narrow #auroraExpBackdrop {
+		transition: none;
+	}
+}

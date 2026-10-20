@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<title>Pagina nao encontrada | Synapse Live Preview</title>
+		<meta name="description" content="O endereco pedido nao existe no Synapse Live Preview. Volte para o editor ou consulte a documentacao." />
+		<meta name="robots" content="noindex, follow" />
+		<link rel="icon" href="./favicon.ico?v=1002" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png?v=1002" />
+		<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16.png?v=1002" />
+		<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=1002" />
+		<meta name="theme-color" content="#0b0d12" />
+		<style>
+			:root {
+				--bg: #14100d;
+				--bg-2: #1b1611;
+				--line: #2c241c;
+				--txt: #e9e3d8;
+				--txt-2: #9d9388;
+				--acc: #d1601f;
+				--mono: ui-monospace, 'Cascadia Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				margin: 0;
+				min-height: 100%;
+			}
+			body {
+				background: var(--bg);
+				color: var(--txt);
+				font: 13px/1.6 var(--mono);
+				display: flex;
+				flex-direction: column;
+			}
+			header,
+			footer {
+				padding: 12px 18px;
+				background: var(--bg-2);
+				font-size: 11.5px;
+				color: var(--txt-2);
+			}
+			header {
+				border-bottom: 1px solid var(--line);
+			}
+			footer {
+				border-top: 1px solid var(--line);
+				margin-top: auto;
+			}
+			nav.trilha a,
+			footer a {
+				color: var(--txt-2);
+				text-decoration: none;
+				border-bottom: 1px solid transparent;
+			}
+			nav.trilha a:hover,
+			footer a:hover {
+				color: var(--txt);
+				border-bottom-color: var(--acc);
+			}
+			nav.trilha span {
+				margin: 0 6px;
+				color: #5d554c;
+			}
+			main {
+				width: 100%;
+				max-width: 720px;
+				margin: 0 auto;
+				padding: 56px 18px 64px;
+			}
+			.cod {
+				font-size: 11px;
+				letter-spacing: 0.24em;
+				text-transform: uppercase;
+				color: var(--acc);
+			}
+			h1 {
+				font-size: 22px;
+				line-height: 1.25;
+				font-weight: 600;
+				margin: 10px 0 12px;
+				letter-spacing: -0.01em;
+			}
+			p {
+				margin: 0 0 14px;
+				color: var(--txt-2);
+				max-width: 58ch;
+			}
+			ul.rotas {
+				list-style: none;
+				margin: 26px 0 0;
+				padding: 0;
+				border-top: 1px solid var(--line);
+			}
+			ul.rotas li {
+				border-bottom: 1px solid var(--line);
+			}
+			ul.rotas a {
+				display: flex;
+				gap: 14px;
+				align-items: baseline;
+				padding: 11px 2px;
+				color: var(--txt);
+				text-decoration: none;
+			}
+			ul.rotas a:hover {
+				background: var(--bg-2);
+			}
+			ul.rotas b {
+				font-weight: 600;
+				min-width: 128px;
+				color: var(--acc);
+			}
+			ul.rotas i {
+				font-style: normal;
+				color: var(--txt-2);
+			}
+			@media (max-width: 560px) {
+				main {
+					padding: 32px 14px 44px;
+				}
+				ul.rotas a {
+					flex-direction: column;
+					gap: 3px;
+				}
+				ul.rotas b {
+					min-width: 0;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<nav class="trilha" aria-label="Trilha de navegacao">
+				<a href="/">Synapse Live Preview</a><span>/</span>erro 404
+			</nav>
+		</header>
+		<main>
+			<span class="cod">HTTP 404</span>
+			<h1>Esse endereco nao existe aqui</h1>
+			<p>
+				O caminho pedido nao corresponde a nenhuma pagina do Synapse Live Preview. Projetos ficam salvos no seu
+				navegador, entao nada foi perdido: volte ao editor e o ultimo projeto continua aberto.
+			</p>
+			<ul class="rotas">
+				<li><a href="/"><b>/</b><i>Editor com preview ao vivo, terminal e build</i></a></li>
+				<li><a href="/docs/"><b>/docs/</b><i>Documentacao completa</i></a></li>
+				<li><a href="/docs/primeiros-passos.html"><b>/docs/primeiros-passos</b><i>Criar ou importar um projeto</i></a></li>
+				<li><a href="/docs/problemas.html"><b>/docs/problemas</b><i>Solucao de problemas e suporte</i></a></li>
+			</ul>
+		</main>
+		<footer>Synapse Live Preview &middot; <a href="/docs/atualizacoes.html">notas de atualizacao</a></footer>
+	</body>
+</html>

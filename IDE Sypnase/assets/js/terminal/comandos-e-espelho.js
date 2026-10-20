@@ -1,395 +1,395 @@
 'use strict';
 function termProjName(proj) {
-  return proj.name || 'projeto-' + proj.id;
+	return proj.name || 'projeto-' + proj.id;
 }
 function termFilesOf(proj) {
-  const out = [];
-  proj.files.forEach((f, p) => {
-      if (f && typeof f.text === 'string') out.push({ path: p, text: f.text });
-      else if (f && f.data && f.data.length <= 12 * 1024 * 1024)
-      out.push({ path: p, b64: _b64(f.data) });
-  });
-  return out;
+	const out = [];
+	proj.files.forEach((f, p) => {
+		if (f && typeof f.text === 'string') out.push({ path: p, text: f.text });
+		else if (f && f.data && f.data.length <= 12 * 1024 * 1024)
+			out.push({ path: p, b64: _b64(f.data) });
+	});
+	return out;
 }
 async function termSync(proj) {
-  const all = termFilesOf(proj);
-  const paths = [...proj.files.keys()];
-  const MAXB = 30 * 1024 * 1024;
-  let batch = [];
-  let size = 0;
-  for (const f of all) {
-    const sz = (f.text != null ? f.text.length : f.b64 ? f.b64.length : 0) + f.path.length + 32;
-    if (batch.length && size + sz > MAXB) {
-      await termApi('sync', { project: termProjName(proj), files: batch, prune: false });
-      batch = [];
-      size = 0;
-    }
-    batch.push(f);
-    size += sz;
-  }
-  return termApi('sync', {
-      project: termProjName(proj),
-      files: batch,
-      prune: true,
-      allPaths: paths,
-  });
+	const all = termFilesOf(proj);
+	const paths = [...proj.files.keys()];
+	const MAXB = 30 * 1024 * 1024;
+	let batch = [];
+	let size = 0;
+	for (const f of all) {
+		const sz = (f.text != null ? f.text.length : f.b64 ? f.b64.length : 0) + f.path.length + 32;
+		if (batch.length && size + sz > MAXB) {
+			await termApi('sync', { project: termProjName(proj), files: batch, prune: false });
+			batch = [];
+			size = 0;
+		}
+		batch.push(f);
+		size += sz;
+	}
+	return termApi('sync', {
+		project: termProjName(proj),
+		files: batch,
+		prune: true,
+		allPaths: paths,
+	});
 }
 function termEcho(kind, text) {
-  const o = $('#termOut');
-  if (!o) return;
-  const d = document.createElement('div');
-  d.className = 't-' + kind;
-  d.textContent = String(text).replace(/\r/g, '');
-  o.appendChild(d);
-  while (o.childNodes.length > 1500) o.removeChild(o.firstChild);
-  o.scrollTop = o.scrollHeight;
+	const o = $('#termOut');
+	if (!o) return;
+	const d = document.createElement('div');
+	d.className = 't-' + kind;
+	d.textContent = String(text).replace(/\r/g, '');
+	o.appendChild(d);
+	while (o.childNodes.length > 1500) o.removeChild(o.firstChild);
+	o.scrollTop = o.scrollHeight;
 }
 function termCwdShow(dir) {
-  const c = $('#termCwd');
-  if (c) {
-    c.textContent = dir || '';
-    c.title = dir || '';
-  }
+	const c = $('#termCwd');
+	if (c) {
+		c.textContent = dir || '';
+		c.title = dir || '';
+	}
 }
 function termPromptState() {
-  const i = $('#termIn');
-  if (i) i.disabled = !!TERM.busy;
-  const p = $('#termPrompt');
-  if (p) p.textContent = TERM.busy ? '…' : '>';
+	const i = $('#termIn');
+	if (i) i.disabled = !!TERM.busy;
+	const p = $('#termPrompt');
+	if (p) p.textContent = TERM.busy ? '…' : '>';
 }
 function termOpen(open) {
-  TERM.open = !!open;
-  const p = $('#termPane');
-  if (p) p.classList.toggle('open', TERM.open);
-  const b = $('#termBtn');
-  if (b) b.classList.toggle('on', TERM.open);
-  if (TERM.open) {
-    if (!TERM.greeted) {
-      TERM.greeted = true;
-      termEcho(
-        'sys',
-        'Os comandos rodam no SEU computador, na pasta espelhada do projeto (relay). Configure a URL do relay no menu MCP se ainda nao configurou.',
-      );
-    }
-    const i = $('#termIn');
-    if (i && !TERM.busy) setTimeout(() => i.focus(), 60);
-  }
+	TERM.open = !!open;
+	const p = $('#termPane');
+	if (p) p.classList.toggle('open', TERM.open);
+	const b = $('#termBtn');
+	if (b) b.classList.toggle('on', TERM.open);
+	if (TERM.open) {
+		if (!TERM.greeted) {
+			TERM.greeted = true;
+			termEcho(
+				'sys',
+				'Os comandos rodam no SEU computador, na pasta espelhada do projeto (relay). Configure a URL do relay no menu MCP se ainda nao configurou.',
+			);
+		}
+		const i = $('#termIn');
+		if (i && !TERM.busy) setTimeout(() => i.focus(), 60);
+	}
 }
 async function termStart(proj, cmd, who) {
-  const s = await termSync(proj);
-  termCwdShow(s.dir || '');
-  if (s.locked && s.locked.length)
-  termEcho(
-    'sys',
-    `aviso: ${s.locked.length} arquivo(s) em uso nao foram atualizados no disco: ${s.locked.slice(0, 5).join(', ')}`,
-  );
-  termEcho(who === 'agent' ? 'agent' : 'cmd', (who === 'agent' ? '[agente] > ' : '> ') + cmd);
-  let r = null,
-  tentRun = 0;
-  while (true) {
-    try {
-      r = await termApi('run', { project: termProjName(proj), command: cmd });
-      break;
-    } catch (eRun) {
-      const mRun = String((eRun && eRun.message) || eRun);
-      if (++tentRun > 6 || !/processos simultaneos|HTTP 429/i.test(mRun)) throw eRun;
-      termEcho('sys', `relay lotado (${tentRun}/6), esperando vaga: ${mRun.slice(0, 110)}`);
-      await (window.bgEspera
-        ? window.bgEspera(2000 + tentRun * 1500)
-        : new Promise(function (rs) {
-            setTimeout(rs, 2000 + tentRun * 1500);
-      }));
-    }
-  }
-  try {
-    tmCmdNoteProc(r.procId, who, cmd, proj);
-  } catch (e) {
-    ignorarErro(e, 'termStart');
-  }
-  if (r.reused)
-  termEcho(
-    'sys',
-    `(comando identico ja em execucao - reaproveitando o processo ${r.procId}, sem duplicar)`,
-  );
-  if (who === 'user') TERM.cur = { procId: r.procId };
-  if (TERM.echoed[r.procId] == null) TERM.echoed[r.procId] = 0;
-  return r.procId;
+	const s = await termSync(proj);
+	termCwdShow(s.dir || '');
+	if (s.locked && s.locked.length)
+		termEcho(
+			'sys',
+			`aviso: ${s.locked.length} arquivo(s) em uso nao foram atualizados no disco: ${s.locked.slice(0, 5).join(', ')}`,
+		);
+	termEcho(who === 'agent' ? 'agent' : 'cmd', (who === 'agent' ? '[agente] > ' : '> ') + cmd);
+	let r = null,
+		tentRun = 0;
+	while (true) {
+		try {
+			r = await termApi('run', { project: termProjName(proj), command: cmd });
+			break;
+		} catch (eRun) {
+			const mRun = String((eRun && eRun.message) || eRun);
+			if (++tentRun > 6 || !/processos simultaneos|HTTP 429/i.test(mRun)) throw eRun;
+			termEcho('sys', `relay lotado (${tentRun}/6), esperando vaga: ${mRun.slice(0, 110)}`);
+			await (window.bgEspera
+				? window.bgEspera(2000 + tentRun * 1500)
+				: new Promise(function (rs) {
+						setTimeout(rs, 2000 + tentRun * 1500);
+					}));
+		}
+	}
+	try {
+		tmCmdNoteProc(r.procId, who, cmd, proj);
+	} catch (e) {
+		ignorarErro(e, 'termStart');
+	}
+	if (r.reused)
+		termEcho(
+			'sys',
+			`(comando identico ja em execucao - reaproveitando o processo ${r.procId}, sem duplicar)`,
+		);
+	if (who === 'user') TERM.cur = { procId: r.procId };
+	if (TERM.echoed[r.procId] == null) TERM.echoed[r.procId] = 0;
+	return r.procId;
 }
 async function termWait(proj, procId, waitMs) {
-  const t0 = Date.now();
-  let acc = '';
-  let from = 0;
-  let st = null;
-  while (true) {
-    st = await termApi('out', { procId: procId, from: from });
-    if (st.text) {
-      acc += st.text;
-      const seen = TERM.echoed[procId] || 0;
-      const end = from + st.text.length;
-      if (end > seen) {
-        termEcho('out', st.text.slice(Math.max(0, seen - from)));
-        TERM.echoed[procId] = end;
-      }
-    }
-    from = st.next || from;
-    if (st.done) break;
-    if (Date.now() - t0 >= waitMs) break;
-    await (window.bgEspera ? window.bgEspera(500) : new Promise((rs) => setTimeout(rs, 500)));
-  }
-  let note = '';
-  if (st && st.done) {
-    if (TERM.cur && TERM.cur.procId === procId) TERM.cur = null;
-    try {
-      note = await termApplyChanges(proj);
-    } catch (e) {
-      note = 'falha ao sincronizar de volta: ' + ((e && e.message) || e);
-    }
-    termEcho('sys', `— fim (codigo ${st.code})${note ? ' · ' + note : ''}`);
-    delete TERM.echoed[procId];
-  }
-  return { done: !!(st && st.done), code: st ? st.code : null, out: acc, note: note };
+	const t0 = Date.now();
+	let acc = '';
+	let from = 0;
+	let st = null;
+	while (true) {
+		st = await termApi('out', { procId: procId, from: from });
+		if (st.text) {
+			acc += st.text;
+			const seen = TERM.echoed[procId] || 0;
+			const end = from + st.text.length;
+			if (end > seen) {
+				termEcho('out', st.text.slice(Math.max(0, seen - from)));
+				TERM.echoed[procId] = end;
+			}
+		}
+		from = st.next || from;
+		if (st.done) break;
+		if (Date.now() - t0 >= waitMs) break;
+		await (window.bgEspera ? window.bgEspera(500) : new Promise((rs) => setTimeout(rs, 500)));
+	}
+	let note = '';
+	if (st && st.done) {
+		if (TERM.cur && TERM.cur.procId === procId) TERM.cur = null;
+		try {
+			note = await termApplyChanges(proj);
+		} catch (e) {
+			note = 'falha ao sincronizar de volta: ' + ((e && e.message) || e);
+		}
+		termEcho('sys', `— fim (codigo ${st.code})${note ? ' · ' + note : ''}`);
+		delete TERM.echoed[procId];
+	}
+	return { done: !!(st && st.done), code: st ? st.code : null, out: acc, note: note };
 }
 async function termApplyChanges(proj) {
-  let n = 0,
-  del = 0,
-  ab = 0;
-  const soDisco = [];
-  let extra = false;
-  const recusados = [];
-  let scanParcial = false;
-  for (let round = 0; round < 5; round++) {
-    const ch = await termApi('changes', { project: termProjName(proj) });
-    if (ch && ch.parcial) scanParcial = true;
-    (ch.changed || []).forEach((it) => {
-        if (!validRelPath(it.path)) return;
-        let f = proj.files.get(it.path);
-        if (!f) {
-          f = newFileEntry(it.path);
-          f.isText = true;
-          f.data = null;
-          f.text = it.text;
-          f.history = [{ t: Date.now(), text: it.text }];
-          f.doDisco = true;
-          proj.files.set(it.path, f);
-        } else {
-          if (f.text === it.text) return;
-          mcpHist(f);
-          f.isText = true;
-          f.data = null;
-          f.text = it.text;
-        }
-        if (it.enc === 'latin1')
-        mcpLog('warn', 'arquivo nao era UTF-8, lido como latin1: ' + it.path);
-        n++;
-        mcpAfterWrite(proj, it.path);
-    });
-    const pedidos = (ch.deleted || []).filter((p) => proj.files.has(p));
-    if (pedidos.length) {
-      const limite = Math.max(DISCO.cfg.delMin, Math.ceil(proj.files.size * DISCO.cfg.delPct));
-      const loteGrande = pedidos.length > limite;
-      pedidos.forEach((p) => {
-          const f = proj.files.get(p);
-          const liberado =
-          !ch.parcial && !loteGrande && (!DISCO.cfg.exigirOrigem || !!(f && f.doDisco));
-          if (!liberado) {
-            recusados.push(p);
-            return;
-          }
-          discoLixo(proj, p, f);
-          mcpDeleteOne(proj, p);
-          del++;
-      });
-    }
-    (ch.binaries || []).forEach((it) => {
-        if (!validRelPath(it.path)) return;
-        if (it.b64) {
-          try {
-            const bytes = b64ToBytes(it.b64);
-            const antigo = proj.files.get(it.path);
-            const nf = makeFileEntry(it.path, bytes);
-            nf.doDisco = antigo ? !!antigo.doDisco : true;
-            proj.files.set(it.path, nf);
-            ab++;
-            mcpAfterWrite(proj, it.path);
-          } catch (e) {
-            soDisco.push(it.path);
-          }
-        } else soDisco.push(it.path);
-    });
-    if (!ch.more) {
-      extra = false;
-      break;
-    }
-    extra = true;
-  }
-  if (recusados.length) {
-    DISCO.recusas.unshift({
-        proj: proj.id,
-        nome: proj.name,
-        qtd: recusados.length,
-        parcial: scanParcial,
-        paths: recusados.slice(0, 400),
-        at: Date.now(),
-    });
-    while (DISCO.recusas.length > 20) DISCO.recusas.pop();
-    termEcho(
-      'err',
-      `PROTECAO DE PROJETO: o disco pediu para apagar ${recusados.length} arquivo(s) do editor${scanParcial ? ' (a leitura da pasta veio incompleta)' : ''} \
+	let n = 0,
+		del = 0,
+		ab = 0;
+	const soDisco = [];
+	let extra = false;
+	const recusados = [];
+	let scanParcial = false;
+	for (let round = 0; round < 5; round++) {
+		const ch = await termApi('changes', { project: termProjName(proj) });
+		if (ch && ch.parcial) scanParcial = true;
+		(ch.changed || []).forEach((it) => {
+			if (!validRelPath(it.path)) return;
+			let f = proj.files.get(it.path);
+			if (!f) {
+				f = newFileEntry(it.path);
+				f.isText = true;
+				f.data = null;
+				f.text = it.text;
+				f.history = [{ t: Date.now(), text: it.text }];
+				f.doDisco = true;
+				proj.files.set(it.path, f);
+			} else {
+				if (f.text === it.text) return;
+				mcpHist(f);
+				f.isText = true;
+				f.data = null;
+				f.text = it.text;
+			}
+			if (it.enc === 'latin1')
+				mcpLog('warn', 'arquivo nao era UTF-8, lido como latin1: ' + it.path);
+			n++;
+			mcpAfterWrite(proj, it.path);
+		});
+		const pedidos = (ch.deleted || []).filter((p) => proj.files.has(p));
+		if (pedidos.length) {
+			const limite = Math.max(DISCO.cfg.delMin, Math.ceil(proj.files.size * DISCO.cfg.delPct));
+			const loteGrande = pedidos.length > limite;
+			pedidos.forEach((p) => {
+				const f = proj.files.get(p);
+				const liberado =
+					!ch.parcial && !loteGrande && (!DISCO.cfg.exigirOrigem || !!(f && f.doDisco));
+				if (!liberado) {
+					recusados.push(p);
+					return;
+				}
+				discoLixo(proj, p, f);
+				mcpDeleteOne(proj, p);
+				del++;
+			});
+		}
+		(ch.binaries || []).forEach((it) => {
+			if (!validRelPath(it.path)) return;
+			if (it.b64) {
+				try {
+					const bytes = b64ToBytes(it.b64);
+					const antigo = proj.files.get(it.path);
+					const nf = makeFileEntry(it.path, bytes);
+					nf.doDisco = antigo ? !!antigo.doDisco : true;
+					proj.files.set(it.path, nf);
+					ab++;
+					mcpAfterWrite(proj, it.path);
+				} catch (e) {
+					soDisco.push(it.path);
+				}
+			} else soDisco.push(it.path);
+		});
+		if (!ch.more) {
+			extra = false;
+			break;
+		}
+		extra = true;
+	}
+	if (recusados.length) {
+		DISCO.recusas.unshift({
+			proj: proj.id,
+			nome: proj.name,
+			qtd: recusados.length,
+			parcial: scanParcial,
+			paths: recusados.slice(0, 400),
+			at: Date.now(),
+		});
+		while (DISCO.recusas.length > 20) DISCO.recusas.pop();
+		termEcho(
+			'err',
+			`PROTECAO DE PROJETO: o disco pediu para apagar ${recusados.length} arquivo(s) do editor${scanParcial ? ' (a leitura da pasta veio incompleta)' : ''} \
 e NADA foi apagado no site. Exemplos: ${recusados.slice(0, 4).join(', ')}${recusados.length > 4 ? ' ...' : ''}. \
 O site vai reescrever esses arquivos no disco. Detalhes: SYNAPSE_DISCO.estado()`,
-    );
-    try {
-      mcpLog(
-        'warn',
-        `protecao de projeto: ${recusados.length} exclusao(oes) vindas do disco recusadas${scanParcial ? ' (scan parcial)' : ''}`,
-      );
-    } catch (e) {
-      ignorarErro(e, 'termApplyChanges');
-    }
-    if (Date.now() - DISCO.ultRestauro > DISCO.cfg.restauroMs) {
-      DISCO.ultRestauro = Date.now();
-      try {
-        await termSync(proj);
-      } catch (e) {
-        ignorarErro(e, 'termApplyChanges');
-      }
-    }
-  }
-  if (del) {
-    if (proj.id === State.active) {
-      renderTree();
-      renderEditorTabs();
-      scheduleBuild(proj);
-    }
-    saveSession();
-  }
-  const parts = [];
-  if (n) parts.push(n + ' arquivo(s) atualizados no editor');
-  if (ab) parts.push(ab + ' asset(s) binario(s) atualizados');
-  if (del) parts.push(del + ' removido(s)');
-  if (soDisco.length) parts.push(soDisco.length + ' arquivo(s) grande(s) so no disco');
-  if (recusados.length)
-  parts.push(recusados.length + ' exclusao(oes) do disco RECUSADAS (protecao de projeto)');
-  if (extra)
-  parts.push(
-    'ha mais alteracoes no disco (rode command_output ou outro comando para continuar a sincronizacao)',
-  );
-  return parts.join(', ');
+		);
+		try {
+			mcpLog(
+				'warn',
+				`protecao de projeto: ${recusados.length} exclusao(oes) vindas do disco recusadas${scanParcial ? ' (scan parcial)' : ''}`,
+			);
+		} catch (e) {
+			ignorarErro(e, 'termApplyChanges');
+		}
+		if (Date.now() - DISCO.ultRestauro > DISCO.cfg.restauroMs) {
+			DISCO.ultRestauro = Date.now();
+			try {
+				await termSync(proj);
+			} catch (e) {
+				ignorarErro(e, 'termApplyChanges');
+			}
+		}
+	}
+	if (del) {
+		if (proj.id === State.active) {
+			renderTree();
+			renderEditorTabs();
+			scheduleBuild(proj);
+		}
+		saveSession();
+	}
+	const parts = [];
+	if (n) parts.push(n + ' arquivo(s) atualizados no editor');
+	if (ab) parts.push(ab + ' asset(s) binario(s) atualizados');
+	if (del) parts.push(del + ' removido(s)');
+	if (soDisco.length) parts.push(soDisco.length + ' arquivo(s) grande(s) so no disco');
+	if (recusados.length)
+		parts.push(recusados.length + ' exclusao(oes) do disco RECUSADAS (protecao de projeto)');
+	if (extra)
+		parts.push(
+			'ha mais alteracoes no disco (rode command_output ou outro comando para continuar a sincronizacao)',
+		);
+	return parts.join(', ');
 }
 function termReport(r, procId) {
-  const tail = r.out.length > 30000 ? '…(inicio da saida omitido)…\n' + r.out.slice(-30000) : r.out;
-  if (r.done)
-  return (
-    'Comando finalizado (exit code ' +
-    r.code +
-    ').' +
-    (r.note ? ` ${r.note}.` : '') +
-    '\n--- saida ---\n' +
-    (tail || '(sem saida)')
-  );
-  return `Ainda em execucao (proc_id: ${procId}). Chame command_output com este proc_id para continuar \
+	const tail = r.out.length > 30000 ? '…(inicio da saida omitido)…\n' + r.out.slice(-30000) : r.out;
+	if (r.done)
+		return (
+			'Comando finalizado (exit code ' +
+			r.code +
+			').' +
+			(r.note ? ` ${r.note}.` : '') +
+			'\n--- saida ---\n' +
+			(tail || '(sem saida)')
+		);
+	return `Ainda em execucao (proc_id: ${procId}). Chame command_output com este proc_id para continuar \
 acompanhando (ou stop_command para encerrar).\n--- saida ate agora ---\n${tail || '(sem saida ainda)'}`;
 }
 async function termRunManual(cmd) {
-  if (!termBase()) {
-    termEcho(
-      'err',
-      'Configure o endereço do Synapse Relay no menu MCP (ex.: http://localhost:8787) e execute \"node relay.js\" (Node 18+).',
-    );
-    return;
-  }
-  const proj = activeProject();
-  if (!proj) {
-    termEcho('err', 'Nenhum projeto aberto. Importe um .zip ou crie um projeto.');
-    return;
-  }
-  TERM.busy = true;
-  termPromptState();
-  try {
-    const id = await termStart(proj, cmd, 'user');
-    await termWait(proj, id, 600000);
-  } catch (e) {
-    termEcho('err', String((e && e.message) || e));
-  } finally {
-    TERM.busy = false;
-    termPromptState();
-    const i = $('#termIn');
-    if (i) setTimeout(() => i.focus(), 30);
-  }
+	if (!termBase()) {
+		termEcho(
+			'err',
+			'Configure o endereço do Synapse Relay no menu MCP (ex.: http://localhost:8787) e execute \"node relay.js\" (Node 18+).',
+		);
+		return;
+	}
+	const proj = activeProject();
+	if (!proj) {
+		termEcho('err', 'Nenhum projeto aberto. Importe um .zip ou crie um projeto.');
+		return;
+	}
+	TERM.busy = true;
+	termPromptState();
+	try {
+		const id = await termStart(proj, cmd, 'user');
+		await termWait(proj, id, 600000);
+	} catch (e) {
+		termEcho('err', String((e && e.message) || e));
+	} finally {
+		TERM.busy = false;
+		termPromptState();
+		const i = $('#termIn');
+		if (i) setTimeout(() => i.focus(), 30);
+	}
 }
 function wireTerm() {
-  termLoadCfg();
-  const btn = $('#termBtn');
-  if (btn) btn.addEventListener('click', () => termOpen(!TERM.open));
-  const cl = $('#termClose');
-  if (cl) cl.addEventListener('click', () => termOpen(false));
-  const cc = $('#termClear');
-  if (cc)
-  cc.addEventListener('click', () => {
-      const o = $('#termOut');
-      if (o) o.innerHTML = '';
-  });
-  const stp = $('#termStop');
-  if (stp)
-  stp.addEventListener('click', async () => {
-      if (!TERM.cur) {
-        termEcho('sys', 'Nenhum comando em execucao.');
-        return;
-      }
-      try {
-        await termApi('kill', { procId: TERM.cur.procId });
-        termEcho('sys', '— interrompido');
-      } catch (e) {
-        termEcho('err', String((e && e.message) || e));
-      }
-  });
-  const inp = $('#termIn');
-  if (inp)
-  inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const v = inp.value.trim();
-        if (v && !TERM.busy) {
-          TERM.hist.push(v);
-          if (TERM.hist.length > 100) TERM.hist.shift();
-          TERM.hi = TERM.hist.length;
-          inp.value = '';
-          termRunManual(v);
-        }
-      } else if (e.key === 'ArrowUp') {
-        if (TERM.hi > 0) {
-          TERM.hi--;
-          inp.value = TERM.hist[TERM.hi] || '';
-          e.preventDefault();
-        }
-      } else if (e.key === 'ArrowDown') {
-        if (TERM.hi < TERM.hist.length) {
-          TERM.hi++;
-          inp.value = TERM.hist[TERM.hi] || '';
-          e.preventDefault();
-        }
-      }
-  });
-  const ck = $('#mcpTermAllow');
-  if (ck) {
-    ck.checked = TERM.allow;
-    ck.addEventListener('change', () => {
-        TERM.allow = ck.checked;
-        termSaveCfg();
-        mcpLog('ok', `Terminal para o agente ${TERM.allow ? 'ATIVADO' : 'desativado'}.`);
-        mcpRenderPanel();
-    });
-  }
-  const tl = document.getElementById('mcpTermList');
-  if (tl) {
-    tl.value = (TERM.allowList || []).join('\n');
-    tl.addEventListener('input', () => {
-        TERM.allowList = tl.value
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean);
-        termSaveCfg();
-    });
-  }
+	termLoadCfg();
+	const btn = $('#termBtn');
+	if (btn) btn.addEventListener('click', () => termOpen(!TERM.open));
+	const cl = $('#termClose');
+	if (cl) cl.addEventListener('click', () => termOpen(false));
+	const cc = $('#termClear');
+	if (cc)
+		cc.addEventListener('click', () => {
+			const o = $('#termOut');
+			if (o) o.innerHTML = '';
+		});
+	const stp = $('#termStop');
+	if (stp)
+		stp.addEventListener('click', async () => {
+			if (!TERM.cur) {
+				termEcho('sys', 'Nenhum comando em execucao.');
+				return;
+			}
+			try {
+				await termApi('kill', { procId: TERM.cur.procId });
+				termEcho('sys', '— interrompido');
+			} catch (e) {
+				termEcho('err', String((e && e.message) || e));
+			}
+		});
+	const inp = $('#termIn');
+	if (inp)
+		inp.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter') {
+				const v = inp.value.trim();
+				if (v && !TERM.busy) {
+					TERM.hist.push(v);
+					if (TERM.hist.length > 100) TERM.hist.shift();
+					TERM.hi = TERM.hist.length;
+					inp.value = '';
+					termRunManual(v);
+				}
+			} else if (e.key === 'ArrowUp') {
+				if (TERM.hi > 0) {
+					TERM.hi--;
+					inp.value = TERM.hist[TERM.hi] || '';
+					e.preventDefault();
+				}
+			} else if (e.key === 'ArrowDown') {
+				if (TERM.hi < TERM.hist.length) {
+					TERM.hi++;
+					inp.value = TERM.hist[TERM.hi] || '';
+					e.preventDefault();
+				}
+			}
+		});
+	const ck = $('#mcpTermAllow');
+	if (ck) {
+		ck.checked = TERM.allow;
+		ck.addEventListener('change', () => {
+			TERM.allow = ck.checked;
+			termSaveCfg();
+			mcpLog('ok', `Terminal para o agente ${TERM.allow ? 'ATIVADO' : 'desativado'}.`);
+			mcpRenderPanel();
+		});
+	}
+	const tl = document.getElementById('mcpTermList');
+	if (tl) {
+		tl.value = (TERM.allowList || []).join('\n');
+		tl.addEventListener('input', () => {
+			TERM.allowList = tl.value
+				.split('\n')
+				.map((s) => s.trim())
+				.filter(Boolean);
+			termSaveCfg();
+		});
+	}
 }
 
 const RELAY_SRC = `const SYNAPSE_DEPURAR =
@@ -2960,24 +2960,24 @@ server.listen(PORT, function () {
 });
 `;
 function mcpDownloadRelay() {
-  try {
-    const blob = new Blob([RELAY_SRC], { type: 'text/javascript' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'relay.js';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => {
-        try {
-          URL.revokeObjectURL(url);
-        } catch (e) {
-          ignorarErro(e, 'mcpDownloadRelay');
-        }
-      }, 2000);
-    toast('relay.js baixado', 'Rode com: node relay.js (Node 18+) em um host público', 'ok');
-  } catch (e) {
-    toast('Falha ao baixar', (e && e.message) || '', 'err');
-  }
+	try {
+		const blob = new Blob([RELAY_SRC], { type: 'text/javascript' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'relay.js';
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		setTimeout(() => {
+			try {
+				URL.revokeObjectURL(url);
+			} catch (e) {
+				ignorarErro(e, 'mcpDownloadRelay');
+			}
+		}, 2000);
+		toast('relay.js baixado', 'Rode com: node relay.js (Node 18+) em um host público', 'ok');
+	} catch (e) {
+		toast('Falha ao baixar', (e && e.message) || '', 'err');
+	}
 }

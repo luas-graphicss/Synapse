@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function () {
+				if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+				var caminho = location.pathname || '';
+				if (!caminho || /\/$/.test(caminho) || /\.[a-z0-9]+$/i.test(caminho)) return;
+				var base = document.createElement('base');
+				base.setAttribute('href', caminho + '/');
+				if (document.head) document.head.appendChild(base);
+			})();
+		</script>
+		<link rel="icon" href="../favicon.ico?v=1001" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png?v=1001" />
+		<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png?v=1001" />
+		<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png?v=1001" />
+		<link rel="manifest" href="../site.webmanifest" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="canonical" href="https://sypnase-live-preview.vercel.app/docs/extensoes-publicar.html" />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:type" content="article" />
+		<meta property="og:site_name" content="Synapse Live Preview" />
+		<meta property="og:title" content="Empacotar e publicar | Documentação da Synapse IDE" />
+		<meta property="og:description" content="Como empacotar uma extensão da Synapse IDE em .sx, versionar com semver e CHANGELOG, assinar, publicar no registro via GitHub Release e automatizar com GitHub Actions." />
+		<meta property="og:url" content="https://sypnase-live-preview.vercel.app/docs/extensoes-publicar.html" />
+		<meta property="og:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Empacotar e publicar | Documentação da Synapse IDE" />
+		<meta name="twitter:description" content="Como empacotar uma extensão da Synapse IDE em .sx, versionar com semver e CHANGELOG, assinar, publicar no registro via GitHub Release e automatizar com GitHub Actions." />
+		<meta name="twitter:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<title>Empacotar e publicar | Documentação da Synapse IDE</title>
+		<meta name="description" content="Como empacotar uma extensão da Synapse IDE em .sx, versionar com semver e CHANGELOG, assinar, publicar no registro via GitHub Release e automatizar com GitHub Actions." />
+		<link rel="stylesheet" href="../assets/css/tema.css" />
+		<link rel="stylesheet" href="./assets/docs-shell.css" />
+		<link rel="stylesheet" href="./assets/docs-navigation.css" />
+		<link rel="stylesheet" href="./assets/docs-prose.css" />
+		<link rel="stylesheet" href="./assets/docs-theme.css" />
+		<link rel="stylesheet" href="./assets/docs-typography.css" />
+		<script src="./assets/docs-ide-preference.js"></script>
+		<script src="./assets/docs-theme-sync.js"></script>
+	</head>
+	<body data-docs-category="extensoes-publicar">
+		<header class="docs-topbar">
+			<a class="docs-brand" href="./index.html">
+				<span class="docs-brand-mark">SYNAPSE</span>
+				<span class="docs-brand-text">Documentação oficial</span>
+			</a>
+			<nav class="docs-topbar-links">
+				<span class="docs-topbar-version">build 2026.09</span>
+				<a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+				<a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+			</nav>
+		</header>
+		<div class="docs-frame">
+			<nav class="docs-sidebar" aria-label="Categorias da documentação"></nav>
+			<main class="docs-main">
+				<article class="docs-article">
+					<p class="docs-kicker">Extensões / Empacotar e publicar</p>
+					<h1 class="docs-title">Empacotar, versionar e publicar</h1>
+					<p class="docs-lede">Do pacote .sx local até a entrada no registro público, com assinatura, Release no GitHub e o fluxo automatizado que o assistente já deixa configurado.</p>
+					<div class="docs-meta">
+						<span>revisado em 15/09/2026</span>
+						<span>leitura 8 min</span>
+						<span>público: dev</span>
+					</div>
+					<section>
+						<h2>O que é um pacote .sx</h2>
+						<p>
+							Um <code>.sx</code> é um ZIP da pasta da extensão com o manifesto na raiz, sem
+							<code>node_modules</code>, <code>.git</code>, pacotes anteriores e arquivos de teste
+							de desenvolvimento. A IDE calcula o SHA-256 do arquivo e esse hash vira a identidade
+							daquela versão no registro: mudou um byte, mudou o hash, a instalação recusa.
+						</p>
+						<p>
+							Instalar um <code>.sx</code> passa pela mesma validação de manifesto de uma pasta de
+							desenvolvimento, mais a checagem de hash e, quando houver, da assinatura.
+						</p>
+					</section>
+
+					<section>
+						<h2>Antes de empacotar</h2>
+						<ol class="docs-steps">
+							<li>Aumente <code>version</code> no manifesto seguindo semver: correção → patch, recurso → minor, quebra de compatibilidade → major.</li>
+							<li>Registre a mudança em <code>CHANGELOG.md</code> na seção da nova versão. O registro mostra esse trecho na página da extensão.</li>
+							<li>Confira <code>engines.synapse</code>: se você usou uma API nova, suba o mínimo.</li>
+							<li>Rode os testes no Extension Development Host. O empacotador não bloqueia por teste falhando, mas o registro exibe o resultado da última execução.</li>
+							<li>Preencha <code>repository</code> com a URL pública do GitHub e <code>license</code>.</li>
+						</ol>
+					</section>
+
+					<section>
+						<h2>Empacotar pela IDE</h2>
+						<p>
+							<strong>Extensões: Empacotar (.sx)</strong> pede a pasta (ou usa a única existente),
+							valida, gera o arquivo e baixa. O nome segue <code>&lt;nome&gt;-&lt;versão&gt;.sx</code>
+							e o console mostra o SHA-256 e os avisos encontrados (arquivos grandes, permissões
+							amplas, ícone ausente).
+						</p>
+						<p>
+							Para distribuir sem registro, basta enviar o <code>.sx</code>: quem recebe usa
+							<strong>Extensões: Instalar de arquivo (.sx)</strong>.
+						</p>
+					</section>
+
+					<section>
+						<h2>Assinatura</h2>
+						<p>
+							Extensões assinadas recebem o selo <em>Verificado</em>. A chave é ECDSA P-256 gerada
+							uma vez por publisher com <strong>Extensões: Gerar chave de assinatura do publisher</strong>;
+							a parte privada fica só no seu navegador (IndexedDB) e a pública vai para o registro
+							junto com a primeira publicação.
+						</p>
+						<div class="docs-note docs-note-alert">
+							<span class="docs-note-label">Faça backup</span>
+							Use <strong>Extensões: Exportar chave de assinatura</strong> e guarde o arquivo em
+							lugar seguro. Perder a chave significa publicar as próximas versões sem selo até que
+							uma rotação seja aprovada no registro.
+						</div>
+					</section>
+
+					<section>
+						<h2>Publicar no registro</h2>
+						<p>
+							<strong>Extensões: Publicar no registro</strong> faz tudo que o empacotamento faz e
+							ainda prepara a entrada do registro:
+						</p>
+						<ol class="docs-steps">
+							<li>Verifica que <code>publisher</code> é igual ao dono do repositório (em minúsculas) e que a versão é maior que a última publicada.</li>
+							<li>Gera <code>dist-sx/&lt;nome&gt;.registry.json</code> com id, versões, hash, assinatura, tag e URL do asset.</li>
+							<li>Baixa o <code>.sx</code> e copia o JSON para a área de transferência.</li>
+							<li>Abre o GitHub com o arquivo do registro já pré-preenchido em <code>registry/&lt;publisher&gt;/&lt;nome&gt;.json</code>.</li>
+						</ol>
+						<p>
+							Você então cria a Release <code>vX.Y.Z</code> no seu repositório anexando o
+							<code>.sx</code>, e abre o PR no registro. A Action do registro baixa o asset,
+							confere o hash, a assinatura e o semver, e faz o merge sozinha quando tudo bate.
+						</p>
+					</section>
+
+					<section>
+						<h2>Automatizar com GitHub Actions</h2>
+						<p>
+							O assistente de nova extensão gera <code>.github/workflows/release.yml</code>. Com ele
+							o fluxo vira apenas <em>subir a versão, commitar, criar a tag</em>:
+						</p>
+						<pre><code>git commit -am "v1.2.0"
+git tag v1.2.0
+git push --tags</code></pre>
+						<p>O workflow:</p>
+						<ul>
+							<li>falha se a tag não bater com <code>version</code> do manifesto;</li>
+							<li>gera o <code>.sx</code> excluindo <code>.git</code>, <code>.github</code>, <code>node_modules</code> e pacotes anteriores;</li>
+							<li>escreve <code>SHA256SUMS.txt</code>;</li>
+							<li>cria a Release com notas automáticas e anexa os dois arquivos.</li>
+						</ul>
+						<p>
+							Depois disso, só falta o PR no registro, que a IDE prepara com um clique. Se você
+							já publicou antes, o PR é uma linha nova na lista de versões.
+						</p>
+					</section>
+
+					<section>
+						<h2>Atualizações e rollback</h2>
+						<p>
+							Quem instalou pelo registro recebe aviso de nova versão na tela de extensões e pode
+							atualizar com um clique. A IDE guarda o pacote anterior e oferece
+							<strong>Extensões: Voltar para a versão anterior</strong> se a nova quebrar algo.
+						</p>
+						<p>
+							Para retirar uma versão problemática do ar, abra um PR no registro marcando-a com
+							<code>"yanked": true</code>; instalações existentes continuam, novas passam a receber
+							a versão anterior.
+						</p>
+					</section>
+
+					<section>
+						<h2>Checklist final</h2>
+						<table class="docs-table">
+							<thead><tr><th>Item</th><th>Onde conferir</th></tr></thead>
+							<tbody>
+								<tr><td>Manifesto válido, sem avisos</td><td>Console ao empacotar</td></tr>
+								<tr><td>Testes passando</td><td>Extension Development Host → Testes</td></tr>
+								<tr><td>Permissões mínimas</td><td>Inspetor → Permissões; remova o que não usa</td></tr>
+								<tr><td>README com exemplos e CHANGELOG atualizado</td><td>Pasta da extensão</td></tr>
+								<tr><td>Ícone 128×128 em <code>media/</code></td><td><code>icon</code> no manifesto</td></tr>
+								<tr><td>Tag = versão</td><td>Action <code>release.yml</code></td></tr>
+							</tbody>
+						</table>
+					</section>
+
+				</article>
+				<footer class="docs-pager"></footer>
+				<p class="docs-page-footer">A Action do registro rejeita hash divergente, versão que não cresce e publisher diferente do dono do repositório. Confira os três antes de abrir o PR.</p>
+			</main>
+			<aside class="docs-outline" aria-label="Nesta página"></aside>
+		</div>
+		<script src="./assets/docs-catalog.js"></script>
+		<script src="./assets/docs-current-category.js"></script>
+		<script src="./assets/docs-sidebar.js"></script>
+		<script src="./assets/docs-filter.js"></script>
+		<script src="./assets/docs-outline.js"></script>
+		<script src="./assets/docs-pager.js"></script>
+		<script src="./assets/docs-boot.js"></script>
+		<script src="../assets/js/i18n/phrase-registration.js"></script>
+		<script src="./assets/docs-phrases.js"></script>
+		<script src="./assets/docs-error-silencer.js"></script>
+		<script src="../assets/js/i18n/idiomas.js"></script>
+	</body>
+</html>

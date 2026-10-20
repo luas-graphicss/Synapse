@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function () {
+				if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+				var caminho = location.pathname || '';
+				if (!caminho || /\/$/.test(caminho) || /\.[a-z0-9]+$/i.test(caminho)) return;
+				var base = document.createElement('base');
+				base.setAttribute('href', caminho + '/');
+				if (document.head) document.head.appendChild(base);
+			})();
+		</script>
+		<link rel="icon" href="../favicon.ico?v=1001" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png?v=1001" />
+		<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png?v=1001" />
+		<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png?v=1001" />
+		<link rel="manifest" href="../site.webmanifest" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="canonical" href="https://sypnase-live-preview.vercel.app/docs/extensoes-manifesto.html" />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:type" content="article" />
+		<meta property="og:site_name" content="Synapse Live Preview" />
+		<meta property="og:title" content="Manifesto e permissões | Documentação da Synapse IDE" />
+		<meta property="og:description" content="Referência completa do synapse-extension.json: campos obrigatórios, eventos de ativação, permissões, contribuições e validação por JSON Schema." />
+		<meta property="og:url" content="https://sypnase-live-preview.vercel.app/docs/extensoes-manifesto.html" />
+		<meta property="og:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Manifesto e permissões | Documentação da Synapse IDE" />
+		<meta name="twitter:description" content="Referência completa do synapse-extension.json: campos obrigatórios, eventos de ativação, permissões, contribuições e validação por JSON Schema." />
+		<meta name="twitter:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<title>Manifesto e permissões | Documentação da Synapse IDE</title>
+		<meta name="description" content="Referência completa do synapse-extension.json: campos obrigatórios, eventos de ativação, permissões, contribuições e validação por JSON Schema." />
+		<link rel="stylesheet" href="../assets/css/tema.css" />
+		<link rel="stylesheet" href="./assets/docs-shell.css" />
+		<link rel="stylesheet" href="./assets/docs-navigation.css" />
+		<link rel="stylesheet" href="./assets/docs-prose.css" />
+		<link rel="stylesheet" href="./assets/docs-theme.css" />
+		<link rel="stylesheet" href="./assets/docs-typography.css" />
+		<script src="./assets/docs-ide-preference.js"></script>
+		<script src="./assets/docs-theme-sync.js"></script>
+	</head>
+	<body data-docs-category="extensoes-manifesto">
+		<header class="docs-topbar">
+			<a class="docs-brand" href="./index.html">
+				<span class="docs-brand-mark">SYNAPSE</span>
+				<span class="docs-brand-text">Documentação oficial</span>
+			</a>
+			<nav class="docs-topbar-links">
+				<span class="docs-topbar-version">build 2026.09</span>
+				<a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+				<a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+			</nav>
+		</header>
+		<div class="docs-frame">
+			<nav class="docs-sidebar" aria-label="Categorias da documentação"></nav>
+			<main class="docs-main">
+				<article class="docs-article">
+					<p class="docs-kicker">Extensões / Manifesto e permissões</p>
+					<h1 class="docs-title">O manifesto <code>synapse-extension.json</code></h1>
+					<p class="docs-lede">Cada campo do manifesto, o que ele libera, o que ele restringe e como a IDE valida tudo antes de ativar a extensão. Com o JSON Schema oficial para autocompletar no editor.</p>
+					<div class="docs-meta">
+						<span>revisado em 15/09/2026</span>
+						<span>leitura 9 min</span>
+						<span>público: dev</span>
+					</div>
+					<section>
+						<h2>Estrutura mínima</h2>
+						<pre><code>{
+	"$schema": "https://sypnase-live-preview.vercel.app/schemas/extension-manifest.schema.json",
+	"id": "ana.hello-world",
+	"name": "Hello World",
+	"version": "1.0.0",
+	"publisher": "ana",
+	"main": "extension.js",
+	"engines": { "synapse": "^2.4.0" },
+	"activationEvents": ["onCommand:hello.dizerOla"],
+	"permissions": ["editor"],
+	"contributes": {
+		"commands": [{ "command": "hello.dizerOla", "title": "Hello: Dizer olá" }]
+	}
+}</code></pre>
+						<p>
+							Cinco campos são obrigatórios: <code>id</code>, <code>name</code>, <code>version</code>,
+							<code>publisher</code> e <code>main</code>. O resto é opcional, mas quase toda extensão
+							útil declara <code>activationEvents</code>, <code>permissions</code> e
+							<code>contributes</code>.
+						</p>
+						<div class="docs-note">
+							<span class="docs-note-label">Autocompletar no editor</span>
+							Aponte <code>$schema</code> para o arquivo acima (ou para
+							<code>../../schemas/extension-manifest.schema.json</code> em repositórios locais).
+							A IDE, o VS Code e qualquer editor com suporte a JSON Schema passam a sugerir campos e
+							apontar erros enquanto você digita.
+						</div>
+					</section>
+
+					<section>
+						<h2>Identidade</h2>
+						<dl class="docs-definition">
+							<dt><code>id</code></dt>
+							<dd>Formato <code>publisher.nome</code>, tudo em minúsculas, números e hífens. É a chave usada em configurações, comandos internos e no registro de pacotes. Não muda depois de publicado.</dd>
+							<dt><code>name</code></dt>
+							<dd>Nome de exibição, até 80 caracteres.</dd>
+							<dt><code>version</code></dt>
+							<dd>Semver estrito (<code>1.2.3</code>, <code>1.2.3-beta.1</code>). A IDE compara versões para decidir atualização e rollback.</dd>
+							<dt><code>publisher</code></dt>
+							<dd>Precisa ser igual ao prefixo do <code>id</code>.</dd>
+							<dt><code>icon</code></dt>
+							<dd>Caminho relativo de uma imagem PNG, JPG, WebP ou SVG dentro do pacote (ex.: <code>media/icon.png</code>). Quadrada, de 128 a 256 px, até 512 KB. Aparece na view de Extensões, na página de detalhes e no marketplace; sem ela a IDE mostra as iniciais do nome. O assistente <em>Extensões: Criar nova extensão…</em> pede a imagem ao criar o projeto, e <em>Extensões: Definir ícone da extensão…</em> troca depois.</dd>
+							<dt><code>description</code>, <code>categories</code>, <code>repository</code>, <code>license</code></dt>
+							<dd>Metadados de vitrine. <code>categories</code> aceita: Linguagens, Temas, Formatadores, Snippets, Depuradores, Outros.</dd>
+							<dt><code>engines.synapse</code></dt>
+							<dd>Faixa semver da API exigida. Se a IDE for mais antiga que o mínimo, a extensão fica em estado <code>incompatible</code> e não ativa. A versão atual está em <code>synapse.version</code> e no topo da <a href="./extensoes-api.html">referência</a>.</dd>
+						</dl>
+					</section>
+
+					<section>
+						<h2>Eventos de ativação</h2>
+						<p>
+							<code>activationEvents</code> controla <em>quando</em> o worker é criado. Menos eventos,
+							IDE mais leve. Se omitido, vale <code>*</code> (ativa na inicialização).
+						</p>
+						<table class="docs-table">
+							<thead><tr><th>Evento</th><th>Ativa quando</th></tr></thead>
+							<tbody>
+								<tr><td><code>onStartupFinished</code></td><td>A IDE terminou de carregar e ficou ociosa.</td></tr>
+								<tr><td><code>onCommand:&lt;id&gt;</code></td><td>Alguém executa o comando pela primeira vez (paleta, atalho, menu, outra extensão).</td></tr>
+								<tr><td><code>onLanguage:&lt;id&gt;</code></td><td>Um arquivo da linguagem é aberto no editor.</td></tr>
+								<tr><td><code>onView:&lt;id&gt;</code></td><td>A view contribuída fica visível pela primeira vez.</td></tr>
+								<tr><td><code>workspaceContains:&lt;glob&gt;</code></td><td>O projeto aberto tem um arquivo que casa com o padrão (ex.: <code>**/Cargo.toml</code>).</td></tr>
+								<tr><td><code>*</code></td><td>Imediatamente. Evite; reserve para temas e coisas que precisam existir antes de tudo.</td></tr>
+							</tbody>
+						</table>
+					</section>
+
+					<section>
+						<h2>Permissões</h2>
+						<p>
+							Toda chamada de API que sai do worker passa por uma checagem de permissão. Uma extensão
+							sem a permissão certa recebe <code>PermissionDenied</code> e o evento aparece no
+							painel de auditoria. O usuário vê a lista completa antes de instalar.
+						</p>
+						<table class="docs-table">
+							<thead><tr><th>Permissão</th><th>Libera</th></tr></thead>
+							<tbody>
+								<tr><td><code>editor</code></td><td><code>synapse.window.activeTextEditor</code>, seleções, decorações, edições no documento aberto, status bar, mensagens e quick pick.</td></tr>
+								<tr><td><code>workspace.read</code></td><td>Ler arquivos e metadados do projeto ativo, eventos de mudança e watchers.</td></tr>
+								<tr><td><code>workspace.write</code></td><td>Criar, alterar, renomear e apagar arquivos do projeto ativo. Implica <code>workspace.read</code>. Toda gravação entra na pilha de desfazer da IDE.</td></tr>
+								<tr><td><code>workspace.all</code></td><td>O mesmo que <code>workspace.write</code>, mas para todos os projetos abertos. Necessária para <code>synapse.workspace.projects</code>.</td></tr>
+								<tr><td><code>webview</code></td><td><code>createWebviewPanel</code> e <code>registerWebviewViewProvider</code>.</td></tr>
+								<tr><td><code>clipboard</code></td><td><code>synapse.env.clipboard</code>.</td></tr>
+								<tr><td><code>preview</code></td><td>Injetar scripts, recarregar, mudar viewport e ler o estado do preview.</td></tr>
+								<tr><td><code>mcp</code></td><td>Expor ferramentas para agentes conectados pela ponte MCP.</td></tr>
+								<tr><td><code>network:https://&lt;host&gt;</code></td><td><code>fetch</code> para exatamente aquele host. Uma entrada por host; sem coringa.</td></tr>
+							</tbody>
+						</table>
+						<div class="docs-note">
+							<span class="docs-note-label">Workspaces não confiáveis</span>
+							Declare <code>capabilities.untrustedWorkspaces.supported</code> como <code>true</code>,
+							<code>false</code> ou <code>"limited"</code>. Em projeto não confiável, extensões com
+							<code>false</code> não ativam; com <code>"limited"</code> ativam sem
+							<code>workspace.write</code>, <code>preview</code> e <code>network:*</code>.
+						</div>
+					</section>
+
+					<section>
+						<h2>Contribuições</h2>
+						<p>
+							<code>contributes</code> é declarativo: a IDE lê e registra tudo isso <em>antes</em> de
+							ativar o worker, por isso comandos aparecem na paleta e atalhos funcionam mesmo com a
+							extensão dormindo.
+						</p>
+						<dl class="docs-definition">
+							<dt><code>commands[]</code></dt>
+							<dd><code>command</code>, <code>title</code>, opcionais <code>category</code> e <code>icon</code>. O código precisa registrar o mesmo id com <code>synapse.commands.registerCommand</code>.</dd>
+							<dt><code>keybindings[]</code></dt>
+							<dd><code>command</code>, <code>key</code> (ex.: <code>ctrl+alt+m</code>), opcionais <code>mac</code> e <code>when</code>. Conflitos com atalhos do usuário são resolvidos a favor do usuário.</dd>
+							<dt><code>menus</code></dt>
+							<dd>Objeto com <code>editor/context</code>, <code>explorer/context</code> e <code>commandPalette</code>, cada um com <code>{ command, when, group }</code>.</dd>
+							<dt><code>languages[]</code></dt>
+							<dd><code>id</code>, <code>extensions</code>, <code>aliases</code>, <code>filenames</code>, <code>configuration</code> (comentários, pares de fechamento).</dd>
+							<dt><code>grammars[]</code></dt>
+							<dd><code>language</code> + <code>path</code> para o JSON da gramática. Veja <a href="./extensoes-linguagens.html">Linguagens</a>.</dd>
+							<dt><code>themes[]</code> e <code>iconThemes[]</code></dt>
+							<dd><code>label</code>, <code>uiTheme</code> (<code>dark</code>/<code>light</code>) e <code>path</code>.</dd>
+							<dt><code>snippets[]</code></dt>
+							<dd><code>language</code> + <code>path</code> no formato <code>{ "nome": { "prefix", "body", "description" } }</code>.</dd>
+							<dt><code>configuration</code></dt>
+							<dd><code>title</code> e <code>properties</code> no formato JSON Schema reduzido; aparecem na tela de configurações da IDE e são lidas com <code>synapse.workspace.getConfiguration</code>.</dd>
+							<dt><code>views.sidebar[]</code></dt>
+							<dd><code>id</code>, <code>name</code>, opcionais <code>icon</code> e <code>when</code>. Preenchidas por <code>registerWebviewViewProvider</code>.</dd>
+							<dt><code>statusBar[]</code></dt>
+							<dd>Itens estáticos: <code>id</code>, <code>alignment</code>, <code>priority</code>, <code>text</code>, <code>tooltip</code>, <code>command</code>.</dd>
+						</dl>
+					</section>
+
+					<section>
+						<h2>Localização do manifesto</h2>
+						<p>
+							Qualquer string de exibição aceita a forma <code>%chave%</code>. A IDE procura
+							<code>package.nls.json</code> (padrão) e <code>package.nls.&lt;idioma&gt;.json</code>
+							na pasta da extensão e substitui de acordo com o idioma ativo.
+						</p>
+						<pre><code>// synapse-extension.json
+"contributes": { "commands": [{ "command": "x.run", "title": "%cmd.run%" }] }
+
+// package.nls.json
+{ "cmd.run": "Run analysis" }
+
+// package.nls.pt-br.json
+{ "cmd.run": "Executar análise" }</code></pre>
+					</section>
+
+					<section>
+						<h2>Como a validação acontece</h2>
+						<ol class="docs-steps">
+							<li>JSON precisa fazer parse. Erro de sintaxe bloqueia tudo.</li>
+							<li>Cada campo é checado contra tipo, padrão, tamanho e enumeração. Os erros vêm com o caminho (<code>contributes.commands[2].title</code>) e uma dica.</li>
+							<li><code>main</code>, <code>icon</code> e todos os <code>path</code> precisam existir na pasta.</li>
+							<li>Comandos declarados em <code>keybindings</code>, <code>menus</code> e <code>statusBar</code> precisam existir em <code>contributes.commands</code>.</li>
+							<li><code>engines.synapse</code> é comparado com <code>synapse.version</code>.</li>
+						</ol>
+						<p>
+							Você vê o resultado no console da IDE ao executar a pasta, no Extension Development
+							Host e ao empacotar. A mesma rotina roda na instalação de um <code>.sx</code>.
+						</p>
+					</section>
+
+				</article>
+				<footer class="docs-pager"></footer>
+				<p class="docs-page-footer">O validador da IDE e o JSON Schema em schemas/extension-manifest.schema.json usam as mesmas regras; se um aceita, o outro aceita.</p>
+			</main>
+			<aside class="docs-outline" aria-label="Nesta página"></aside>
+		</div>
+		<script src="./assets/docs-catalog.js"></script>
+		<script src="./assets/docs-current-category.js"></script>
+		<script src="./assets/docs-sidebar.js"></script>
+		<script src="./assets/docs-filter.js"></script>
+		<script src="./assets/docs-outline.js"></script>
+		<script src="./assets/docs-pager.js"></script>
+		<script src="./assets/docs-boot.js"></script>
+		<script src="../assets/js/i18n/phrase-registration.js"></script>
+		<script src="./assets/docs-phrases.js"></script>
+		<script src="./assets/docs-error-silencer.js"></script>
+		<script src="../assets/js/i18n/idiomas.js"></script>
+	</body>
+</html>

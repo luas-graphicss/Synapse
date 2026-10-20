@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function () {
+				if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+				var caminho = location.pathname || '';
+				if (!caminho || /\/$/.test(caminho) || /\.[a-z0-9]+$/i.test(caminho)) return;
+				var base = document.createElement('base');
+				base.setAttribute('href', caminho + '/');
+				if (document.head) document.head.appendChild(base);
+			})();
+		</script>
+		<link rel="icon" href="../favicon.ico?v=1001" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png?v=1001" />
+		<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png?v=1001" />
+		<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png?v=1001" />
+		<link rel="manifest" href="../site.webmanifest" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="canonical" href="https://sypnase-live-preview.vercel.app/docs/extensoes-primeiros-passos.html" />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:type" content="article" />
+		<meta property="og:site_name" content="Synapse Live Preview" />
+		<meta property="og:title" content="Primeiros passos com extensões | Documentação da Synapse IDE" />
+		<meta property="og:description" content="Crie, execute e teste sua primeira extensão da Synapse IDE usando o assistente, o Extension Development Host e o synapse.test." />
+		<meta property="og:url" content="https://sypnase-live-preview.vercel.app/docs/extensoes-primeiros-passos.html" />
+		<meta property="og:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Primeiros passos com extensões | Documentação da Synapse IDE" />
+		<meta name="twitter:description" content="Crie, execute e teste sua primeira extensão da Synapse IDE usando o assistente, o Extension Development Host e o synapse.test." />
+		<meta name="twitter:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<title>Primeiros passos com extensões | Documentação da Synapse IDE</title>
+		<meta name="description" content="Crie, execute e teste sua primeira extensão da Synapse IDE usando o assistente, o Extension Development Host e o synapse.test." />
+		<link rel="stylesheet" href="../assets/css/tema.css" />
+		<link rel="stylesheet" href="./assets/docs-shell.css" />
+		<link rel="stylesheet" href="./assets/docs-navigation.css" />
+		<link rel="stylesheet" href="./assets/docs-prose.css" />
+		<link rel="stylesheet" href="./assets/docs-theme.css" />
+		<link rel="stylesheet" href="./assets/docs-typography.css" />
+		<script src="./assets/docs-ide-preference.js"></script>
+		<script src="./assets/docs-theme-sync.js"></script>
+	</head>
+	<body data-docs-category="extensoes-primeiros-passos">
+		<header class="docs-topbar">
+			<a class="docs-brand" href="./index.html">
+				<span class="docs-brand-mark">SYNAPSE</span>
+				<span class="docs-brand-text">Documentação oficial</span>
+			</a>
+			<nav class="docs-topbar-links">
+				<span class="docs-topbar-version">build 2026.09</span>
+				<a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+				<a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+			</nav>
+		</header>
+		<div class="docs-frame">
+			<nav class="docs-sidebar" aria-label="Categorias da documentação"></nav>
+			<main class="docs-main">
+				<article class="docs-article">
+					<p class="docs-kicker">Extensões / Primeiros passos com extensões</p>
+					<h1 class="docs-title">Sua primeira extensão em 5 minutos</h1>
+					<p class="docs-lede">Da pasta vazia até um comando na paleta, passando pelo assistente de criação, o Extension Development Host e o primeiro teste. Nenhuma ferramenta fora do navegador.</p>
+					<div class="docs-meta">
+						<span>revisado em 15/09/2026</span>
+						<span>leitura 6 min</span>
+						<span>público: dev iniciante</span>
+					</div>
+					<section>
+						<h2>O que é uma extensão aqui</h2>
+						<p>
+							Uma extensão é uma pasta com dois arquivos mínimos: <code>synapse-extension.json</code>
+							(o manifesto, que declara identidade, permissões e contribuições) e um arquivo
+							JavaScript principal que exporta <code>activate(context)</code>. Ela roda em um
+							Web Worker isolado e conversa com a IDE pela API <code>synapse.*</code>.
+						</p>
+						<p>
+							Você não precisa de Node, bundler nem terminal. A própria IDE cria o esqueleto,
+							executa, recarrega, testa e empacota.
+						</p>
+					</section>
+
+					<section>
+						<h2>1. Gerar o esqueleto</h2>
+						<ol class="docs-steps">
+							<li>Abra a paleta de comandos (<kbd>Ctrl</kbd>+<kbd>K</kbd> ou <kbd>F1</kbd>).</li>
+							<li>Execute <strong>Extensões: Criar nova extensão…</strong>.</li>
+							<li>Escolha o tipo <strong>Comando</strong>, informe um nome (ex.: <em>Contador de linhas</em>) e um publisher (seu apelido).</li>
+							<li>Confirme. A IDE cria a pasta <code>extensoes/contador-de-linhas/</code> dentro do projeto atual (ou um projeto novo, se você preferir) com manifesto, código, README, CHANGELOG, um teste e o <code>synapse.d.ts</code> para IntelliSense.</li>
+						</ol>
+						<div class="docs-note">
+							<span class="docs-note-label">Tipos disponíveis</span>
+							Comando, Linguagem (gramática + snippets), Tema, Webview (painel HTML) e Formatador.
+							Todos compartilham o mesmo layout de pasta; só mudam o manifesto e o código inicial.
+						</div>
+					</section>
+
+					<section>
+						<h2>2. Executar no Extension Development Host</h2>
+						<p>
+							Execute <strong>Extensões: Abrir Extension Development Host</strong>. O painel lista as
+							extensões em desenvolvimento do projeto atual. Se a lista estiver vazia, clique em
+							<strong>Executar pasta…</strong> e aceite a pasta sugerida.
+						</p>
+						<p>Quando a extensão ativa, você vê:</p>
+						<ul>
+							<li>status <code>active</code> e o tempo de ativação em milissegundos;</li>
+							<li>a aba <strong>Console</strong> com tudo que a extensão escreveu por <code>OutputChannel</code> ou <code>console.log</code>;</li>
+							<li>a aba <strong>Inspetor</strong> com comandos registrados, permissões, eventos de ativação e uma tabela comparando o que o manifesto declara com o que está de fato em execução.</li>
+						</ul>
+						<p>
+							Ligue <strong>Auto-recarregar</strong>. A partir daí qualquer edição em um arquivo da
+							pasta da extensão recarrega o worker em até 1,5 s, sem perder o painel aberto.
+						</p>
+					</section>
+
+					<section>
+						<h2>3. Ver o comando funcionando</h2>
+						<p>
+							O template registra um comando (<code>contador-de-linhas.executar</code>). Abra a
+							paleta, procure pelo título do comando e execute. O template padrão mostra uma
+							mensagem com o total de linhas do editor ativo. No Inspetor você também pode
+							executar qualquer comando direto pelo botão <strong>Executar</strong>.
+						</p>
+						<pre><code>function activate(context) {
+	const comando = synapse.commands.registerCommand('contador-de-linhas.executar', async () =&gt; {
+		const editor = synapse.window.activeTextEditor;
+		if (!editor) return synapse.window.showWarningMessage('Abra um arquivo primeiro.');
+		synapse.window.showInformationMessage(`${editor.document.lineCount} linha(s).`);
+	});
+	context.subscriptions.push(comando);
+}
+module.exports = { activate };</code></pre>
+					</section>
+
+					<section>
+						<h2>4. Rodar o primeiro teste</h2>
+						<p>
+							A pasta <code>test/</code> já contém <code>extension.test.js</code>. Testes rodam
+							<em>dentro</em> do worker da extensão, com acesso à mesma API <code>synapse.*</code>,
+							por isso podem executar comandos reais e inspecionar o resultado.
+						</p>
+						<pre><code>const { describe, it, expect } = synapse.test;
+
+describe('contador de linhas', () =&gt; {
+	it('registra o comando', async () =&gt; {
+		const comandos = await synapse.commands.getCommands();
+		expect(comandos).toContain('contador-de-linhas.executar');
+	});
+});</code></pre>
+						<p>
+							No Extension Development Host clique em <strong>Rodar testes</strong>. O relatório
+							aparece na aba <strong>Testes</strong> com tempo por caso e stack de falha quando houver.
+							O mesmo relatório está disponível pela paleta em
+							<strong>Extensões: Executar testes de extensão</strong>.
+						</p>
+					</section>
+
+					<section>
+						<h2>5. Empacotar</h2>
+						<p>
+							Quando estiver satisfeito, <strong>Extensões: Empacotar (.sx)</strong> gera o pacote
+							instalável e valida o manifesto de novo. Veja o
+							<a href="./extensoes-publicar.html">guia de publicação</a> para versionamento,
+							CHANGELOG e o fluxo automatizado com GitHub Actions que o assistente já deixou pronto.
+						</p>
+					</section>
+
+					<section>
+						<h2>Próximos passos</h2>
+						<ul>
+							<li><a href="./extensoes-manifesto.html">Manifesto e permissões</a>: tudo que <code>synapse-extension.json</code> aceita.</li>
+							<li><a href="./extensoes-api.html">Referência da API</a>: cada função de <code>synapse.*</code>, gerada do arquivo de tipos.</li>
+							<li><a href="./extensoes-webviews.html">Webviews</a>: painéis com HTML próprio, CSP e troca de mensagens.</li>
+							<li><a href="./extensoes-linguagens.html">Linguagens</a>: gramáticas, snippets, providers de completion e diagnósticos.</li>
+						</ul>
+					</section>
+
+				</article>
+				<footer class="docs-pager"></footer>
+				<p class="docs-page-footer">Travou em algum passo? Abra o Extension Development Host: o console mostra exatamente onde a ativação parou.</p>
+			</main>
+			<aside class="docs-outline" aria-label="Nesta página"></aside>
+		</div>
+		<script src="./assets/docs-catalog.js"></script>
+		<script src="./assets/docs-current-category.js"></script>
+		<script src="./assets/docs-sidebar.js"></script>
+		<script src="./assets/docs-filter.js"></script>
+		<script src="./assets/docs-outline.js"></script>
+		<script src="./assets/docs-pager.js"></script>
+		<script src="./assets/docs-boot.js"></script>
+		<script src="../assets/js/i18n/phrase-registration.js"></script>
+		<script src="./assets/docs-phrases.js"></script>
+		<script src="./assets/docs-error-silencer.js"></script>
+		<script src="../assets/js/i18n/idiomas.js"></script>
+	</body>
+</html>

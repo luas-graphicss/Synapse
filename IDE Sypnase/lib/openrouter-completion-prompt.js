@@ -1,10 +1,10 @@
 'use strict';
 
 const SYSTEM_MESSAGE = [
-  'Voce completa codigo dentro de um editor.',
-  'Responda somente com continuacoes possiveis, uma por linha.',
-  'Nao explique, nao numere e nao use blocos de codigo.',
-  'Cada linha deve encaixar exatamente na posicao do cursor.',
+	'Voce completa codigo dentro de um editor.',
+	'Responda somente com continuacoes possiveis, uma por linha.',
+	'Nao explique, nao numere e nao use blocos de codigo.',
+	'Cada linha deve encaixar exatamente na posicao do cursor.',
 ].join(' ');
 
 const FENCE_LINE = /^\s*`{3,}/;

@@ -1,7 +1,7 @@
 (function (root) {
-    'use strict';
+	'use strict';
 
-    const indexHtml = `<!DOCTYPE html>
+	const indexHtml = `<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
@@ -82,7 +82,7 @@
 </html>
 `;
 
-    const tokensCss = `:root {
+	const tokensCss = `:root {
 	color-scheme: dark;
 	--surface-base: #0f1116;
 	--surface-raised: #161922;
@@ -108,7 +108,7 @@
 }
 `;
 
-    const appCss = `* {
+	const appCss = `* {
 	box-sizing: border-box;
 }
 
@@ -432,7 +432,7 @@ body {
 	align-items: center;
 	padding: 3px 8px;
 	border: 1px solid var(--border-strong);
-	border-radius: 999px;
+	border-radius: 3px;
 	color: var(--text-secondary);
 	font-size: 11px;
 }
@@ -502,7 +502,7 @@ body {
 }
 `;
 
-    const formatScript = `const currencyFormatter = new Intl.NumberFormat('en-US', {
+	const formatScript = `const currencyFormatter = new Intl.NumberFormat('en-US', {
 	style: 'currency',
 	currency: 'USD',
 	maximumFractionDigits: 0,
@@ -535,7 +535,7 @@ function formatSignedPercent(ratio) {
 }
 `;
 
-    const dataScript = `const monthlyPerformance = [
+	const dataScript = `const monthlyPerformance = [
 	{ month: 'Jan', revenue: 386000, target: 400000 },
 	{ month: 'Feb', revenue: 412500, target: 405000 },
 	{ month: 'Mar', revenue: 398200, target: 410000 },
@@ -569,7 +569,7 @@ const reportingRanges = {
 };
 `;
 
-    const chartScript = `const svgNamespace = 'http://www.w3.org/2000/svg';
+	const chartScript = `const svgNamespace = 'http://www.w3.org/2000/svg';
 
 function createSvgElement(tagName, attributes) {
 	const element = document.createElementNS(svgNamespace, tagName);
@@ -667,7 +667,7 @@ function renderRevenueChart(container, series) {
 }
 `;
 
-    const appScript = `const rangeOptions = Array.from(document.querySelectorAll('.range-option'));
+	const appScript = `const rangeOptions = Array.from(document.querySelectorAll('.range-option'));
 const sortButtons = Array.from(document.querySelectorAll('.sort-button'));
 const metricGrid = document.getElementById('metricGrid');
 const chartFrame = document.getElementById('chartFrame');
@@ -872,7 +872,7 @@ exportButton.addEventListener('click', downloadAccountsCsv);
 renderDashboard();
 `;
 
-    const readme = `# Revenue dashboard
+	const readme = `# Revenue dashboard
 
 Operations dashboard that reads a local dataset and renders key metrics, a revenue chart and an account table.
 
@@ -894,19 +894,19 @@ Operations dashboard that reads a local dataset and renders key metrics, a reven
 - Export CSV downloads the accounts currently visible
 `;
 
-    root.SynapseSampleProject = Object.freeze({
-        name: 'revenue-dashboard',
-        files: Object.freeze(
-          [
-            { path: 'index.html', content: indexHtml },
-            { path: 'styles/tokens.css', content: tokensCss },
-            { path: 'styles/app.css', content: appCss },
-            { path: 'scripts/format.js', content: formatScript },
-            { path: 'scripts/data.js', content: dataScript },
-            { path: 'scripts/chart.js', content: chartScript },
-            { path: 'scripts/app.js', content: appScript },
-            { path: 'README.md', content: readme },
-          ].map((file) => Object.freeze(file)),
-        ),
-    });
+	root.SynapseSampleProject = Object.freeze({
+		name: 'revenue-dashboard',
+		files: Object.freeze(
+			[
+				{ path: 'index.html', content: indexHtml },
+				{ path: 'styles/tokens.css', content: tokensCss },
+				{ path: 'styles/app.css', content: appCss },
+				{ path: 'scripts/format.js', content: formatScript },
+				{ path: 'scripts/data.js', content: dataScript },
+				{ path: 'scripts/chart.js', content: chartScript },
+				{ path: 'scripts/app.js', content: appScript },
+				{ path: 'README.md', content: readme },
+			].map((file) => Object.freeze(file)),
+		),
+	});
 })(globalThis);

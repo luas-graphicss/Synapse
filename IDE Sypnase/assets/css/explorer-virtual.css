@@ -1,0 +1,33 @@
+#tree.vtree {
+	position: relative;
+	contain: layout paint;
+	overflow-anchor: none;
+}
+
+.vtree-spacer {
+	position: relative;
+	width: 100%;
+	min-height: 100%;
+}
+
+.vtree-spacer > .row {
+	position: absolute;
+	left: 0;
+	right: 0;
+	box-sizing: border-box;
+	height: var(--vtree-row, 28px);
+	min-height: 0;
+	margin: 0;
+	contain: layout style;
+}
+
+.vtree-spacer > .row.vtree-probe {
+	position: static;
+	height: auto;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.vtree-spacer > .row .rname {
+	min-width: 0;
+}

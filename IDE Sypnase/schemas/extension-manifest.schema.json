@@ -1,0 +1,258 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://sypnase-live-preview.vercel.app/schemas/extension-manifest.schema.json",
+	"title": "Manifesto de extensão da Synapse IDE (synapse-extension.json)",
+	"description": "Descreve identidade, ativação, permissões e pontos de contribuição de uma extensão. Validado pela IDE ao carregar, empacotar e publicar.",
+	"type": "object",
+	"required": ["id", "name", "version", "publisher", "main"],
+	"additionalProperties": true,
+	"definitions": {
+		"commandId": { "type": "string", "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]*$", "description": "Identificador de comando, ex.: \"minha.acao\"." },
+		"relativePath": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\<>:\"|?*]+$", "description": "Caminho relativo à pasta da extensão, sem \"..\"." },
+		"languageId": { "type": "string", "pattern": "^[a-z][a-z0-9_+.#-]{0,39}$", "description": "Id de linguagem em minúsculas começando por letra." },
+		"whenClause": { "type": "string", "maxLength": 300, "description": "Cláusula when: editorFocus, editorLangId == python, resourceExtname == .md, view == id, isMobile." },
+		"menuItems": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"required": ["command"],
+				"properties": {
+					"command": { "$ref": "#/definitions/commandId" },
+					"when": { "$ref": "#/definitions/whenClause" },
+					"group": { "type": "string", "maxLength": 60, "description": "Grupo e ordem, ex.: \"navigation\" ou \"1_modificacao@2\"." }
+				}
+			}
+		}
+	},
+	"properties": {
+		"$schema": { "type": "string", "description": "URL deste schema; habilita validação e autocompletar no editor." },
+		"id": {
+			"type": "string",
+			"pattern": "^[a-z0-9][a-z0-9-]*\\.[a-z0-9][a-z0-9-]*$",
+			"description": "Identificador único no formato \"publisher.nome\", em minúsculas. Ex.: \"ana.hello-world\"."
+		},
+		"name": { "type": "string", "minLength": 1, "maxLength": 80, "description": "Nome exibido na view de Extensões." },
+		"version": {
+			"type": "string",
+			"pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$",
+			"description": "Versão semver (major.minor.patch). Deve crescer a cada publicação."
+		},
+		"publisher": {
+			"type": "string",
+			"pattern": "^[a-z0-9][a-z0-9-]*$",
+			"description": "Login do GitHub do autor em minúsculas. Precisa coincidir com o dono do repositório em \"repository\"."
+		},
+		"description": { "type": "string", "maxLength": 300, "description": "Uma frase sobre o que a extensão faz." },
+		"engines": {
+			"type": "object",
+			"properties": {
+				"synapse": { "type": "string", "minLength": 1, "description": "Faixa semver da API exigida, ex.: \">=2.0.0\"." }
+			}
+		},
+		"main": { "$ref": "#/definitions/relativePath", "description": "Arquivo JavaScript (CommonJS) que exporta activate/deactivate. Ex.: \"src/extension.js\"." },
+		"icon": { "$ref": "#/definitions/relativePath", "description": "Imagem quadrada PNG, JPG, WebP ou SVG dentro do pacote, ex.: media/icon.png (128 a 256 px recomendado, até 512 KB). Aparece na view de Extensões e no marketplace." },
+		"categories": {
+			"type": "array",
+			"items": { "type": "string", "enum": ["Linguagens", "Temas", "Formatadores", "Snippets", "Depuradores", "Outros"] },
+			"description": "Categorias exibidas nos filtros da view de Extensões."
+		},
+		"activationEvents": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"pattern": "^(?:\\*|onStartupFinished|onCommand:[^\\s]+|onLanguage:[^\\s]+|onView:[^\\s]+|workspaceContains:[^\\s]+)$"
+			},
+			"description": "Quando ativar: \"onStartupFinished\", \"onCommand:<id>\", \"onLanguage:<id>\", \"onView:<id>\", \"workspaceContains:<glob>\" ou \"*\"."
+		},
+		"permissions": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"pattern": "^(?:workspace\\.read|workspace\\.write|workspace\\.all|editor|webview|clipboard|preview|mcp|network:self|network:https://[^\\s/]+)$"
+			},
+			"description": "Capacidades pedidas ao usuário na instalação. Chamadas sem permissão são recusadas com PermissionDenied."
+		},
+		"contributes": {
+			"type": "object",
+			"description": "Pontos de contribuição declarativos.",
+			"properties": {
+				"commands": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["command", "title"],
+						"properties": {
+							"command": { "$ref": "#/definitions/commandId" },
+							"title": { "type": "string", "minLength": 1, "maxLength": 120, "description": "Texto na paleta (traduzível via %chave% + package.nls.json)." },
+							"category": { "type": "string", "maxLength": 60 },
+							"icon": { "type": "string" }
+						}
+					}
+				},
+				"keybindings": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["command", "key"],
+						"properties": {
+							"command": { "$ref": "#/definitions/commandId" },
+							"key": { "type": "string", "minLength": 1, "maxLength": 60, "description": "Ex.: \"ctrl+alt+m\", \"shift+f9\"." },
+							"mac": { "type": "string", "maxLength": 60 },
+							"when": { "$ref": "#/definitions/whenClause" }
+						}
+					}
+				},
+				"menus": {
+					"type": "object",
+					"properties": {
+						"editor/context": { "$ref": "#/definitions/menuItems" },
+						"explorer/context": { "$ref": "#/definitions/menuItems" },
+						"commandPalette": { "$ref": "#/definitions/menuItems" }
+					}
+				},
+				"languages": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["id"],
+						"properties": {
+							"id": { "$ref": "#/definitions/languageId" },
+							"extensions": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 20 }, "description": "Extensões de arquivo com ponto, ex.: [\".zig\"]." },
+							"aliases": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 40 } },
+							"filenames": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 80 } }
+						}
+					}
+				},
+				"grammars": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["language", "path"],
+						"properties": {
+							"language": { "$ref": "#/definitions/languageId" },
+							"path": { "$ref": "#/definitions/relativePath", "description": "JSON com lineComments, blockComments, quotes, keywords, balanced ou patterns (TextMate-lite)." }
+						}
+					}
+				},
+				"themes": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["label", "path"],
+						"properties": {
+							"label": { "type": "string", "minLength": 1, "maxLength": 60 },
+							"uiTheme": { "type": "string", "enum": ["dark", "light"] },
+							"path": { "$ref": "#/definitions/relativePath", "description": "JSON mapeando os tokens de tema.css (bg, bg-1..3, line, txt, acc, ok, warn, err, info, tk-*)." }
+						}
+					}
+				},
+				"iconThemes": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["id", "label", "path"],
+						"properties": {
+							"id": { "$ref": "#/definitions/commandId" },
+							"label": { "type": "string", "minLength": 1, "maxLength": 60 },
+							"path": { "$ref": "#/definitions/relativePath", "description": "JSON com iconDefinitions, fileExtensions e fileNames." }
+						}
+					}
+				},
+				"snippets": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["language", "path"],
+						"properties": {
+							"language": { "type": "string", "minLength": 1, "maxLength": 40 },
+							"path": { "$ref": "#/definitions/relativePath", "description": "JSON { \"nome\": { \"prefix\", \"body\", \"description\" } } no formato TextMate." }
+						}
+					}
+				},
+				"configuration": {
+					"type": "object",
+					"properties": {
+						"title": { "type": "string", "maxLength": 80 },
+						"properties": {
+							"type": "object",
+							"additionalProperties": {
+								"type": "object",
+								"properties": {
+									"type": { "type": "string", "enum": ["string", "number", "boolean", "array", "object"] },
+									"default": {},
+									"enum": { "type": "array" },
+									"description": { "type": "string" },
+									"minimum": { "type": "number" },
+									"maximum": { "type": "number" }
+								}
+							}
+						}
+					}
+				},
+				"views": {
+					"type": "object",
+					"properties": {
+						"sidebar": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"required": ["id", "name"],
+								"properties": {
+									"id": { "$ref": "#/definitions/commandId" },
+									"name": { "type": "string", "minLength": 1, "maxLength": 80 },
+									"icon": { "type": "string", "maxLength": 200 },
+									"when": { "$ref": "#/definitions/whenClause" }
+								}
+							}
+						}
+					}
+				},
+				"mcpTools": {
+					"type": "array",
+					"description": "Ferramentas MCP expostas pela extensão (exige permissão \"mcp\"). Publicadas como ext_<publisher>_<nome>__<name>.",
+					"items": {
+						"type": "object",
+						"required": ["name", "description"],
+						"properties": {
+							"name": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,47}$", "description": "Minúsculas, dígitos e \"_\", começando por letra." },
+							"title": { "type": "string", "maxLength": 80 },
+							"description": { "type": "string", "minLength": 1, "maxLength": 600 },
+							"readOnly": { "type": "boolean" },
+							"inputSchema": { "type": "object" }
+						}
+					}
+				},
+				"statusBar": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": ["id"],
+						"properties": {
+							"id": { "$ref": "#/definitions/commandId" },
+							"alignment": { "type": "string", "enum": ["left", "right"] },
+							"priority": { "type": "number" },
+							"text": { "type": "string", "maxLength": 200 },
+							"tooltip": { "type": "string", "maxLength": 300 },
+							"command": { "$ref": "#/definitions/commandId" }
+						}
+					}
+				}
+			}
+		},
+		"repository": { "type": "string", "maxLength": 500, "description": "URL pública do GitHub (https://github.com/owner/repo). Obrigatória para publicar." },
+		"license": { "type": "string", "maxLength": 80, "description": "Identificador SPDX, ex.: \"MIT\"." },
+		"capabilities": {
+			"type": "object",
+			"properties": {
+				"untrustedWorkspaces": {
+					"type": "object",
+					"required": ["supported"],
+					"properties": {
+						"supported": { "enum": [true, false, "limited"], "description": "Se a extensão pode ativar em projetos restritos (Workspace Trust)." },
+						"description": { "type": "string", "maxLength": 300 }
+					}
+				}
+			}
+		}
+	}
+}

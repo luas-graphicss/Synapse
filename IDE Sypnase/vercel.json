@@ -1,0 +1,17 @@
+{
+	"cleanUrls": false,
+	"trailingSlash": false,
+	"redirects": [
+		{ "source": "/docs", "destination": "/docs/", "permanent": false }
+	],
+	"headers": [
+		{
+			"source": "/docs/assets/(.*)",
+			"headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }]
+		},
+		{
+			"source": "/api/bug-report",
+			"headers": [{ "key": "Cache-Control", "value": "no-store" }]
+		}
+	]
+}

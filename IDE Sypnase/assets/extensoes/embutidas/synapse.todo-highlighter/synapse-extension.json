@@ -1,0 +1,47 @@
+{
+	"id": "synapse.todo-highlighter",
+	"name": "Marcadores TODO",
+	"version": "1.0.0",
+	"publisher": "synapse",
+	"icon": "media/icon.png",
+	"description": "Destaca TODO, FIXME, HACK e NOTE no editor, lista os marcadores do arquivo e expõe a contagem na barra de status.",
+	"engines": { "synapse": ">=2.5.0" },
+	"main": "main.js",
+	"categories": ["Outros"],
+	"license": "MIT",
+	"repository": "https://github.com/pedrinnieeva/synapse",
+	"activationEvents": ["onStartupFinished"],
+	"permissions": ["editor", "workspace.read", "mcp"],
+	"contributes": {
+		"commands": [
+			{ "command": "synapse.todo.list", "title": "Listar marcadores TODO do arquivo", "category": "Editor" },
+			{ "command": "synapse.todo.toggle", "title": "Alternar destaque de marcadores TODO", "category": "Editor" }
+		],
+		"configuration": {
+			"title": "Marcadores TODO",
+			"properties": {
+				"synapse.todo.enabled": { "type": "boolean", "default": true, "description": "Destacar marcadores no editor." },
+				"synapse.todo.keywords": { "type": "array", "items": { "type": "string" }, "default": ["TODO", "FIXME", "HACK", "NOTE", "XXX"], "description": "Palavras reconhecidas como marcador." }
+			}
+		},
+		"statusBar": [
+			{ "id": "synapse.todo.count", "alignment": "right", "priority": 5, "command": "synapse.todo.list" }
+		],
+		"mcpTools": [
+			{
+				"name": "list_markers",
+				"title": "Listar marcadores TODO",
+				"description": "Procura TODO/FIXME/HACK/NOTE nos arquivos do projeto que casam com o glob informado e devolve arquivo, linha e texto.",
+				"readOnly": true,
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"glob": { "type": "string", "description": "Padrão de arquivos, ex.: src/**/*.js. Padrão: **/*" },
+						"maxResults": { "type": "number" }
+					}
+				}
+			}
+		]
+	}
+}
+

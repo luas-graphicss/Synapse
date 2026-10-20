@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-16T14:44:33.039Z",
+  "count": 10,
+  "source": "local",
+  "blocklistUrl": "blocklist.json",
+  "extensions": [
+    {
+      "id": "synapse.formatador-simples",
+      "publisher": "synapse",
+      "name": "formatador-simples",
+      "displayName": "Formatador Simples",
+      "description": "Formatador de exemplo executado no Extension Host: reindenta por chaves, normaliza espaços e quebras de linha em Zig, INI e texto.",
+      "categories": [
+        "Formatadores"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "",
+      "icon": "icones/synapse.formatador-simples.png",
+      "permissions": [
+        "editor"
+      ],
+      "latest": "0.1.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "sha256": "e8efa3c5685f2070b1ee6b59c6217ae814b3a0c886bc1c53163c1540e2b6a2f9",
+          "size": 28543,
+          "url": "pacotes/synapse.formatador-simples-0.1.0.sx",
+          "engines": {
+            "synapse": ">=2.2.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.hello-world",
+      "publisher": "synapse",
+      "name": "hello-world",
+      "displayName": "Hello World",
+      "description": "Extensão mínima de exemplo: registra um comando que mostra uma mensagem.",
+      "categories": [
+        "Outros"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "",
+      "icon": "icones/synapse.hello-world.png",
+      "permissions": [
+        "workspace.read"
+      ],
+      "latest": "0.1.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "sha256": "25e1a13fa9129828f24fb82e0f24939894b76e6903123490ce77cef374eedb91",
+          "size": 55781,
+          "url": "pacotes/synapse.hello-world-0.1.0.sx",
+          "engines": {
+            "synapse": ">=2.0.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.paleta-de-cores",
+      "publisher": "synapse",
+      "name": "paleta-de-cores",
+      "displayName": "Paleta de Cores",
+      "description": "Webview lateral que extrai as cores do arquivo aberto e um painel para gerar escalas; demonstra createWebviewPanel, registerWebviewViewProvider e os hooks de preview.",
+      "categories": [
+        "Outros"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "https://github.com/synapse/paleta-de-cores",
+      "icon": "icones/synapse.paleta-de-cores.png",
+      "permissions": [
+        "editor",
+        "webview",
+        "clipboard",
+        "preview"
+      ],
+      "latest": "0.1.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "sha256": "26912523fac979b5e36abd944343d4665a94275e086cd5c37181712717db501a",
+          "size": 41534,
+          "url": "pacotes/synapse.paleta-de-cores-0.1.0.sx",
+          "engines": {
+            "synapse": ">=2.3.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.preview-hooks",
+      "publisher": "synapse",
+      "name": "preview-hooks",
+      "displayName": "Preview Hooks",
+      "description": "Observa recargas do preview, injeta um overlay de viewport, troca resoluções e expõe o estado. Exemplo da API synapse.preview.",
+      "categories": [
+        "Outros"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "https://github.com/synapse/preview-hooks",
+      "icon": "icones/synapse.preview-hooks.png",
+      "permissions": [
+        "preview",
+        "editor"
+      ],
+      "latest": "1.0.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "sha256": "99ebe314f03a0f63bdf4bdf60df405b2fd1c18108c9b08bfcb5667cc20173992",
+          "size": 28927,
+          "url": "pacotes/synapse.preview-hooks-1.0.0.sx",
+          "engines": {
+            "synapse": ">=2.4.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.produtividade",
+      "publisher": "synapse",
+      "name": "produtividade",
+      "displayName": "%ext.name%",
+      "description": "%ext.description%",
+      "categories": [
+        "Outros"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "",
+      "icon": "icones/synapse.produtividade.png",
+      "permissions": [
+        "workspace.read",
+        "clipboard"
+      ],
+      "latest": "0.2.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.2.0",
+          "sha256": "364a3976a47d82dbdf4f0ce19da4ae9290e3eb51cf3a1d00073628368442f40a",
+          "size": 48032,
+          "url": "pacotes/synapse.produtividade-0.2.0.sx",
+          "engines": {
+            "synapse": ">=2.0.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.snippets-web",
+      "publisher": "synapse",
+      "name": "snippets-web",
+      "displayName": "Snippets Web",
+      "description": "Trechos prontos para HTML, CSS e JavaScript. Exemplo de extensão 100% declarativa: sem código, só manifesto e JSON.",
+      "categories": [
+        "Snippets"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "https://github.com/synapse/snippets-web",
+      "icon": "icones/synapse.snippets-web.png",
+      "permissions": [],
+      "latest": "1.0.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "1.0.0",
+          "sha256": "3eaf1e808353fa845e9bed3c2c56c24cf084fbd703e60e3af465e895e3001b32",
+          "size": 43058,
+          "url": "pacotes/synapse.snippets-web-1.0.0.sx",
+          "engines": {
+            "synapse": ">=2.4.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.sort-lines",
+      "publisher": "synapse",
+      "name": "sort-lines",
+      "displayName": "Sort Lines",
+      "description": "Ordena linhas da seleção ou do documento e, em massa, de vários arquivos com uma única entrada de undo.",
+      "categories": [
+        "Outros"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "",
+      "icon": "icones/synapse.sort-lines.png",
+      "permissions": [
+        "editor",
+        "workspace.read",
+        "workspace.write"
+      ],
+      "latest": "0.1.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "sha256": "6d382f30104f6890662384bffb8359018dabcc06308401b6dfee6e734a742808",
+          "size": 29341,
+          "url": "pacotes/synapse.sort-lines-0.1.0.sx",
+          "engines": {
+            "synapse": ">=2.0.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.temas-ferro",
+      "publisher": "synapse",
+      "name": "temas-ferro",
+      "displayName": "Temas Ferro",
+      "description": "Dois temas (Noite Ferro, escuro; Aço Claro, claro) e um tema de ícones de arquivo. Demonstra contributes.themes e contributes.iconThemes sem nenhum código.",
+      "categories": [
+        "Temas"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "https://github.com/synapse/temas-ferro",
+      "icon": "icones/synapse.temas-ferro.png",
+      "permissions": [],
+      "latest": "0.1.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "sha256": "7778d6aec8c8c128ca748c8b21ca6064b50ab70766991cfc40dd85b758d467b3",
+          "size": 25813,
+          "url": "pacotes/synapse.temas-ferro-0.1.0.sx",
+          "engines": {
+            "synapse": ">=2.3.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.todo-highlighter",
+      "publisher": "synapse",
+      "name": "todo-highlighter",
+      "displayName": "Todo Highlighter",
+      "description": "Destaca TODO, FIXME e marcadores configuráveis no editor, com contagem na barra de status e navegação.",
+      "categories": [
+        "Outros"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "",
+      "icon": "icones/synapse.todo-highlighter.png",
+      "permissions": [
+        "editor",
+        "workspace.read"
+      ],
+      "latest": "0.1.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "sha256": "4fe81bad73143f86a443396cbc8a65b994ec83cec54be0255344d2a0f8979f42",
+          "size": 57070,
+          "url": "pacotes/synapse.todo-highlighter-0.1.0.sx",
+          "engines": {
+            "synapse": ">=2.0.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    },
+    {
+      "id": "synapse.zig-language",
+      "publisher": "synapse",
+      "name": "zig-language",
+      "displayName": "Zig Language",
+      "description": "Suporte à linguagem Zig: gramática, snippets, completions, hover, símbolos, diagnósticos e ações de código.",
+      "categories": [
+        "Linguagens",
+        "Snippets"
+      ],
+      "tags": [],
+      "license": "MIT",
+      "repository": "https://github.com/synapse/zig-language",
+      "icon": "icones/synapse.zig-language.png",
+      "permissions": [],
+      "latest": "0.1.0",
+      "verified": false,
+      "origin": "local",
+      "versions": [
+        {
+          "version": "0.1.0",
+          "sha256": "55133c71654236faba3db0d616a6f378d4cba30e95f72aa0d12c5090cfc62c66",
+          "size": 42751,
+          "url": "pacotes/synapse.zig-language-0.1.0.sx",
+          "engines": {
+            "synapse": ">=2.2.0"
+          },
+          "publishedAt": "2026-09-16T14:44:33.039Z",
+          "signed": false
+        }
+      ]
+    }
+  ]
+}

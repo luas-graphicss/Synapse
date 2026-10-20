@@ -1,10 +1,10 @@
 <!doctype html>
-  <html lang="pt-BR">
-    <head>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width,initial-scale=1" />
-      <title>Auto-compiler — demonstração</title>
-      <style>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Auto-compiler — demonstração</title>
+		<style>
 			* {
 				box-sizing: border-box;
 			}
@@ -152,54 +152,56 @@
 				color: #c9d1d9;
 			}
 		</style>
-    </head>
-    <body>
-      <h1>Auto-compiler — demonstração</h1>
-      <div class="sub">Detector de projeto, runtime WASI e shell de preview, rodando de verdade.</div>
-      <div class="grade">
-        <div class="cartao">
-          <h2>1. Detector de projeto</h2>
-          <p style="margin: 0 0 8px; font-size: 13px; color: #8b949e">
-            Um arquivo por linha, no formato <code>caminho :: conteúdo</code>. O conteúdo é opcional, mas é o que permite
-            detectar GUI.
-          </p>
-          <textarea id="entrada">
+	</head>
+	<body>
+		<h1>Auto-compiler — demonstração</h1>
+		<div class="sub">Detector de projeto, runtime WASI e shell de preview, rodando de verdade.</div>
+
+		<div class="grade">
+			<div class="cartao">
+				<h2>1. Detector de projeto</h2>
+				<p style="margin: 0 0 8px; font-size: 13px; color: #8b949e">
+					Um arquivo por linha, no formato <code>caminho :: conteúdo</code>. O conteúdo é opcional, mas é o que permite
+					detectar GUI.
+				</p>
+				<textarea id="entrada">
 main.c :: #include &lt;stdio.h&gt;
 int main(void){ printf("ola do C\n"); return 0; }</textarea>
-          <div>
-            <button id="btnDetectar">Detectar</button>
-            <button class="sec" id="btnExemploSdl">Exemplo SDL2</button>
-            <button class="sec" id="btnExemploWin">Exemplo Win32</button>
-            <button class="sec" id="btnExemploCs">Exemplo C#</button>
-            <button class="sec" id="btnExemploRust">Exemplo Rust</button>
-          </div>
-          <div id="veredito">
-          </div>
-        </div>
-        <div class="cartao">
-          <h2>2. Execução no shell de preview</h2>
-          <p style="margin: 0 0 8px; font-size: 13px; color: #8b949e">
-            Dois binários WASI reais, executados pelo <code>wasi.js</code> dentro do iframe.
-          </p>
-          <div style="margin-bottom: 10px">
-            <button id="btnRodarOlaWasm">Executar (sucesso)</button>
-            <button class="sec" id="btnRodarSaida7Wasm">Executar (erro, código 7)</button>
-            <button class="sec" id="btnLimpar">Limpar</button>
-          </div>
-          <iframe id="frame" title="preview">
-          </iframe>
-        </div>
-      </div>
-      <div class="nota">
-        <b>O que esta demo não faz:</b> não compila C ainda. Os binários acima já vêm prontos, montados byte a byte para
-          provar o runtime. Compilar de verdade depende de preencher <code>catalogo.js</code> com as URLs do Clang — veja
-          <code>VERIFICAR.md</code>.
-          </div>
-          <script src="../../nucleo/diagnostico.js"></script>
-          <script src="../../cmake/project-discovery.js"></script>
-          <script src="../deteccao.js"></script>
-          <script src="../wasi.js"></script>
-          <script src="../shell-preview.js"></script>
-          <script src="app.js"></script>
-        </body>
-      </html>
+				<div>
+					<button id="btnDetectar">Detectar</button>
+					<button class="sec" id="btnExemploSdl">Exemplo SDL2</button>
+					<button class="sec" id="btnExemploWin">Exemplo Win32</button>
+					<button class="sec" id="btnExemploCs">Exemplo C#</button>
+					<button class="sec" id="btnExemploRust">Exemplo Rust</button>
+				</div>
+				<div id="veredito"></div>
+			</div>
+
+			<div class="cartao">
+				<h2>2. Execução no shell de preview</h2>
+				<p style="margin: 0 0 8px; font-size: 13px; color: #8b949e">
+					Dois binários WASI reais, executados pelo <code>wasi.js</code> dentro do iframe.
+				</p>
+				<div style="margin-bottom: 10px">
+					<button id="btnRodarOlaWasm">Executar (sucesso)</button>
+					<button class="sec" id="btnRodarSaida7Wasm">Executar (erro, código 7)</button>
+					<button class="sec" id="btnLimpar">Limpar</button>
+				</div>
+				<iframe id="frame" title="preview"></iframe>
+			</div>
+		</div>
+
+		<div class="nota">
+			<b>O que esta demo não faz:</b> não compila C ainda. Os binários acima já vêm prontos, montados byte a byte para
+			provar o runtime. Compilar de verdade depende de preencher <code>catalogo.js</code> com as URLs do Clang — veja
+			<code>VERIFICAR.md</code>.
+		</div>
+
+		<script src="../../nucleo/diagnostico.js"></script>
+		<script src="../../cmake/project-discovery.js"></script>
+		<script src="../deteccao.js"></script>
+		<script src="../wasi.js"></script>
+		<script src="../shell-preview.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>
