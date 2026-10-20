@@ -1,7 +1,7 @@
 # Ordenar linhas
 
-Extensão embutida da Synapse IDE. Atua na seleção (ou no arquivo inteiro quando não há seleção).
+Extensão embutida da Synapse IDE que trabalha em cima da seleção atual, ou do arquivo inteiro quando não tem nada selecionado.
 
-- `F9` ordena A→Z, `Shift+F9` ordena Z→A (ordem natural, sem distinguir maiúsculas).
-- Remover duplicadas, inverter ordem e remover espaços no fim das linhas via paleta de comandos ou menu de contexto do editor.
-- Ferramenta MCP `ext_synapse_sort_lines__sort_text` para agentes ordenarem texto sem tocar no editor.
+O F9 ordena as linhas de A a Z e, segurando Shift, o F9 ordena de Z a A. A ordenação é natural e não diferencia maiúsculas de minúsculas, então item2 vem antes de item10. Pela paleta de comandos ou pelo menu de contexto do editor também dá para remover linhas duplicadas, inverter a ordem e tirar os espaços que sobram no fim das linhas.
+
+Agentes conectados pelo MCP podem usar a ferramenta sort_text para ordenar um texto sem mexer no editor.

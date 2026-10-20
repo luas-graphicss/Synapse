@@ -1,7 +1,7 @@
 # Marcadores TODO
 
-Extensão embutida da Synapse IDE.
+Extensão embutida da Synapse IDE que destaca os marcadores TODO, FIXME, HACK, NOTE e XXX no editor ativo. A lista de palavras pode ser trocada na configuração synapse.todo.keywords.
 
-- Destaca `TODO`, `FIXME`, `HACK`, `NOTE` e `XXX` (configurável em `synapse.todo.keywords`) no editor ativo e publica diagnósticos leves no painel Problemas.
-- Item na barra de status com a contagem do arquivo; clique para listar e navegar.
-- Ferramenta MCP `ext_synapse_todo_highlighter__list_markers` varre o projeto por glob e devolve os marcadores para agentes.
+Cada marcador também vira um diagnóstico leve no painel Problemas, e a barra de status mostra quantos marcadores existem no arquivo aberto. Clicando nesse item aparece a lista completa e dá para ir direto até cada um.
+
+Agentes conectados pelo MCP contam com a ferramenta list_markers, que percorre o projeto usando um padrão glob e devolve todos os marcadores encontrados.

@@ -1,8 +1,7 @@
 # Relatar bug
 
-Extensão embutida da Synapse IDE que substitui o antigo módulo `assets/js/support/bug-report-*`.
+Extensão que já vem embutida na Synapse IDE e substitui o antigo módulo interno de relato de bug.
 
-- Comando `synapse.bugReport.open` (menu Ajuda → Relatar um bug).
-- Formulário em webview com CSP e nonce; envio `POST api/bug-report` na mesma origem da IDE (`network:self`).
-- Se o servidor não responder, abre o cliente de e-mail com o texto pronto.
-- Ferramenta MCP `ext_synapse_bug_report__draft` monta o texto do relato para agentes sem enviar nada.
+Ela adiciona o comando synapse.bugReport.open, que também aparece no menu Ajuda como Relatar um bug. O comando abre um formulário em webview protegido por CSP com nonce, e o relato vai para o endpoint api/bug-report na mesma origem da IDE, usando a permissão network:self. Se o servidor não responder, a extensão abre o seu cliente de e-mail com o texto já preenchido, e aí é só enviar.
+
+Agentes conectados pelo MCP contam com a ferramenta draft, que monta o texto do relato sem enviar nada.

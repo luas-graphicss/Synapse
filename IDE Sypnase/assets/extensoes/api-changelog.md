@@ -1,41 +1,29 @@
-# Changelog da API de extensões (`synapse.d.ts`)
+# Changelog da API de extensões
 
-A versão da API é a que o host expõe em `synapse.version` e a que o manifesto compara em `engines.synapse`.
+[Read in English](api-changelog.en.md)
 
-## Política de compatibilidade
+Aqui ficam registradas as mudanças da API de extensões da Synapse, que é definida no arquivo synapse.d.ts. A versão da API é a mesma que o host expõe em synapse.version e que o manifesto de cada extensão compara no campo engines.synapse.
 
-- Versionamento semântico: *minor* só adiciona; *major* pode remover o que estiver marcado `@deprecated` há pelo menos uma versão maior.
-- Janela de suporte: o host garante as **2 versões maiores mais recentes** (hoje `2.x` e `1.x`). Extensões com `engines.synapse` abaixo disso instalam com aviso e podem parar de funcionar sem aviso prévio.
-- APIs `@deprecated` continuam funcionando durante toda a janela. O host registra um aviso único por extensão e por API no painel de saída da extensão (`api.deprecated`) e o painel Extensões em execução lista as chamadas.
-- Remoções são anunciadas aqui e na referência (`docs/extensoes-api.html`) com a versão em que acontecerão.
+## Compatibilidade
+
+A API segue versionamento semântico. Versões menores só adicionam coisas, e uma versão maior só pode remover o que já estava marcado como obsoleto há pelo menos uma versão maior.
+
+O host garante suporte às duas versões maiores mais recentes, que hoje são a 2 e a 1. Extensões que pedem uma versão abaixo disso ainda instalam, mas com aviso, e podem parar de funcionar sem aviso prévio.
+
+As APIs marcadas como obsoletas continuam funcionando durante toda essa janela. O host registra um único aviso por extensão e por API no painel de saída da extensão, e o painel de extensões em execução lista essas chamadas. Toda remoção é anunciada aqui e na [referência da API](../../docs/extensoes-api.html), junto com a versão em que ela vai acontecer.
 
 ## 2.5.0
 
-### Adicionado
+Essa versão trouxe a função synapse.mcp.registerTool, que expõe uma função da extensão como ferramenta MCP para os agentes conectados ao relay. Ela exige a permissão mcp, e o nome público junta o publicador, o nome da extensão e o nome da ferramenta, como em ext_synapse_sort_lines__sort_text. Os metadados das ferramentas também podem ser declarados em contributes.mcpTools. Entrou também synapse.env.appRoot, com a URL base da IDE, útil para chamar endpoints da própria origem. O manifesto ganhou extensionPack e extensionDependencies, que são resolvidos e instalados em cadeia a partir do registro, além de contributes.mcpTools e da permissão network:self, que libera acesso à mesma origem da IDE. A própria IDE passou a carregar pela API pública as extensões embutidas synapse.bug-report, synapse.sort-lines e synapse.todo-highlighter.
 
-- `synapse.mcp.registerTool(name, handler, options?)`: expõe uma função da extensão como ferramenta MCP para agentes conectados ao relay. Exige a permissão `mcp`; o nome público segue `ext_<publisher>_<nome>__<ferramenta>`. Metadados podem ser declarados em `contributes.mcpTools`.
-- `synapse.env.appRoot`: URL base da IDE (para resolver endpoints da própria origem).
-- Manifesto: `extensionPack` e `extensionDependencies` com resolução e instalação em cadeia a partir do registro; `contributes.mcpTools`; permissão `network:self` (mesma origem da IDE).
-- Extensões embutidas (`builtin`): a própria IDE passa a carregar `synapse.bug-report`, `synapse.sort-lines` e `synapse.todo-highlighter` pela API pública.
+Alguns problemas foram corrigidos. Os campos webview.nonce e webview.cspSource agora ficam disponíveis logo depois de createWebviewPanel. Antes eles chegavam vazios até o host responder, o que quebrava a CSP de quem lia o nonce na hora. Os painéis de webview e os painéis do próprio host, como os detalhes de uma extensão, não aparecem mais juntos no editor, e abrir um esconde o outro. A IDE passou a publicar SYNAPSE_VERSION, então engines.synapse deixou de recusar todos os pacotes achando que a IDE era a versão 0.0.0. As ferramentas registradas com mcp.registerTool agora chegam de verdade ao catálogo MCP da IDE, e as extensões embutidas passaram a declarar a permissão mcp que as ferramentas delas exigem.
 
-### Corrigido
-
-- `webview.nonce` e `webview.cspSource` ficam disponíveis de forma síncrona logo após `createWebviewPanel` (antes chegavam vazios até a resposta do host, quebrando a CSP de quem lia o nonce na hora).
-- Painéis de webview e painéis do host (detalhes de extensão) agora são mutuamente exclusivos no editor: abrir um esconde o outro.
-- `SYNAPSE_VERSION` passa a ser publicada pela IDE; `engines.synapse` deixa de rejeitar todo pacote com "esta IDE é 0.0.0".
-- Ferramentas de `mcp.registerTool` chegam de fato ao catálogo MCP da IDE.
-- Extensões embutidas declaram a permissão `mcp` que suas ferramentas exigem.
-
-### Obsoleto (remoção prevista em 4.0.0)
-
-- `synapse.workspace.readFile(path)` → use `synapse.workspace.fs.readFile(uri)` e decodifique com `TextDecoder`.
-- `synapse.workspace.writeFile(path, text)` → use `synapse.workspace.fs.writeFile(uri, bytes)`.
-- `synapse.workspace.findFilePaths(glob)` → use `synapse.workspace.findFiles(glob)` e `synapse.workspace.asRelativePath(uri)`.
+Três funções viraram obsoletas e devem sair na versão 4.0.0. No lugar de synapse.workspace.readFile, use synapse.workspace.fs.readFile e decodifique o resultado com TextDecoder. No lugar de synapse.workspace.writeFile, use synapse.workspace.fs.writeFile passando os bytes. No lugar de synapse.workspace.findFilePaths, use synapse.workspace.findFiles junto com synapse.workspace.asRelativePath.
 
 ## 2.4.0
 
-- Testes de extensão (`synapse.test`), `preview.*`, `keybindings.bindingFor`.
+Entraram os testes de extensão em synapse.test, as APIs de preview e a função keybindings.bindingFor.
 
 ## 2.0.0
 
-- Primeira versão estável com host isolado em Worker, permissões declarativas e webviews com CSP.
+Primeira versão estável, com o host isolado em um Worker, permissões declarativas e webviews com CSP.

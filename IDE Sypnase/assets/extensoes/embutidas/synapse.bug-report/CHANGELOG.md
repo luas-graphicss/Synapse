@@ -2,5 +2,4 @@
 
 ## 1.0.0
 
-- Migração do módulo interno de bug report para extensão embutida (Fase 10 do roadmap).
-- Ferramenta MCP `draft` para agentes.
+Primeira versão como extensão embutida. O antigo módulo interno de relato de bug foi migrado para cá durante a fase 10 do roadmap, e a extensão ganhou a ferramenta MCP draft para os agentes.
