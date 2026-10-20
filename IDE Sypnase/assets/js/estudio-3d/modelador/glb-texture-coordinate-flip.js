@@ -1,5 +1,5 @@
 'use strict';
 
 function verticalTextureCoordinateForGltf(coordinate) {
-  return 1 - coordinate;
+	return 1 - coordinate;
 }

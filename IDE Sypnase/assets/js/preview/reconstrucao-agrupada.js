@@ -1,844 +1,844 @@
 'use strict';
 let buildDrenoLigado = false;
 function buildRegistrarDreno() {
-  if (buildDrenoLigado) return;
-  try {
-    if (!window.MCP_ADMISSAO || typeof window.MCP_ADMISSAO.aoDrenar !== 'function') return;
-    buildDrenoLigado = true;
-    window.MCP_ADMISSAO.aoDrenar(function () {
-        try {
-          const p = typeof activeProject === 'function' ? activeProject() : null;
-          if (p && p.previewDirty) scheduleBuild(p);
-        } catch (e) {
-          ignorarErro(e, 'buildRegistrarDreno');
-        }
-    });
-  } catch (e) {
-    ignorarErro(e, 'buildRegistrarDreno');
-  }
+	if (buildDrenoLigado) return;
+	try {
+		if (!window.MCP_ADMISSAO || typeof window.MCP_ADMISSAO.aoDrenar !== 'function') return;
+		buildDrenoLigado = true;
+		window.MCP_ADMISSAO.aoDrenar(function () {
+			try {
+				const p = typeof activeProject === 'function' ? activeProject() : null;
+				if (p && p.previewDirty) scheduleBuild(p);
+			} catch (e) {
+				ignorarErro(e, 'buildRegistrarDreno');
+			}
+		});
+	} catch (e) {
+		ignorarErro(e, 'buildRegistrarDreno');
+	}
 }
 function scheduleBuild(proj) {
-  if (!proj) return;
-  window.SynapsePreviewRuntime.cancel(proj);
-  if (proj.explicitBuildInProgress) {
-    proj.previewDirty = true;
-    return;
-  }
-  try {
-    if (window.MCP_ADMISSAO && window.MCP_ADMISSAO.ocupado()) {
-      proj.previewDirty = true;
-      buildRegistrarDreno();
-      return;
-    }
-  } catch (e) {
-    ignorarErro(e, 'scheduleBuild');
-  }
-  if (proj.previewEverOpened && State.layout === 'editor') {
-    proj.previewDirty = true;
-    const _sh = scheduleHandles.get(proj.id);
-    if (_sh) {
-      if (_sh.raf) cancelAnimationFrame(_sh.raf);
-      if (_sh.t) clearTimeout(_sh.t);
-      scheduleHandles.delete(proj.id);
-    }
-    return;
-  }
-  const sh = scheduleHandles.get(proj.id);
-  if (sh) {
-    if (sh.raf) cancelAnimationFrame(sh.raf);
-    if (sh.t) clearTimeout(sh.t);
-  }
-  let total = 0;
-  try {
-    for (const f of proj.files.values()) {
-      total +=
-      f.text != null ? f.text.length : (f.data && (f.data.byteLength || f.data.length)) || 0;
-      if (total > 400000) break;
-    }
-  } catch (e) {
-    ignorarErro(e, 'scheduleBuild');
-  }
-  const nf = (proj.files && proj.files.size) || 0;
-  let espera = nf > 600 ? 700 : nf > 250 ? 450 : total > 400000 ? 280 : 0;
-  if (document.hidden) espera = Math.max(espera, 1200);
-  const go = () => {
-    scheduleHandles.delete(proj.id);
-    buildPreview(proj);
-  };
-  if (espera > 0) scheduleHandles.set(proj.id, { t: setTimeout(go, espera) });
-  else scheduleHandles.set(proj.id, { raf: requestAnimationFrame(go) });
+	if (!proj) return;
+	window.SynapsePreviewRuntime.cancel(proj);
+	if (proj.explicitBuildInProgress) {
+		proj.previewDirty = true;
+		return;
+	}
+	try {
+		if (window.MCP_ADMISSAO && window.MCP_ADMISSAO.ocupado()) {
+			proj.previewDirty = true;
+			buildRegistrarDreno();
+			return;
+		}
+	} catch (e) {
+		ignorarErro(e, 'scheduleBuild');
+	}
+	if (proj.previewEverOpened && State.layout === 'editor') {
+		proj.previewDirty = true;
+		const _sh = scheduleHandles.get(proj.id);
+		if (_sh) {
+			if (_sh.raf) cancelAnimationFrame(_sh.raf);
+			if (_sh.t) clearTimeout(_sh.t);
+			scheduleHandles.delete(proj.id);
+		}
+		return;
+	}
+	const sh = scheduleHandles.get(proj.id);
+	if (sh) {
+		if (sh.raf) cancelAnimationFrame(sh.raf);
+		if (sh.t) clearTimeout(sh.t);
+	}
+	let total = 0;
+	try {
+		for (const f of proj.files.values()) {
+			total +=
+				f.text != null ? f.text.length : (f.data && (f.data.byteLength || f.data.length)) || 0;
+			if (total > 400000) break;
+		}
+	} catch (e) {
+		ignorarErro(e, 'scheduleBuild');
+	}
+	const nf = (proj.files && proj.files.size) || 0;
+	let espera = nf > 600 ? 700 : nf > 250 ? 450 : total > 400000 ? 280 : 0;
+	if (document.hidden) espera = Math.max(espera, 1200);
+	const go = () => {
+		scheduleHandles.delete(proj.id);
+		buildPreview(proj);
+	};
+	if (espera > 0) scheduleHandles.set(proj.id, { t: setTimeout(go, espera) });
+	else scheduleHandles.set(proj.id, { raf: requestAnimationFrame(go) });
 }
 
 const BIN_DE_BUILD = ['.wasm', '.data', '.mem', '.bin'];
 function ehBinarioDeBuild(p) {
-  const b = String(p || '').toLowerCase();
-  for (let i = 0; i < BIN_DE_BUILD.length; i++) {
-    const suf = BIN_DE_BUILD[i];
-    if (b.length >= suf.length && b.slice(b.length - suf.length) === suf) return true;
-  }
-  return false;
+	const b = String(p || '').toLowerCase();
+	for (let i = 0; i < BIN_DE_BUILD.length; i++) {
+		const suf = BIN_DE_BUILD[i];
+		if (b.length >= suf.length && b.slice(b.length - suf.length) === suf) return true;
+	}
+	return false;
 }
 function arquivosParaCompilador(proj) {
-  const lista = [];
-  try {
-    for (const [p, f] of proj.files) {
-      let txt = '';
-      try {
-        if (f && f.text != null) txt = f.text;
-        else if (f && f.isText) txt = fileText(f) || '';
-      } catch (e) {
-        txt = '';
-      }
-      let bin = null;
-      try {
-        if (f && f.data) bin = f.data;
-        else if (f && f.text != null && ehBinarioDeBuild(p)) bin = new TextEncoder().encode(f.text);
-      } catch (e) {
-        bin = null;
-      }
-      let editado = false;
-      try {
-        editado = !!(f && f.history && f.history.length > 1);
-      } catch (e) {
-        editado = false;
-      }
-      lista.push({ caminho: p, conteudo: txt, bytes: bin, editado: editado });
-    }
-  } catch (e) {
-    ignorarErro(e, 'arquivosParaCompilador');
-  }
-  return lista;
+	const lista = [];
+	try {
+		for (const [p, f] of proj.files) {
+			let txt = '';
+			try {
+				if (f && f.text != null) txt = f.text;
+				else if (f && f.isText) txt = fileText(f) || '';
+			} catch (e) {
+				txt = '';
+			}
+			let bin = null;
+			try {
+				if (f && f.data) bin = f.data;
+				else if (f && f.text != null && ehBinarioDeBuild(p)) bin = new TextEncoder().encode(f.text);
+			} catch (e) {
+				bin = null;
+			}
+			let editado = false;
+			try {
+				editado = !!(f && f.history && f.history.length > 1);
+			} catch (e) {
+				editado = false;
+			}
+			lista.push({ caminho: p, conteudo: txt, bytes: bin, editado: editado });
+		}
+	} catch (e) {
+		ignorarErro(e, 'arquivosParaCompilador');
+	}
+	return lista;
 }
 function rotulosDoCompilador() {
-  const t = (s) => {
-    try {
-      return window.SYNAPSE_I18N && window.SYNAPSE_I18N.t ? window.SYNAPSE_I18N.t(s) : s;
-    } catch (e) {
-      return s;
-    }
-  };
-  return {
-    esperando: t('Aguardando...'),
-    saida: t('Saída do programa'),
-    entrada: t('Digite e pressione Enter'),
-    fim: t('Programa encerrado'),
-    codigo: t('código'),
-    truncado: t('Saída antiga removida para não travar o navegador.'),
-    rodando: t('Rodando'),
-    quadros: t('quadros/s'),
-    clique: t('Clique no preview para o teclado e o mouse funcionarem.'),
-    parado: t('O programa parou de desenhar.'),
-    iniciando: t('Iniciando módulo...'),
-    erro: t('Erro'),
-    estFalhouInicio: t('Falhou ao iniciar'),
-    estIncompativel: t('Ambiente incompativel'),
-    estNaoExecutavel: t('Nao executavel no navegador'),
-    estPrecisaBuild: t('Precisa de build web ou Relay'),
-    estNativo: t('Preview nativo'),
-    estSemToolchain: t('Toolchain nao configurado'),
-    estSemAdaptador: t('Sem adaptador de compilacao'),
-    estPreparando: t('Preparando o compilador...'),
-    estCompilando: t('Compilando...'),
-    estFalhaCompilacao: t('Falha na compilacao'),
-    estBinarioInvalido: t('Binario invalido'),
-    estExecutando: t('Executando...'),
-    estCancelado: t('Cancelado'),
-    estErroCompilacao: t('Erro de compilacao'),
-    estFalhou: t('Falhou'),
-  };
+	const t = (s) => {
+		try {
+			return window.SYNAPSE_I18N && window.SYNAPSE_I18N.t ? window.SYNAPSE_I18N.t(s) : s;
+		} catch (e) {
+			return s;
+		}
+	};
+	return {
+		esperando: t('Aguardando...'),
+		saida: t('Saída do programa'),
+		entrada: t('Digite e pressione Enter'),
+		fim: t('Programa encerrado'),
+		codigo: t('código'),
+		truncado: t('Saída antiga removida para não travar o navegador.'),
+		rodando: t('Rodando'),
+		quadros: t('quadros/s'),
+		clique: t('Clique no preview para o teclado e o mouse funcionarem.'),
+		parado: t('O programa parou de desenhar.'),
+		iniciando: t('Iniciando módulo...'),
+		erro: t('Erro'),
+		estFalhouInicio: t('Falhou ao iniciar'),
+		estIncompativel: t('Ambiente incompativel'),
+		estNaoExecutavel: t('Nao executavel no navegador'),
+		estPrecisaBuild: t('Precisa de build web ou Relay'),
+		estNativo: t('Preview nativo'),
+		estSemToolchain: t('Toolchain nao configurado'),
+		estSemAdaptador: t('Sem adaptador de compilacao'),
+		estPreparando: t('Preparando o compilador...'),
+		estCompilando: t('Compilando...'),
+		estFalhaCompilacao: t('Falha na compilacao'),
+		estBinarioInvalido: t('Binario invalido'),
+		estExecutando: t('Executando...'),
+		estCancelado: t('Cancelado'),
+		estErroCompilacao: t('Erro de compilacao'),
+		estFalhou: t('Falhou'),
+	};
 }
 
 const STUB_SERVICE_WORKER =
-'try{if(navigator.serviceWorker){const __r=function(){return Promise.resolve({unregister:' +
-'function(){return Promise.resolve(true)},update:function(){return Promise.resolve()},' +
-'addEventListener:function(){}})};Object.defineProperty(navigator,"serviceWorker",{value:' +
-'{register:__r,ready:new Promise(function(){}),getRegistration:function(){return ' +
-'Promise.resolve(undefined)},getRegistrations:function(){return Promise.resolve([])},' +
-'addEventListener:function(){},controller:null},configurable:true});}}catch(e){}';
+	'try{if(navigator.serviceWorker){const __r=function(){return Promise.resolve({unregister:' +
+	'function(){return Promise.resolve(true)},update:function(){return Promise.resolve()},' +
+	'addEventListener:function(){}})};Object.defineProperty(navigator,"serviceWorker",{value:' +
+	'{register:__r,ready:new Promise(function(){}),getRegistration:function(){return ' +
+	'Promise.resolve(undefined)},getRegistrations:function(){return Promise.resolve([])},' +
+	'addEventListener:function(){},controller:null},configurable:true});}}catch(e){}';
 
 function preludiosDoPreview(contexto) {
-  const preludios = [];
+	const preludios = [];
 
-  if (contexto.framework === 'flutter') {
-    preludios.push({ nome: 'stub-service-worker', codigo: STUB_SERVICE_WORKER });
-  }
+	if (contexto.framework === 'flutter') {
+		preludios.push({ nome: 'stub-service-worker', codigo: STUB_SERVICE_WORKER });
+	}
 
-  const vp = contexto.viewport;
-  if (vp) {
-    const medidas = { w: vp.w, h: vp.h, dpr: vp.dpr || 0, touch: vp.touch ? 5 : 0 };
-    preludios.push({ nome: 'viewport', codigo: `window.__lpVP=${JSON.stringify(medidas)};` });
-  }
+	const vp = contexto.viewport;
+	if (vp) {
+		const medidas = { w: vp.w, h: vp.h, dpr: vp.dpr || 0, touch: vp.touch ? 5 : 0 };
+		preludios.push({ nome: 'viewport', codigo: `window.__lpVP=${JSON.stringify(medidas)};` });
+	}
 
-  preludios.push({ nome: 'rotas-spa', codigo: AURORA_SPA_SHIM });
-  preludios.push({ nome: 'preludio-aurora', codigo: AURORA_PRELUDE });
-  preludios.push({ nome: 'visao', codigo: VISION_HOOK });
-  preludios.push({ nome: 'console', codigo: CONSOLE_HOOK });
+	preludios.push({ nome: 'rotas-spa', codigo: AURORA_SPA_SHIM });
+	preludios.push({ nome: 'preludio-aurora', codigo: AURORA_PRELUDE });
+	preludios.push({ nome: 'visao', codigo: VISION_HOOK });
+	preludios.push({ nome: 'console', codigo: CONSOLE_HOOK });
 
-  preludios.push({
-      nome: 'mapa-de-arquivos',
-      codigo:
-      `window.__LP_SRC__=${JSON.stringify(contexto.fontes)};\n` +
-      `window.__LP_MAP__=${JSON.stringify(contexto.arquivos)};\n` +
-      FETCH_SHIM,
-  });
+	preludios.push({
+		nome: 'mapa-de-arquivos',
+		codigo:
+			`window.__LP_SRC__=${JSON.stringify(contexto.fontes)};\n` +
+			`window.__LP_MAP__=${JSON.stringify(contexto.arquivos)};\n` +
+			FETCH_SHIM,
+	});
 
-  return preludios;
+	return preludios;
 }
 
 function injetarPreludios(dom, contexto) {
-  const preludios = preludiosDoPreview(contexto);
-  for (let i = preludios.length - 1; i >= 0; i--) {
-    const script = dom.createElement('script');
-    script.setAttribute('data-synapse', 'preludio');
-    script.setAttribute('data-synapse-preludio', preludios[i].nome);
-    script.textContent = preludios[i].codigo;
-    dom.head.insertBefore(script, dom.head.firstChild);
-  }
+	const preludios = preludiosDoPreview(contexto);
+	for (let i = preludios.length - 1; i >= 0; i--) {
+		const script = dom.createElement('script');
+		script.setAttribute('data-synapse', 'preludio');
+		script.setAttribute('data-synapse-preludio', preludios[i].nome);
+		script.textContent = preludios[i].codigo;
+		dom.head.insertBefore(script, dom.head.firstChild);
+	}
 }
 
 function planoDoCompilador(proj) {
-  if (!window.SYNAPSE_ORQUESTRADOR || !window.SYNAPSE_DETECCAO) return null;
-  if (!proj || !proj.files || !proj.files.size) return null;
-  const arquivos = arquivosParaCompilador(proj);
-  let plano = null;
-  try {
-    plano = window.SYNAPSE_DETECCAO.detectar(arquivos);
-  } catch (e) {
-    return null;
-  }
-  if (!plano) return null;
-  if (!proj.files.has('synapse.preview.json') && (plano.toolchain === 'nativo' || plano.toolchain === 'dev-server')) return null;
-  return { plano: plano, arquivos: arquivos };
+	if (!window.SYNAPSE_ORQUESTRADOR || !window.SYNAPSE_DETECCAO) return null;
+	if (!proj || !proj.files || !proj.files.size) return null;
+	const arquivos = arquivosParaCompilador(proj);
+	let plano = null;
+	try {
+		plano = window.SYNAPSE_DETECCAO.detectar(arquivos);
+	} catch (e) {
+		return null;
+	}
+	if (!plano) return null;
+	if (!proj.files.has('synapse.preview.json') && (plano.toolchain === 'nativo' || plano.toolchain === 'dev-server')) return null;
+	return { plano: plano, arquivos: arquivos };
 }
 function temEntradaHtml(proj) {
-  try {
-    if (!proj || !proj.files) return false;
-    for (const p of proj.files.keys()) if (/\.html?$/i.test(p)) return true;
-  } catch (e) {
-    ignorarErro(e, 'temEntradaHtml');
-  }
-  return false;
+	try {
+		if (!proj || !proj.files) return false;
+		for (const p of proj.files.keys()) if (/\.html?$/i.test(p)) return true;
+	} catch (e) {
+		ignorarErro(e, 'temEntradaHtml');
+	}
+	return false;
 }
 
 async function autoCompilarPreview(proj, token, alvo) {
-  const plano = alvo.plano;
-  if (proj.id !== State.active) return true;
-  const nativeSnapshot = window.SYNAPSE_BUILD_PROFILES?.snapshot(proj.files, 'wasi');
-  const shouldMount = () => token === proj.buildToken && proj.id === State.active && (!nativeSnapshot || window.SYNAPSE_BUILD_PROFILES.isCurrent(nativeSnapshot, proj.files, 'wasi'));
-  logCmd(
-    proj,
-    'Projeto ' +
-    plano.tipo +
-    ' detectado' +
-    (plano.entrada ? ` (entrada: ${plano.entrada})` : '') +
-    ': o pipeline web nao serve aqui, assumindo com o auto-compilador.',
-  );
-  if (State.layout === 'editor') {
-    proj.previewDirty = true;
-    logCmd(proj, 'Preview fechado agora - o auto-compilador roda assim que voce abrir o preview.');
-    return true;
-  }
-  if (proj.id === State.active) {
-    hidePreviewLoading();
-    hidePreviewError();
-    el.previewEmpty.classList.add('hidden');
-    el.device.classList.remove('hidden');
-    setStatus('run', 'Auto-compilando...');
-  }
-  try {
-    el.frame.setAttribute(
-      'sandbox',
-      'allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock allow-modals',
-    );
-  } catch (e) {
-    ignorarErro(e, 'autoCompilarPreview');
-  }
-  try {
-    el.frame.setAttribute('allow', window.SynapsePreviewPermissions.allowValue());
-  } catch (e) {
-    ignorarErro(e, 'autoCompilarPreview');
-  }
-  try {
-    el.frame.removeAttribute('src');
-  } catch (e) {
-    ignorarErro(e, 'autoCompilarPreview');
-  }
-  proj.lastHtml = null;
-  let r = null;
-  try {
-    r = await window.SYNAPSE_ORQUESTRADOR.autoPreview({
-        arquivos: alvo.arquivos,
-        shouldMount,
-        frame: el.frame,
-        limiteMs: 10000,
-        rotulos: rotulosDoCompilador(),
-        aoLog: function (reg) {
-          if (!reg) return;
-          if (token !== proj.buildToken) return;
-          const txt = '[auto-compilador] ' + reg.texto;
-          if (reg.nivel === 'erro') logErr(proj, txt);
-          else if (reg.nivel === 'aviso') pushLog(proj, 'warn', txt);
-          else logCmd(proj, txt);
-        },
-    });
-  } catch (e) {
-    logErr(proj, '[auto-compilador] parou de um jeito nao previsto: ' + ((e && e.message) || e));
-  }
-  if (!shouldMount()) return true;
-  if (r && r.ok) {
-    logCmd(proj, 'Preview compilado e executado ✓');
-    if (proj.id === State.active) {
-      setStatus('ok', 'Preview compilado');
-      try {
-        renderStatusbar();
-      } catch (e) {
-        ignorarErro(e, 'autoCompilarPreview');
-      }
-    }
-    return true;
-  }
-  if (r && r.etapa === 'cmake-relay') {
-    if (temEntradaHtml(proj)) return false;
-    if (proj.id === State.active) setStatus('ok', 'CMake · use o botão CMake');
-    return true;
-  }
-  const etapa = (r && r.etapa) || '?';
-  const motivo = (r && (r.motivo || r.texto)) || 'sem motivo informado';
-  logErr(proj, `[auto-compilador] parou na etapa "${etapa}": ${motivo}`);
-  if (temEntradaHtml(proj)) {
-    pushLog(
-      proj,
-      'warn',
-      '[auto-compilador] O projeto tem HTML, entao o preview volta para o pipeline web.',
-    );
-    return false;
-  }
-  if (proj.id === State.active) {
-    setStatus('err', 'Auto-compilador parou');
-    try {
-      renderStatusbar();
-    } catch (e) {
-      ignorarErro(e, 'autoCompilarPreview');
-    }
-  }
-  return true;
+	const plano = alvo.plano;
+	if (proj.id !== State.active) return true;
+	const nativeSnapshot = window.SYNAPSE_BUILD_PROFILES?.snapshot(proj.files, 'wasi');
+	const shouldMount = () => token === proj.buildToken && proj.id === State.active && (!nativeSnapshot || window.SYNAPSE_BUILD_PROFILES.isCurrent(nativeSnapshot, proj.files, 'wasi'));
+	logCmd(
+		proj,
+		'Projeto ' +
+			plano.tipo +
+			' detectado' +
+			(plano.entrada ? ` (entrada: ${plano.entrada})` : '') +
+			': o pipeline web nao serve aqui, assumindo com o auto-compilador.',
+	);
+	if (State.layout === 'editor') {
+		proj.previewDirty = true;
+		logCmd(proj, 'Preview fechado agora - o auto-compilador roda assim que voce abrir o preview.');
+		return true;
+	}
+	if (proj.id === State.active) {
+		hidePreviewLoading();
+		hidePreviewError();
+		el.previewEmpty.classList.add('hidden');
+		el.device.classList.remove('hidden');
+		setStatus('run', 'Auto-compilando...');
+	}
+	try {
+		el.frame.setAttribute(
+			'sandbox',
+			'allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock allow-modals',
+		);
+	} catch (e) {
+		ignorarErro(e, 'autoCompilarPreview');
+	}
+	try {
+		el.frame.setAttribute('allow', window.SynapsePreviewPermissions.allowValue());
+	} catch (e) {
+		ignorarErro(e, 'autoCompilarPreview');
+	}
+	try {
+		el.frame.removeAttribute('src');
+	} catch (e) {
+		ignorarErro(e, 'autoCompilarPreview');
+	}
+	proj.lastHtml = null;
+	let r = null;
+	try {
+		r = await window.SYNAPSE_ORQUESTRADOR.autoPreview({
+			arquivos: alvo.arquivos,
+			shouldMount,
+			frame: el.frame,
+			limiteMs: 10000,
+			rotulos: rotulosDoCompilador(),
+			aoLog: function (reg) {
+				if (!reg) return;
+				if (token !== proj.buildToken) return;
+				const txt = '[auto-compilador] ' + reg.texto;
+				if (reg.nivel === 'erro') logErr(proj, txt);
+				else if (reg.nivel === 'aviso') pushLog(proj, 'warn', txt);
+				else logCmd(proj, txt);
+			},
+		});
+	} catch (e) {
+		logErr(proj, '[auto-compilador] parou de um jeito nao previsto: ' + ((e && e.message) || e));
+	}
+	if (!shouldMount()) return true;
+	if (r && r.ok) {
+		logCmd(proj, 'Preview compilado e executado ✓');
+		if (proj.id === State.active) {
+			setStatus('ok', 'Preview compilado');
+			try {
+				renderStatusbar();
+			} catch (e) {
+				ignorarErro(e, 'autoCompilarPreview');
+			}
+		}
+		return true;
+	}
+	if (r && r.etapa === 'cmake-relay') {
+		if (temEntradaHtml(proj)) return false;
+		if (proj.id === State.active) setStatus('ok', 'CMake · use o botão CMake');
+		return true;
+	}
+	const etapa = (r && r.etapa) || '?';
+	const motivo = (r && (r.motivo || r.texto)) || 'sem motivo informado';
+	logErr(proj, `[auto-compilador] parou na etapa "${etapa}": ${motivo}`);
+	if (temEntradaHtml(proj)) {
+		pushLog(
+			proj,
+			'warn',
+			'[auto-compilador] O projeto tem HTML, entao o preview volta para o pipeline web.',
+		);
+		return false;
+	}
+	if (proj.id === State.active) {
+		setStatus('err', 'Auto-compilador parou');
+		try {
+			renderStatusbar();
+		} catch (e) {
+			ignorarErro(e, 'autoCompilarPreview');
+		}
+	}
+	return true;
 }
 
 async function buildPreview(proj, buildOptions = {}) {
-  if (proj?.explicitBuildInProgress) {
-    proj.previewDirty = true;
-    return { ok: false, error: 'A Relay build is synchronizing this project.' };
-  }
-  if (!proj) {
-    hidePreviewLoading();
-    renderPreviewEmpty(true);
-    return;
-  }
-  window.SynapsePreviewRuntime.cancel(proj);
-  proj.previewEverOpened = true;
-  proj.previewDirty = false;
-  const token = (proj.buildToken = (proj.buildToken || 0) + 1);
-  window.SynapsePreviewBlobUsage.startBuild(proj);
-  const publishBrowserBuild = (html) => {
-    if (buildOptions.shouldMount && !buildOptions.shouldMount())
-    throw new Error('The project changed or Run was canceled before preview launch.');
-    setFrame(proj, html, token);
-    finishBuild(proj, token);
-    return { ok: token === proj.buildToken, html };
-  };
-  logCmd(proj, '⚙ Montando preview…');
-  if (proj.id === State.active) {
-    setStatus('run', 'Compilando preview…');
-    setPreviewLoadingDetail('Compilando o preview…');
-  }
-  try {
-    if (!proj.files.size) {
-      if (proj.id === State.active) {
-        hidePreviewLoading();
-        renderPreviewEmpty(true);
-      }
-      return;
-    }
-    const __alvo = buildOptions.browserOnly ? null : planoDoCompilador(proj);
-    if (__alvo) {
-      const okAuto = await autoCompilarPreview(proj, token, __alvo);
-      if (okAuto !== false) return;
-      if (token !== proj.buildToken) return;
-      try {
-        window.SynapsePreviewMountReset.clearMountedPreview(proj);
-      } catch (e) {
-        ignorarErro(e, 'buildPreview');
-      }
-      proj.lastHtml = null;
-    }
-    limparBlobsSoltos(proj);
-    if (proj.detect && proj.detect.framework === 'flutter' && !proj.entry) {
-      return publishBrowserBuild(flutterPreviewDoc(proj));
-    }
-    const files = proj.files;
-    const rawUrl = {};
-    const mimeOf = {};
-    const cacheRaw = proj.blobCache || (proj.blobCache = new Map());
-    const vivos = new Set();
-    let __bn = 0,
-    __novos = 0;
-    for (const [p, f] of files) {
-      const mime = Core.getMime(p);
-      mimeOf[p] = mime;
-      let ent = cacheRaw.get(p);
-      const igual =
-      !!ent &&
-      ent.mime === mime &&
-      ((f.text != null && ent.txt === f.text && ent.bin == null) ||
-        (f.text == null && ent.txt == null && ent.bin === f.data));
-      if (!igual) {
-        if (ent && ent.url) {
-          try {
-            window.SynapsePreviewResources.retire(proj, ent.url);
-          } catch (e) {
-            ignorarErro(e, 'buildPreview');
-          }
-        }
-        ent = {
-          mime: mime,
-          txt: f.text != null ? f.text : null,
-          bin: f.text != null ? null : f.data,
-          url: mkBlob(proj, fileBytes(f), mime),
-        };
-        cacheRaw.set(p, ent);
-        __novos++;
-      }
-      rawUrl[p] = ent.url;
-      vivos.add(p);
-      if (++__bn % 150 === 0 && __novos > 0) {
-        if (proj.id === State.active)
-        setPreviewLoadingDetail(`Preparando arquivos... ${__bn}/${files.size}`);
-        await AuroraFix.yieldUI();
-        if (token !== proj.buildToken) return;
-      }
-    }
-    for (const [pv, entv] of [...cacheRaw]) {
-      if (!vivos.has(pv)) {
-        if (entv && entv.url) {
-          try {
-            window.SynapsePreviewResources.retire(proj, entv.url);
-          } catch (e) {
-            ignorarErro(e, 'buildPreview');
-          }
-        }
-        cacheRaw.delete(pv);
-      }
-    }
-    const cssCache = {};
-    const processCss = (path, seen) => {
-      if (cssCache[path]) return cssCache[path];
-      seen = seen || new Set();
-      if (seen.has(path)) return rawUrl[path];
-      seen.add(path);
-      const f = files.get(path);
-      if (!f) {
-        return rawUrl[path];
-      }
-      let text = fileText(f);
-      const dir = Core.dirname(path);
-      text = text.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/g, (m, q, ref) => {
-              const r = Core.joinPath(dir, ref);
-              if (files.has(r)) return `url(${rawUrl[r]})`;
-              return m;
-          });
-          text = text.replace(/@import\s+(["'])([^"']+)\1/g, (m, q, ref) => {
-                const r = Core.joinPath(dir, ref);
-                if (files.has(r)) return `@import "${processCss(r, seen)}"`;
-                return m;
-            });
-            const cch = proj.cssBlobCache || (proj.cssBlobCache = new Map());
-            const ant = cch.get(path);
-            if (ant && ant.txt === text) {
-              cssCache[path] = ant.url;
-              return ant.url;
-            }
-            if (ant && ant.url) {
-              try {
-                window.SynapsePreviewResources.retire(proj, ant.url);
-              } catch (e) {
-                ignorarErro(e, 'processCss');
-              }
-            }
-            const url = mkBlob(proj, text, 'text/css');
-            cch.set(path, { txt: text, url: url });
-            cssCache[path] = url;
-            return url;
-          };
-          for (const p of files.keys()) if (Core.extname(p) === '.css') processCss(p);
+	if (proj?.explicitBuildInProgress) {
+		proj.previewDirty = true;
+		return { ok: false, error: 'A Relay build is synchronizing this project.' };
+	}
+	if (!proj) {
+		hidePreviewLoading();
+		renderPreviewEmpty(true);
+		return;
+	}
+	window.SynapsePreviewRuntime.cancel(proj);
+	proj.previewEverOpened = true;
+	proj.previewDirty = false;
+	const token = (proj.buildToken = (proj.buildToken || 0) + 1);
+	window.SynapsePreviewBlobUsage.startBuild(proj);
+	const publishBrowserBuild = (html) => {
+		if (buildOptions.shouldMount && !buildOptions.shouldMount())
+			throw new Error('The project changed or Run was canceled before preview launch.');
+		setFrame(proj, html, token);
+		finishBuild(proj, token);
+		return { ok: token === proj.buildToken, html };
+	};
+	logCmd(proj, '⚙ Montando preview…');
+	if (proj.id === State.active) {
+		setStatus('run', 'Compilando preview…');
+		setPreviewLoadingDetail('Compilando o preview…');
+	}
+	try {
+		if (!proj.files.size) {
+			if (proj.id === State.active) {
+				hidePreviewLoading();
+				renderPreviewEmpty(true);
+			}
+			return;
+		}
+		const __alvo = buildOptions.browserOnly ? null : planoDoCompilador(proj);
+		if (__alvo) {
+			const okAuto = await autoCompilarPreview(proj, token, __alvo);
+			if (okAuto !== false) return;
+			if (token !== proj.buildToken) return;
+			try {
+				window.SynapsePreviewMountReset.clearMountedPreview(proj);
+			} catch (e) {
+				ignorarErro(e, 'buildPreview');
+			}
+			proj.lastHtml = null;
+		}
+		limparBlobsSoltos(proj);
+		if (proj.detect && proj.detect.framework === 'flutter' && !proj.entry) {
+			return publishBrowserBuild(flutterPreviewDoc(proj));
+		}
+		const files = proj.files;
+		const rawUrl = {};
+		const mimeOf = {};
+		const cacheRaw = proj.blobCache || (proj.blobCache = new Map());
+		const vivos = new Set();
+		let __bn = 0,
+			__novos = 0;
+		for (const [p, f] of files) {
+			const mime = Core.getMime(p);
+			mimeOf[p] = mime;
+			let ent = cacheRaw.get(p);
+			const igual =
+				!!ent &&
+				ent.mime === mime &&
+				((f.text != null && ent.txt === f.text && ent.bin == null) ||
+					(f.text == null && ent.txt == null && ent.bin === f.data));
+			if (!igual) {
+				if (ent && ent.url) {
+					try {
+						window.SynapsePreviewResources.retire(proj, ent.url);
+					} catch (e) {
+						ignorarErro(e, 'buildPreview');
+					}
+				}
+				ent = {
+					mime: mime,
+					txt: f.text != null ? f.text : null,
+					bin: f.text != null ? null : f.data,
+					url: mkBlob(proj, fileBytes(f), mime),
+				};
+				cacheRaw.set(p, ent);
+				__novos++;
+			}
+			rawUrl[p] = ent.url;
+			vivos.add(p);
+			if (++__bn % 150 === 0 && __novos > 0) {
+				if (proj.id === State.active)
+					setPreviewLoadingDetail(`Preparando arquivos... ${__bn}/${files.size}`);
+				await AuroraFix.yieldUI();
+				if (token !== proj.buildToken) return;
+			}
+		}
+		for (const [pv, entv] of [...cacheRaw]) {
+			if (!vivos.has(pv)) {
+				if (entv && entv.url) {
+					try {
+						window.SynapsePreviewResources.retire(proj, entv.url);
+					} catch (e) {
+						ignorarErro(e, 'buildPreview');
+					}
+				}
+				cacheRaw.delete(pv);
+			}
+		}
+		const cssCache = {};
+		const processCss = (path, seen) => {
+			if (cssCache[path]) return cssCache[path];
+			seen = seen || new Set();
+			if (seen.has(path)) return rawUrl[path];
+			seen.add(path);
+			const f = files.get(path);
+			if (!f) {
+				return rawUrl[path];
+			}
+			let text = fileText(f);
+			const dir = Core.dirname(path);
+			text = text.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/g, (m, q, ref) => {
+				const r = Core.joinPath(dir, ref);
+				if (files.has(r)) return `url(${rawUrl[r]})`;
+				return m;
+			});
+			text = text.replace(/@import\s+(["'])([^"']+)\1/g, (m, q, ref) => {
+				const r = Core.joinPath(dir, ref);
+				if (files.has(r)) return `@import "${processCss(r, seen)}"`;
+				return m;
+			});
+			const cch = proj.cssBlobCache || (proj.cssBlobCache = new Map());
+			const ant = cch.get(path);
+			if (ant && ant.txt === text) {
+				cssCache[path] = ant.url;
+				return ant.url;
+			}
+			if (ant && ant.url) {
+				try {
+					window.SynapsePreviewResources.retire(proj, ant.url);
+				} catch (e) {
+					ignorarErro(e, 'processCss');
+				}
+			}
+			const url = mkBlob(proj, text, 'text/css');
+			cch.set(path, { txt: text, url: url });
+			cssCache[path] = url;
+			return url;
+		};
+		for (const p of files.keys()) if (Core.extname(p) === '.css') processCss(p);
 
-          let importMap = null,
-          transformedEntryScripts = null;
-          const usesEsModule = (p) =>
-          ['.js', '.mjs', '.cjs'].includes(Core.extname(p)) &&
-          /(^|[^.\w$])(import|export)\b/.test(fileText(files.get(p)));
-          const needTransform =
-          (proj.detect.type !== 'static' && proj.detect.framework !== 'flutter') ||
-          [...files.keys()].some((p) => ['.jsx', '.tsx', '.ts'].includes(Core.extname(p))) ||
-          [...files.keys()].some(usesEsModule);
+		let importMap = null,
+			transformedEntryScripts = null;
+		const usesEsModule = (p) =>
+			['.js', '.mjs', '.cjs'].includes(Core.extname(p)) &&
+			/(^|[^.\w$])(import|export)\b/.test(fileText(files.get(p)));
+		const needTransform =
+			(proj.detect.type !== 'static' && proj.detect.framework !== 'flutter') ||
+			[...files.keys()].some((p) => ['.jsx', '.tsx', '.ts'].includes(Core.extname(p))) ||
+			[...files.keys()].some(usesEsModule);
 
-          let entry = proj.entry && files.has(proj.entry) ? proj.entry : null;
-          if (!entry) {
-            const be = AuroraFix.pickBestEntry(files, proj.detect);
-            if (be) {
-              entry = be;
-              proj.entry = be;
-            }
-          }
-          let entryDir = '',
-          html = '',
-          synth = null;
-          if (entry) {
-            entryDir = Core.dirname(entry);
-            html = fileText(files.get(entry));
-          } else {
-            synth = AuroraFix.synthesizeEntry(files);
-            if (synth) {
-              entryDir = synth.dir;
-              html = synth.html;
-              logCmd(
-                proj,
-                `Sem index.html no projeto: montei uma pagina host para "${synth.entrySource}".`,
-              );
-            }
-          }
-          if (!entry && !synth) {
-            const doc = synthIndex(files, rawUrl);
-            return publishBrowserBuild(doc);
-          }
-          const dom = new DOMParser().parseFromString(html, 'text/html');
-          let base = dom.querySelector('base');
-          if (!base) {
-            base = dom.createElement('base');
-            dom.head.insertBefore(base, dom.head.firstChild);
-          }
-          base.setAttribute('href', 'https://aurora.local/' + (entryDir ? entryDir + '/' : ''));
-          const resolve = (ref) => {
-            const clean = String(ref).replace(/[?#].*$/, '');
-            if (clean.startsWith('/')) {
-              const rel = clean.replace(/^\/+/, '');
-              const scoped = entryDir ? Core.joinPath(entryDir, rel) : rel;
-              if (files.has(scoped)) return scoped;
-              return rel;
-            }
-            let r = Core.joinPath(entryDir, clean);
-            return r.startsWith('/') ? r.slice(1) : r;
-          };
-          const entryFix = AuroraFix.fixEntryScripts(proj, dom, files, resolve, entryDir);
-          if (entry && AuroraFix.isBuildOutPath(entry))
-          logCmd(
-            proj,
-            `Entrada: "${entry}" - build pronto do projeto (o HTML da raiz aponta para um bundle que so existe \
+		let entry = proj.entry && files.has(proj.entry) ? proj.entry : null;
+		if (!entry) {
+			const be = AuroraFix.pickBestEntry(files, proj.detect);
+			if (be) {
+				entry = be;
+				proj.entry = be;
+			}
+		}
+		let entryDir = '',
+			html = '',
+			synth = null;
+		if (entry) {
+			entryDir = Core.dirname(entry);
+			html = fileText(files.get(entry));
+		} else {
+			synth = AuroraFix.synthesizeEntry(files);
+			if (synth) {
+				entryDir = synth.dir;
+				html = synth.html;
+				logCmd(
+					proj,
+					`Sem index.html no projeto: montei uma pagina host para "${synth.entrySource}".`,
+				);
+			}
+		}
+		if (!entry && !synth) {
+			const doc = synthIndex(files, rawUrl);
+			return publishBrowserBuild(doc);
+		}
+		const dom = new DOMParser().parseFromString(html, 'text/html');
+		let base = dom.querySelector('base');
+		if (!base) {
+			base = dom.createElement('base');
+			dom.head.insertBefore(base, dom.head.firstChild);
+		}
+		base.setAttribute('href', 'https://aurora.local/' + (entryDir ? entryDir + '/' : ''));
+		const resolve = (ref) => {
+			const clean = String(ref).replace(/[?#].*$/, '');
+			if (clean.startsWith('/')) {
+				const rel = clean.replace(/^\/+/, '');
+				const scoped = entryDir ? Core.joinPath(entryDir, rel) : rel;
+				if (files.has(scoped)) return scoped;
+				return rel;
+			}
+			let r = Core.joinPath(entryDir, clean);
+			return r.startsWith('/') ? r.slice(1) : r;
+		};
+		const entryFix = AuroraFix.fixEntryScripts(proj, dom, files, resolve, entryDir);
+		if (entry && AuroraFix.isBuildOutPath(entry))
+			logCmd(
+				proj,
+				`Entrada: "${entry}" - build pronto do projeto (o HTML da raiz aponta para um bundle que so existe \
 depois de compilar). Edicoes em src/ so aparecem apos rodar o build; tire a pasta dist/ do zip para \
 compilar do zero aqui.`,
-          );
-          try {
-            const rootsTxt = (entryFix.roots || [])
-            .map((r) => (files.has(r) ? fileText(files.get(r)) : ''))
-            .join('\n');
-            if (/history\.(push|replace)State|location\.pathname/.test(rootsTxt))
-            logCmd(
-              proj,
-              'Rotas por caminho detectadas. O preview roda em <iframe srcdoc>: location.pathname vale ' +
-              '"srcdoc", entao roteadores por caminho caem no 404 do proprio app. Liguei a ponte de ' +
-              'history (sem SecurityError) e comecei em "#/" - no app, caia para modo hash quando ' +
-              'location.protocol nao for http(s).',
-            );
-          } catch (e) {
-            ignorarErro(e, 'buildPreview');
-          }
-          let transform = null;
-          if (needTransform) {
-            transform = await tryBuildModules(
-              proj,
-              files,
-              rawUrl,
-              entryFix.roots,
-              processCss,
-              entryDir,
-            ).catch((e) => {
-                logErr(proj, 'Runtime build: ' + e.message);
-                return null;
-            });
-            if (transform) importMap = transform.importMap;
-          }
-          if (token !== proj.buildToken) return;
-          const projImportMaps = [];
-          dom.querySelectorAll('script').forEach((node) => {
-              if (String(node.getAttribute('type') || '').toLowerCase() !== 'importmap') return;
-              let text = (node.textContent || '').trim();
-              if (!text) {
-                const s = node.getAttribute('src');
-                if (s) {
-                  const r = resolve(s);
-                  if (files.has(r)) text = fileText(files.get(r)).trim();
-                }
-              }
-              if (!text) return;
-              let json = null;
-              try {
-                json = JSON.parse(text);
-              } catch (e) {
-                logErr(proj, 'Import map do projeto inválido (mantido como está): ' + e.message);
-              }
-              if (json && typeof json === 'object') {
-                resolveImportMapLocals(json, resolve, files, rawUrl, transform && transform.modules);
-                projImportMaps.push(json);
-                node.remove();
-              }
-          });
-          dom.querySelectorAll('[href]').forEach((node) => {
-              const v = node.getAttribute('href');
-              if (!v) return;
-              let r = resolve(v);
-              if (
-                !files.has(r) &&
-                node.tagName === 'LINK' &&
-                !/^([a-z][a-z0-9+.-]*:)?\/\//i.test(v) &&
-                !/^(data:|blob:|#|mailto:)/i.test(v)
-              ) {
-                const alt = AuroraFix.resolveMissingRef(files, r, entryDir);
-                if (alt) {
-                  logCmd(proj, `Entrada corrigida: "${v}" nao existe - usei "${alt}".`);
-                  r = alt;
-                }
-              }
-              if (files.has(r)) {
-                if (Core.extname(r) === '.css' && node.tagName === 'LINK')
-                node.setAttribute('href', processCss(r));
-                else node.setAttribute('href', rawUrl[r]);
-              }
-          });
-          dom.querySelectorAll('[src],[data-aurora-src]').forEach((node) => {
-              const fixed = node.getAttribute('data-aurora-src');
-              const v = node.getAttribute('src') || fixed;
-              if (!v) return;
-              const r = fixed || resolve(v);
-              if (fixed) node.removeAttribute('data-aurora-src');
-              if (!files.has(r)) {
-                if (
-                  node.tagName === 'SCRIPT' &&
-                  !/^([a-z]+:)?\/\//i.test(v) &&
-                  !v.startsWith('data:') &&
-                  !v.startsWith('blob:')
-                )
-                logErr(proj, `Script do HTML não encontrado: ${v} (resolvido: ${r})`);
-                return;
-              }
-              if (node.tagName === 'SCRIPT') {
-                const type = (node.getAttribute('type') || '').toLowerCase();
-                if (type === 'module' && transform && transform.modules[r]) {
-                  node.setAttribute('src', transform.modules[r]);
-                  node.setAttribute('type', 'module');
-                } else node.setAttribute('src', rawUrl[r]);
-              } else node.setAttribute('src', rawUrl[r]);
-          });
-          dom.querySelectorAll('script').forEach((node) => {
-              const t = (node.getAttribute('type') || '').toLowerCase();
-              if (
-                t !== 'module' ||
-                node.getAttribute('src') ||
-                !node.textContent ||
-                !node.textContent.trim()
-              )
-              return;
-              node.textContent = node.textContent.replace(
-                /(\bfrom\s*|\bimport\s*|\bexport\s*\*\s*from\s*|\bimport\()\s*(["'])([^"']+)\2/g,
-                      (m, pre, q, spec) => {
-                        if (!(spec.startsWith('.') || spec.startsWith('/'))) return m;
-                        const tryBases = [];
-                        if (spec.startsWith('/')) {
-                          const rel = Core.normalizePath(spec).replace(/^\/+/, '');
-                          if (entryDir) tryBases.push(Core.joinPath(entryDir, rel));
-                          tryBases.push(rel);
-                        } else tryBases.push(Core.joinPath(entryDir, spec));
-                        const ccx = [
-                          '',
-                          '.js',
-                          '.jsx',
-                          '.ts',
-                          '.tsx',
-                          '.mjs',
-                          '/index.js',
-                          '/index.jsx',
-                          '/index.ts',
-                          '/index.tsx',
-                        ];
-                        let h = null;
-                        for (const b of tryBases) {
-                          for (const e of ccx) {
-                            if (files.has(b + e)) {
-                              h = b + e;
-                              break;
-                            }
-                          }
-                          if (h) break;
-                        }
-                        if (h) {
-                          const u = (transform && transform.modules[h]) || rawUrl[h];
-                          return pre + q + u + q;
-                        }
-                        logErr(proj, 'Import do HTML não encontrado nos arquivos: ' + spec);
-                        return m;
-                      },
-                    );
-                });
-                dom.querySelectorAll('[srcset]').forEach((node) => {
-                    const v = node.getAttribute('srcset');
-                    node.setAttribute(
-                      'srcset',
-                      v.replace(/([^\s,]+)/g, (m) => {
-                          const r = resolve(m);
-                          return files.has(r) ? rawUrl[r] : m;
-                      }),
-                    );
-                });
-                dom.querySelectorAll('style').forEach((st) => {
-                    st.textContent = st.textContent.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/g, (m, q, ref) => {
-                            const r = resolve(ref);
-                            return files.has(r) ? `url(${rawUrl[r]})` : m;
-                        });
-                    });
-                    if (importMap || projImportMaps.length) {
-                      const finalMap = mergeImportMaps(importMap, projImportMaps, (msg) =>
-                        logCmd(proj, 'Import map: ' + msg),
-                      );
-                      const im = dom.createElement('script');
-                      im.setAttribute('type', 'importmap');
-                      im.textContent = JSON.stringify(finalMap);
-                      dom.head.insertBefore(im, dom.head.firstChild.nextSibling);
-                    }
-                    const shimMap = {};
-                    for (const p of files.keys()) shimMap['/' + p] = { u: cssCache[p] || rawUrl[p], m: mimeOf[p] };
-                    const srcMap = {};
-                    try {
-                      if (transform && transform.modules)
-                      for (const p of Object.keys(transform.modules)) srcMap[transform.modules[p]] = p;
-                      for (const p of Object.keys(rawUrl)) if (!srcMap[rawUrl[p]]) srcMap[rawUrl[p]] = p;
-                    } catch (e) {
-                      ignorarErro(e, 'buildPreview');
-                    }
-                    injetarPreludios(dom, {
-                        fontes: srcMap,
-                        arquivos: shimMap,
-                        viewport: proj.viewport,
-                        framework: proj.detect && proj.detect.framework,
-                    });
-                    const finalHtml = '<!DOCTYPE html>\n' + dom.documentElement.outerHTML;
-                    return publishBrowserBuild(finalHtml);
-                  } catch (err) {
-                    logErr(proj, 'Build: ' + err.message);
-                    if (proj.id === State.active) {
-                      hidePreviewLoading();
-                      setStatus('err', 'Erro ao compilar');
-                      showBuildCompileError(proj, err);
-                    }
-                    return { ok: false, error: err };
-                  }
-                }
-                function finishBuild(proj, token) {
-                  if (token !== proj.buildToken) return;
-                  logCmd(proj, 'Preview montado com sucesso ✓');
-                  if (proj.id === State.active) {
-                    setStatus('ok', 'Preview atualizado');
-                    renderStatusbar();
-                  }
-                }
-                function frameSrcdoc(html, options) {
-                  return window.SynapsePreviewRuntime.load(html, options);
-                }
-                function setFrame(proj, html, token) {
-                  if (token !== undefined && token !== proj.buildToken) return;
-                  proj.lastHtml = html;
-                  window.SynapsePreviewBlobUsage.publishBuild(proj);
-                  if (proj.id === State.active) {
-                    if (State.layout === 'editor') {
-                      proj.previewDirty = false;
-                      return;
-                    }
-                    proj.previewEverOpened = true;
-                    frameSrcdoc(html, { project: proj, token: proj.buildToken, force: true });
-                    if (proj.blocked && el.previewError && !el.previewError.classList.contains('hidden')) {
-                    } else {
-                      hidePreviewLoading();
-                      hidePreviewError();
-                      el.previewEmpty.classList.add('hidden');
-                      el.device.classList.remove('hidden');
-                    }
-                  }
-                  if (proj.channel) {
-                    try {
-                      proj.channel.postMessage({ type: 'html', html: html });
-                    } catch (e) {
-                      ignorarErro(e, 'setFrame');
-                    }
-                  }
-                  if (proj.popout && !proj.popout.closed) {
-                    try {
-                      proj.popout.postMessage({ __lp_popout: true, html: html }, '*');
-                    } catch (e) {
-                      ignorarErro(e, 'setFrame');
-                    }
-                  }
-                  try {
-                    headlessRefresh(proj, html);
-                  } catch (e) {
-                    ignorarErro(e, 'setFrame');
-                  }
-                }
-                function renderPreviewEmpty(empty) {
-                  try {
-                    AuroraFix.hideRunServerChip();
-                  } catch (e) {
-                    ignorarErro(e, 'renderPreviewEmpty');
-                  }
-                  if (empty) {
-                    window.SynapsePreviewRuntime.reset();
-                    el.device.classList.add('hidden');
-                    el.previewEmpty.classList.remove('hidden');
-                  }
-                }
-                function synthIndex(files, rawUrl) {
-                  let list = '';
-                  for (const p of [...files.keys()].sort())
-                  list += `<li><a href="${rawUrl[p]}" target="_blank">${esc(p)}</a></li>`;
-                  return `<!DOCTYPE html><meta charset="utf-8"><style>body{font-family:system-ui;background:#0b0d12;color:#e7ebf3;\
+			);
+		try {
+			const rootsTxt = (entryFix.roots || [])
+				.map((r) => (files.has(r) ? fileText(files.get(r)) : ''))
+				.join('\n');
+			if (/history\.(push|replace)State|location\.pathname/.test(rootsTxt))
+				logCmd(
+					proj,
+					'Rotas por caminho detectadas. O preview roda em <iframe srcdoc>: location.pathname vale ' +
+						'"srcdoc", entao roteadores por caminho caem no 404 do proprio app. Liguei a ponte de ' +
+						'history (sem SecurityError) e comecei em "#/" - no app, caia para modo hash quando ' +
+						'location.protocol nao for http(s).',
+				);
+		} catch (e) {
+			ignorarErro(e, 'buildPreview');
+		}
+		let transform = null;
+		if (needTransform) {
+			transform = await tryBuildModules(
+				proj,
+				files,
+				rawUrl,
+				entryFix.roots,
+				processCss,
+				entryDir,
+			).catch((e) => {
+				logErr(proj, 'Runtime build: ' + e.message);
+				return null;
+			});
+			if (transform) importMap = transform.importMap;
+		}
+		if (token !== proj.buildToken) return;
+		const projImportMaps = [];
+		dom.querySelectorAll('script').forEach((node) => {
+			if (String(node.getAttribute('type') || '').toLowerCase() !== 'importmap') return;
+			let text = (node.textContent || '').trim();
+			if (!text) {
+				const s = node.getAttribute('src');
+				if (s) {
+					const r = resolve(s);
+					if (files.has(r)) text = fileText(files.get(r)).trim();
+				}
+			}
+			if (!text) return;
+			let json = null;
+			try {
+				json = JSON.parse(text);
+			} catch (e) {
+				logErr(proj, 'Import map do projeto inválido (mantido como está): ' + e.message);
+			}
+			if (json && typeof json === 'object') {
+				resolveImportMapLocals(json, resolve, files, rawUrl, transform && transform.modules);
+				projImportMaps.push(json);
+				node.remove();
+			}
+		});
+		dom.querySelectorAll('[href]').forEach((node) => {
+			const v = node.getAttribute('href');
+			if (!v) return;
+			let r = resolve(v);
+			if (
+				!files.has(r) &&
+				node.tagName === 'LINK' &&
+				!/^([a-z][a-z0-9+.-]*:)?\/\//i.test(v) &&
+				!/^(data:|blob:|#|mailto:)/i.test(v)
+			) {
+				const alt = AuroraFix.resolveMissingRef(files, r, entryDir);
+				if (alt) {
+					logCmd(proj, `Entrada corrigida: "${v}" nao existe - usei "${alt}".`);
+					r = alt;
+				}
+			}
+			if (files.has(r)) {
+				if (Core.extname(r) === '.css' && node.tagName === 'LINK')
+					node.setAttribute('href', processCss(r));
+				else node.setAttribute('href', rawUrl[r]);
+			}
+		});
+		dom.querySelectorAll('[src],[data-aurora-src]').forEach((node) => {
+			const fixed = node.getAttribute('data-aurora-src');
+			const v = node.getAttribute('src') || fixed;
+			if (!v) return;
+			const r = fixed || resolve(v);
+			if (fixed) node.removeAttribute('data-aurora-src');
+			if (!files.has(r)) {
+				if (
+					node.tagName === 'SCRIPT' &&
+					!/^([a-z]+:)?\/\//i.test(v) &&
+					!v.startsWith('data:') &&
+					!v.startsWith('blob:')
+				)
+					logErr(proj, `Script do HTML não encontrado: ${v} (resolvido: ${r})`);
+				return;
+			}
+			if (node.tagName === 'SCRIPT') {
+				const type = (node.getAttribute('type') || '').toLowerCase();
+				if (type === 'module' && transform && transform.modules[r]) {
+					node.setAttribute('src', transform.modules[r]);
+					node.setAttribute('type', 'module');
+				} else node.setAttribute('src', rawUrl[r]);
+			} else node.setAttribute('src', rawUrl[r]);
+		});
+		dom.querySelectorAll('script').forEach((node) => {
+			const t = (node.getAttribute('type') || '').toLowerCase();
+			if (
+				t !== 'module' ||
+				node.getAttribute('src') ||
+				!node.textContent ||
+				!node.textContent.trim()
+			)
+				return;
+			node.textContent = node.textContent.replace(
+				/(\bfrom\s*|\bimport\s*|\bexport\s*\*\s*from\s*|\bimport\()\s*(["'])([^"']+)\2/g,
+				(m, pre, q, spec) => {
+					if (!(spec.startsWith('.') || spec.startsWith('/'))) return m;
+					const tryBases = [];
+					if (spec.startsWith('/')) {
+						const rel = Core.normalizePath(spec).replace(/^\/+/, '');
+						if (entryDir) tryBases.push(Core.joinPath(entryDir, rel));
+						tryBases.push(rel);
+					} else tryBases.push(Core.joinPath(entryDir, spec));
+					const ccx = [
+						'',
+						'.js',
+						'.jsx',
+						'.ts',
+						'.tsx',
+						'.mjs',
+						'/index.js',
+						'/index.jsx',
+						'/index.ts',
+						'/index.tsx',
+					];
+					let h = null;
+					for (const b of tryBases) {
+						for (const e of ccx) {
+							if (files.has(b + e)) {
+								h = b + e;
+								break;
+							}
+						}
+						if (h) break;
+					}
+					if (h) {
+						const u = (transform && transform.modules[h]) || rawUrl[h];
+						return pre + q + u + q;
+					}
+					logErr(proj, 'Import do HTML não encontrado nos arquivos: ' + spec);
+					return m;
+				},
+			);
+		});
+		dom.querySelectorAll('[srcset]').forEach((node) => {
+			const v = node.getAttribute('srcset');
+			node.setAttribute(
+				'srcset',
+				v.replace(/([^\s,]+)/g, (m) => {
+					const r = resolve(m);
+					return files.has(r) ? rawUrl[r] : m;
+				}),
+			);
+		});
+		dom.querySelectorAll('style').forEach((st) => {
+			st.textContent = st.textContent.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/g, (m, q, ref) => {
+				const r = resolve(ref);
+				return files.has(r) ? `url(${rawUrl[r]})` : m;
+			});
+		});
+		if (importMap || projImportMaps.length) {
+			const finalMap = mergeImportMaps(importMap, projImportMaps, (msg) =>
+				logCmd(proj, 'Import map: ' + msg),
+			);
+			const im = dom.createElement('script');
+			im.setAttribute('type', 'importmap');
+			im.textContent = JSON.stringify(finalMap);
+			dom.head.insertBefore(im, dom.head.firstChild.nextSibling);
+		}
+		const shimMap = {};
+		for (const p of files.keys()) shimMap['/' + p] = { u: cssCache[p] || rawUrl[p], m: mimeOf[p] };
+		const srcMap = {};
+		try {
+			if (transform && transform.modules)
+				for (const p of Object.keys(transform.modules)) srcMap[transform.modules[p]] = p;
+			for (const p of Object.keys(rawUrl)) if (!srcMap[rawUrl[p]]) srcMap[rawUrl[p]] = p;
+		} catch (e) {
+			ignorarErro(e, 'buildPreview');
+		}
+		injetarPreludios(dom, {
+			fontes: srcMap,
+			arquivos: shimMap,
+			viewport: proj.viewport,
+			framework: proj.detect && proj.detect.framework,
+		});
+		const finalHtml = '<!DOCTYPE html>\n' + dom.documentElement.outerHTML;
+		return publishBrowserBuild(finalHtml);
+	} catch (err) {
+		logErr(proj, 'Build: ' + err.message);
+		if (proj.id === State.active) {
+			hidePreviewLoading();
+			setStatus('err', 'Erro ao compilar');
+			showBuildCompileError(proj, err);
+		}
+		return { ok: false, error: err };
+	}
+}
+function finishBuild(proj, token) {
+	if (token !== proj.buildToken) return;
+	logCmd(proj, 'Preview montado com sucesso ✓');
+	if (proj.id === State.active) {
+		setStatus('ok', 'Preview atualizado');
+		renderStatusbar();
+	}
+}
+function frameSrcdoc(html, options) {
+	return window.SynapsePreviewRuntime.load(html, options);
+}
+function setFrame(proj, html, token) {
+	if (token !== undefined && token !== proj.buildToken) return;
+	proj.lastHtml = html;
+	window.SynapsePreviewBlobUsage.publishBuild(proj);
+	if (proj.id === State.active) {
+		if (State.layout === 'editor') {
+			proj.previewDirty = false;
+			return;
+		}
+		proj.previewEverOpened = true;
+		frameSrcdoc(html, { project: proj, token: proj.buildToken, force: true });
+		if (proj.blocked && el.previewError && !el.previewError.classList.contains('hidden')) {
+		} else {
+			hidePreviewLoading();
+			hidePreviewError();
+			el.previewEmpty.classList.add('hidden');
+			el.device.classList.remove('hidden');
+		}
+	}
+	if (proj.channel) {
+		try {
+			proj.channel.postMessage({ type: 'html', html: html });
+		} catch (e) {
+			ignorarErro(e, 'setFrame');
+		}
+	}
+	if (proj.popout && !proj.popout.closed) {
+		try {
+			proj.popout.postMessage({ __lp_popout: true, html: html }, '*');
+		} catch (e) {
+			ignorarErro(e, 'setFrame');
+		}
+	}
+	try {
+		headlessRefresh(proj, html);
+	} catch (e) {
+		ignorarErro(e, 'setFrame');
+	}
+}
+function renderPreviewEmpty(empty) {
+	try {
+		AuroraFix.hideRunServerChip();
+	} catch (e) {
+		ignorarErro(e, 'renderPreviewEmpty');
+	}
+	if (empty) {
+		window.SynapsePreviewRuntime.reset();
+		el.device.classList.add('hidden');
+		el.previewEmpty.classList.remove('hidden');
+	}
+}
+function synthIndex(files, rawUrl) {
+	let list = '';
+	for (const p of [...files.keys()].sort())
+		list += `<li><a href="${rawUrl[p]}" target="_blank">${esc(p)}</a></li>`;
+	return `<!DOCTYPE html><meta charset="utf-8"><style>body{font-family:system-ui;background:#0b0d12;color:#e7ebf3;\
 padding:30px}a{color:#6aa3ff}h1{font-size:18px}</style><h1>${files.size} arquivos (sem index.html)</h1>\
 <ul>${list}</ul>`;
-                }
+}
 
-                const CONSOLE_HOOK = [
-                  '(function(){',
-                  '  /* Preview gerenciado: nenhum conteudo pode armar o dialogo nativo "Sair do site?".',
-                  '     Assim a recompilacao (agente ou usuario) troca o documento na hora, sem confirmacao. */',
-                  '  try{',
-                  '    var _ael=window.addEventListener.bind(window);',
-                  '    window.addEventListener=function(t,fn,opt){if(t==="beforeunload"||t==="unload")return;return _ael(t,fn,opt);};',
-                  '    var _dael=document.addEventListener.bind(document);',
-                  '    document.addEventListener=function(t,fn,opt){if(t==="beforeunload"||t==="unload")return;return _dael(t,fn,opt);};',
-                  '    try{Object.defineProperty(window,"onbeforeunload",{configurable:true,get:function(){return null;},set:function(){}});}catch(_e){try{window.onbeforeunload=null;}catch(__e){}}',
-                  '    try{Object.defineProperty(document,"onbeforeunload",{configurable:true,get:function(){return null;},set:function(){}});}catch(_e){}',
-                  '  }catch(e){}',
-                  '  function ser(a){try{if(a instanceof Error)return a.stack||a.message;if(typeof ' +
-                  'a==="object")return JSON.stringify(a,function(k,v){return typeof v==="bigint"?String(v):' +
-                  'v;},2);return String(a);}catch(e){return String(a);}}',
-                  '  function send(level,args,src){try{parent.postMessage({__lp_console:true,level:level,text:Array.prototype.map.call(args,ser).join(" "),src:src||""},"*");}catch(e){}}',
-                  '  ["log","info","warn","error","debug"].forEach(function(m){var ' +
-                  'o=console[m]?console[m].bind(console):function(){};console[m]=function()' +
-                  '{send(m==="debug"?"log":m,arguments);o.apply(null,arguments);};});',
-                  '  function nm(f){try{var M=window.__LP_SRC__||{},b=String(f||"");if(!b)return "";' +
-                  'if(M[b])return M[b];for(var k in M){if(k===b||k.indexOf(b)>=0||b.indexOf(k)>=0)return ' +
-                  'M[k];}var t=b.split("/").pop();return M[t]||t;}catch(e){return String(f||"");}}',
-                  '  window.addEventListener("error",function(e){send("error",[(e.message||"Erro")+(e.filename?" • "+nm(e.filename)+":"+e.lineno+":"+e.colno:"")]);});',
-                  '  window.addEventListener("unhandledrejection",function(e){send("error",["Promise rejeitada: "+ser(e.reason)]);});',
-                  '  send("info",["▶ Preview iniciado "+new Date().toLocaleTimeString()]);',
-                  '})();',
-                ].join('\n');
-                const VISION_HOOK = String.raw`(function () {
+const CONSOLE_HOOK = [
+	'(function(){',
+	'  /* Preview gerenciado: nenhum conteudo pode armar o dialogo nativo "Sair do site?".',
+	'     Assim a recompilacao (agente ou usuario) troca o documento na hora, sem confirmacao. */',
+	'  try{',
+	'    var _ael=window.addEventListener.bind(window);',
+	'    window.addEventListener=function(t,fn,opt){if(t==="beforeunload"||t==="unload")return;return _ael(t,fn,opt);};',
+	'    var _dael=document.addEventListener.bind(document);',
+	'    document.addEventListener=function(t,fn,opt){if(t==="beforeunload"||t==="unload")return;return _dael(t,fn,opt);};',
+	'    try{Object.defineProperty(window,"onbeforeunload",{configurable:true,get:function(){return null;},set:function(){}});}catch(_e){try{window.onbeforeunload=null;}catch(__e){}}',
+	'    try{Object.defineProperty(document,"onbeforeunload",{configurable:true,get:function(){return null;},set:function(){}});}catch(_e){}',
+	'  }catch(e){}',
+	'  function ser(a){try{if(a instanceof Error)return a.stack||a.message;if(typeof ' +
+		'a==="object")return JSON.stringify(a,function(k,v){return typeof v==="bigint"?String(v):' +
+		'v;},2);return String(a);}catch(e){return String(a);}}',
+	'  function send(level,args,src){try{parent.postMessage({__lp_console:true,level:level,text:Array.prototype.map.call(args,ser).join(" "),src:src||""},"*");}catch(e){}}',
+	'  ["log","info","warn","error","debug"].forEach(function(m){var ' +
+		'o=console[m]?console[m].bind(console):function(){};console[m]=function()' +
+		'{send(m==="debug"?"log":m,arguments);o.apply(null,arguments);};});',
+	'  function nm(f){try{var M=window.__LP_SRC__||{},b=String(f||"");if(!b)return "";' +
+		'if(M[b])return M[b];for(var k in M){if(k===b||k.indexOf(b)>=0||b.indexOf(k)>=0)return ' +
+		'M[k];}var t=b.split("/").pop();return M[t]||t;}catch(e){return String(f||"");}}',
+	'  window.addEventListener("error",function(e){send("error",[(e.message||"Erro")+(e.filename?" • "+nm(e.filename)+":"+e.lineno+":"+e.colno:"")]);});',
+	'  window.addEventListener("unhandledrejection",function(e){send("error",["Promise rejeitada: "+ser(e.reason)]);});',
+	'  send("info",["▶ Preview iniciado "+new Date().toLocaleTimeString()]);',
+	'})();',
+].join('\n');
+const VISION_HOOK = String.raw`(function () {
 	if (window.__LP_VISION_V2__) return;
 	window.__LP_VISION_V2__ = true;
 	try {
@@ -3358,26 +3358,26 @@ padding:30px}a{color:#6aa3ff}h1{font-size:18px}</style><h1>${files.size} arquivo
 	});
 })();
 `;
-                const FETCH_SHIM = [
-                  '(function(){',
-                  '  var MAP=window.__LP_MAP__||{};',
-                  '  function lookup(u){try{var url=new URL(u,document.baseURI);if(url.origin==="https:' +
-                  '//aurora.local"){var k=decodeURIComponent(url.pathname);if(MAP[k])return MAP[k];' +
-                  'if(MAP[k.replace(/^\\//,"")])return MAP[k.replace(/^\\//,"")];}}catch(e){}return null;}',
-                  '  var of=window.fetch?window.fetch.bind(window):null;',
-                  '  window.fetch=function(input,init){var u=(typeof input==="string")?input:' +
-                  '(input&&input.url);var hit=lookup(u);if(hit)return of?of(hit.u,init):fetch(hit.u,init);' +
-                  'return of?of(input,init):Promise.reject(new Error("fetch indisponível"));};',
-                  '  var OX=window.XMLHttpRequest;if(OX){var op=OX.prototype.open;OX.prototype.open=function(m,u){var hit=lookup(u);return op.call(this,m,hit?hit.u:u);};}',
-                  '  function redir(v){if(typeof v!=="string"||!v)return v;var hit=lookup(v);return hit?hit.u:v;}',
-                  '  function patchSrc(C){try{if(!C||!C.prototype)return;var ' +
-                  'd=Object.getOwnPropertyDescriptor(C.prototype,"src");if(!d||!d.set)return;' +
-                  'Object.defineProperty(C.prototype,"src",{configurable:true,enumerable:d.enumerable,get:' +
-                  'd.get,set:function(v){d.set.call(this,redir(v));}});}catch(e){}}',
-                  '  [window.HTMLImageElement,window.HTMLMediaElement,window.HTMLSourceElement,window.HTMLTrackElement].forEach(patchSrc);',
-                  '  try{var SA=Element.prototype.setAttribute;Element.prototype.setAttribute=function(n,v)' +
-                  '{if(n&&typeof v==="string"&&(n==="src"||n==="href"||n==="xlink:href"))v=redir(v);return ' +
-                  'SA.call(this,n,v);};}catch(e){}',
-                  '  try{var SI=window.Image;if(SI){window.Image=function(w,h){var img=new SI(w,h);return img;};window.Image.prototype=SI.prototype;}}catch(e){}',
-                  '})();',
-                ].join('\n');
+const FETCH_SHIM = [
+	'(function(){',
+	'  var MAP=window.__LP_MAP__||{};',
+	'  function lookup(u){try{var url=new URL(u,document.baseURI);if(url.origin==="https:' +
+		'//aurora.local"){var k=decodeURIComponent(url.pathname);if(MAP[k])return MAP[k];' +
+		'if(MAP[k.replace(/^\\//,"")])return MAP[k.replace(/^\\//,"")];}}catch(e){}return null;}',
+	'  var of=window.fetch?window.fetch.bind(window):null;',
+	'  window.fetch=function(input,init){var u=(typeof input==="string")?input:' +
+		'(input&&input.url);var hit=lookup(u);if(hit)return of?of(hit.u,init):fetch(hit.u,init);' +
+		'return of?of(input,init):Promise.reject(new Error("fetch indisponível"));};',
+	'  var OX=window.XMLHttpRequest;if(OX){var op=OX.prototype.open;OX.prototype.open=function(m,u){var hit=lookup(u);return op.call(this,m,hit?hit.u:u);};}',
+	'  function redir(v){if(typeof v!=="string"||!v)return v;var hit=lookup(v);return hit?hit.u:v;}',
+	'  function patchSrc(C){try{if(!C||!C.prototype)return;var ' +
+		'd=Object.getOwnPropertyDescriptor(C.prototype,"src");if(!d||!d.set)return;' +
+		'Object.defineProperty(C.prototype,"src",{configurable:true,enumerable:d.enumerable,get:' +
+		'd.get,set:function(v){d.set.call(this,redir(v));}});}catch(e){}}',
+	'  [window.HTMLImageElement,window.HTMLMediaElement,window.HTMLSourceElement,window.HTMLTrackElement].forEach(patchSrc);',
+	'  try{var SA=Element.prototype.setAttribute;Element.prototype.setAttribute=function(n,v)' +
+		'{if(n&&typeof v==="string"&&(n==="src"||n==="href"||n==="xlink:href"))v=redir(v);return ' +
+		'SA.call(this,n,v);};}catch(e){}',
+	'  try{var SI=window.Image;if(SI){window.Image=function(w,h){var img=new SI(w,h);return img;};window.Image.prototype=SI.prototype;}}catch(e){}',
+	'})();',
+].join('\n');

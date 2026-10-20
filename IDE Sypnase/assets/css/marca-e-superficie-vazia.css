@@ -1,0 +1,143 @@
+.brand .logo,
+.topbar .brand .logo {
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+	padding: 0;
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+}
+.brand .logo::before,
+.brand .logo::after {
+	content: none;
+	display: none;
+}
+.brand .logo img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: inherit;
+	object-fit: contain;
+}
+.pe-card .wl-logo,
+.wl-logo {
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+	padding: 0;
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+}
+.wl-logo::before,
+.wl-logo::after {
+	content: none;
+	display: none;
+}
+.wl-logo img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: inherit;
+	object-fit: contain;
+}
+
+.btn .btn-label {
+	display: inline;
+	white-space: nowrap;
+}
+
+html.aurora-narrow .topbar-actions .menu-wrap {
+	display: flex;
+	align-items: center;
+}
+html.aurora-narrow .topbar-actions #importBtn,
+html.aurora-narrow .topbar-actions #exportBtn {
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	align-self: center;
+	width: 30px;
+	min-width: 30px;
+	max-width: 30px;
+	height: 30px;
+	min-height: 30px;
+	max-height: 30px;
+	gap: 0;
+	padding: 0;
+	border-radius: 4px;
+	font-size: 0;
+	line-height: 0;
+	letter-spacing: 0;
+	text-indent: 0;
+	text-align: center;
+	overflow: hidden;
+}
+html.aurora-narrow .topbar-actions #importBtn .btn-label,
+html.aurora-narrow .topbar-actions #exportBtn .btn-label {
+	display: none;
+}
+html.aurora-narrow .topbar-actions #importBtn [data-ico],
+html.aurora-narrow .topbar-actions #exportBtn [data-ico] {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	padding: 0;
+	font-size: 0;
+	line-height: 0;
+}
+html.aurora-narrow .topbar-actions #importBtn .icon,
+html.aurora-narrow .topbar-actions #exportBtn .icon {
+	display: block;
+	width: 16px;
+	height: 16px;
+	margin: 0;
+}
+
+html.sem-arquivo #autocompleteBtn,
+html.sem-arquivo #fmtBtn,
+html.sem-arquivo #foldBtn,
+html.sem-arquivo #miniBtn,
+html.sem-arquivo #qopenBtn,
+html.sem-arquivo #findInFileBtn,
+html.sem-arquivo #histBtn,
+html.sem-arquivo #editorDirty,
+html.sem-arquivo #editorPath {
+	display: none !important;
+}
+html.sem-arquivo .editor-tabs:empty,
+html.sem-arquivo .topbar .tabs:empty {
+	display: none !important;
+}
+html.sem-arquivo .intellisense-toolbar,
+html.sem-arquivo .editor-analysis-band {
+	display: none !important;
+}
+html.sem-projeto #buildSystemBtn,
+html.sem-projeto #debugBtn {
+	display: none !important;
+}
+html.sem-projeto #deviceSeg,
+html.sem-projeto #layoutSeg,
+html.sem-projeto #dims,
+html.sem-projeto #previewZoom,
+html.sem-projeto #reloadBtn,
+html.sem-projeto #popoutBtn,
+html.sem-projeto .toolbar > .tdiv,
+html.sem-projeto .explorer .ex-search,
+html.sem-projeto #collapseBtn {
+	display: none !important;
+}
+html.sem-projeto .toolbar {
+	justify-content: flex-end;
+}
+html.sem-projeto .editor-head {
+	opacity: 0.72;
+}

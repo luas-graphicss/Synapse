@@ -1,0 +1,59 @@
+{
+	"id": "synapse.sort-lines",
+	"name": "Ordenar linhas",
+	"version": "1.0.0",
+	"publisher": "synapse",
+	"icon": "media/icon.png",
+	"description": "Ordena, inverte, remove duplicadas e limpa espaços das linhas selecionadas no editor.",
+	"engines": { "synapse": ">=2.5.0" },
+	"main": "main.js",
+	"categories": ["Outros"],
+	"license": "MIT",
+	"repository": "https://github.com/pedrinnieeva/synapse",
+	"activationEvents": [
+		"onCommand:synapse.sortLines.ascending",
+		"onCommand:synapse.sortLines.descending",
+		"onCommand:synapse.sortLines.unique",
+		"onCommand:synapse.sortLines.reverse",
+		"onCommand:synapse.sortLines.trimTrailing"
+	],
+	"permissions": ["editor", "mcp"],
+	"contributes": {
+		"commands": [
+			{ "command": "synapse.sortLines.ascending", "title": "Ordenar linhas (A→Z)", "category": "Editor" },
+			{ "command": "synapse.sortLines.descending", "title": "Ordenar linhas (Z→A)", "category": "Editor" },
+			{ "command": "synapse.sortLines.unique", "title": "Remover linhas duplicadas", "category": "Editor" },
+			{ "command": "synapse.sortLines.reverse", "title": "Inverter ordem das linhas", "category": "Editor" },
+			{ "command": "synapse.sortLines.trimTrailing", "title": "Remover espaços no fim das linhas", "category": "Editor" }
+		],
+		"keybindings": [
+			{ "command": "synapse.sortLines.ascending", "key": "f9", "when": "editorTextFocus" },
+			{ "command": "synapse.sortLines.descending", "key": "shift+f9", "when": "editorTextFocus" }
+		],
+		"menus": {
+			"editor/context": [
+				{ "command": "synapse.sortLines.ascending", "group": "1_modificacao@8" },
+				{ "command": "synapse.sortLines.unique", "group": "1_modificacao@9" }
+			]
+		},
+		"mcpTools": [
+			{
+				"name": "sort_text",
+				"title": "Ordenar linhas de um texto",
+				"description": "Recebe um texto e devolve as linhas ordenadas; opcionalmente remove duplicadas e inverte.",
+				"readOnly": true,
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"text": { "type": "string" },
+						"descending": { "type": "boolean" },
+						"unique": { "type": "boolean" },
+						"caseSensitive": { "type": "boolean" }
+					},
+					"required": ["text"]
+				}
+			}
+		]
+	}
+}
+

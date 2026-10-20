@@ -1,0 +1,38 @@
+{
+	"id": "synapse.bug-report",
+	"name": "Relatar bug",
+	"version": "1.0.0",
+	"publisher": "synapse",
+	"icon": "media/icon.png",
+	"description": "Formulário para relatar problemas da IDE com envio ao suporte e fallback por e-mail.",
+	"engines": { "synapse": ">=2.5.0" },
+	"main": "main.js",
+	"categories": ["Outros"],
+	"license": "MIT",
+	"repository": "https://github.com/pedrinnieeva/synapse",
+	"activationEvents": ["onCommand:synapse.bugReport.open"],
+	"permissions": ["webview", "network:self", "mcp"],
+	"contributes": {
+		"commands": [
+			{ "command": "synapse.bugReport.open", "title": "Relatar um bug", "category": "Ajuda" }
+		],
+		"mcpTools": [
+			{
+				"name": "draft",
+				"title": "Rascunhar relato de bug",
+				"description": "Monta o texto de um relato de bug no formato usado pelo suporte da Synapse, sem enviar nada.",
+				"readOnly": true,
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"title": { "type": "string" },
+						"description": { "type": "string" },
+						"steps": { "type": "string" }
+					},
+					"required": ["title", "description"]
+				}
+			}
+		]
+	}
+}
+

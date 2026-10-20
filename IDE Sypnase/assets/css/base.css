@@ -10,7 +10,7 @@
   --txt-3: #6b7488;
   --acc: #6aa3ff;
   --acc-2: #8b7bff;
-  --acc-grad: linear-gradient(135deg, #6aa3ff, #8b7bff);
+  --acc-grad: var(--acc);
   --acc-rgb: 106, 163, 255;
   --ok: #3ecf8e;
   --warn: #ffb454;
@@ -27,11 +27,20 @@
   --preview-a: #0e1118;
   --preview-b: #0c0f15;
   --preview-veil: rgba(11, 13, 18, 0.92);
-  --r: 10px;
-  --r-sm: 7px;
-  --sh: 0 8px 30px rgba(0, 0, 0, 0.35);
-  --mono: 'SFMono-Regular', 'JetBrains Mono', 'Fira Code', Consolas, 'Liberation Mono', monospace;
-  --sans:		-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --r: 6px;
+  --r-sm: 4px;
+  --r-xs: 3px;
+  --r-lg: 8px;
+  --sh: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 10px 26px rgba(0, 0, 0, 0.4);
+  --ui:
+		'IBM Plex Sans', 'IBM Plex Sans Fallback', -apple-system, BlinkMacSystemFont,
+		'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', 'Noto Sans', Arial,
+		sans-serif;
+  --mono:
+		ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Mono', Consolas,
+		'Liberation Mono', Menlo, monospace;
+  --sans: var(--ui);
+  --serif: var(--ui);
   --t: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 * {
@@ -84,7 +93,7 @@ svg {
   gap: 10px;
   height: 46px;
   padding: 0 12px;
-  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  background: var(--bg-2);
   border-bottom: 1px solid var(--line);
   position: relative;
   z-index: 30;
@@ -101,22 +110,21 @@ svg {
 .brand .logo {
   width: 28px;
   height: 28px;
-  border-radius: 9px;
+  border-radius: 4px;
   display: grid;
   place-items: center;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 3px 12px rgba(var(--acc-rgb), 0.4);
+  box-shadow: none;
   transition: transform var(--t);
-  animation: aurGlow 4.5s ease-in-out infinite;
 }
 .brand .logo::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(		115deg,		transparent 35%,		rgba(255, 255, 255, 0.6) 50%,		transparent 65%	);
+  display: none;
   transform: translateX(-130%);
-  animation: auroraSheen 4.5s ease-in-out infinite;
+  animation: none;
   pointer-events: none;
 }
 .brand .logo:hover {
@@ -127,7 +135,7 @@ svg {
   height: 100%;
 }
 .brand .logo svg .aur-band {
-  animation: aurShimmer 3.4s ease-in-out infinite;
+  animation: none;
 }
 .brand .logo svg .aur-band:nth-child(2) {
   animation-duration: 4.1s;
@@ -138,7 +146,7 @@ svg {
   animation-delay: -2.2s;
 }
 .brand .logo svg .aur-star {
-  animation: aurTwinkle 2.8s ease-in-out infinite;
+  animation: none;
 }
 .brand .logo svg .aur-star:nth-child(2) {
   animation-delay: 0.9s;
@@ -205,13 +213,7 @@ svg {
 .brand b {
   font-size: 13.5px;
   letter-spacing: 0.2px;
-  background: linear-gradient(90deg, #54e3c2, #5cc8ff, #8b7bff, #7ce0c6, #5cc8ff);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  animation: auroraText 5s linear infinite;
+  color: var(--txt);
 }
 .brand span {
   color: var(--txt-3);
@@ -237,7 +239,7 @@ svg {
   gap: 8px;
   height: 32px;
   padding: 0 9px 0 11px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--bg-1);
   border: 1px solid transparent;
   color: var(--txt-2);
@@ -275,7 +277,7 @@ svg {
 .tab .tclose {
   width: 18px;
   height: 18px;
-  border-radius: 5px;
+  border-radius: 3px;
   display: grid;
   place-items: center;
   color: var(--txt-3);
@@ -303,7 +305,7 @@ svg {
   gap: 7px;
   height: 32px;
   padding: 0 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--bg-3);
   color: var(--txt-2);
   font-weight: 600;
@@ -315,7 +317,7 @@ svg {
 .btn:hover {
   color: var(--txt);
   border-color: var(--line-2);
-  transform: translateY(-1px);
+  background: var(--bg-2);
 }
 .btn:active {
   transform: translateY(0);
@@ -325,16 +327,13 @@ svg {
   color: #08111f;
   border-color: transparent;
   font-weight: 700;
-  box-shadow:		0 4px 14px rgba(var(--acc-rgb), 0.32),		inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  box-shadow: none;
 }
 .btn.primary:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  box-shadow:		0 7px 22px rgba(var(--acc-rgb), 0.45),		inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  filter: brightness(1.06);
 }
 .btn.primary:active {
-  transform: translateY(0);
-  box-shadow: 0 3px 10px rgba(var(--acc-rgb), 0.3);
+  filter: brightness(0.98);
 }
 .btn .icon {
   width: 15px;
@@ -350,7 +349,7 @@ svg {
   min-width: 230px;
   background: var(--bg-2);
   border: 1px solid var(--line-2);
-  border-radius: 12px;
+  border-radius: 5px;
   box-shadow: var(--sh);
   padding: 6px;
   opacity: 0;
@@ -369,7 +368,7 @@ svg {
   align-items: center;
   gap: 11px;
   padding: 9px 10px;
-  border-radius: 8px;
+  border-radius: 4px;
   width: 100%;
   text-align: left;
   color: var(--txt-2);
@@ -407,7 +406,7 @@ svg {
   min-width: 190px;
   background: var(--bg-2);
   border: 1px solid var(--line-2);
-  border-radius: 11px;
+  border-radius: 4px;
   box-shadow: var(--sh);
   padding: 5px;
   animation: pop 0.13s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -417,7 +416,7 @@ svg {
   align-items: center;
   gap: 9px;
   padding: 7px 10px;
-  border-radius: 7px;
+  border-radius: 3px;
   color: var(--txt-2);
   font-size: 12.5px;
   cursor: pointer;
@@ -482,7 +481,7 @@ svg {
   align-items: center;
   gap: 6px;
   padding: 8px 4px;
-  border-radius: 10px;
+  border-radius: 4px;
   border: 1px solid var(--line);
   background: var(--bg-1);
   transition: var(--t);
@@ -499,7 +498,7 @@ svg {
 .tm-sw {
   width: 36px;
   height: 36px;
-  border-radius: 9px;
+  border-radius: 4px;
   position: relative;
   display: block;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -570,7 +569,7 @@ svg {
   margin-top: 10px;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 4px;
   background: var(--bg);
   display: flex;
   flex-direction: column;
@@ -584,7 +583,7 @@ svg {
 .tm-prev {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid var(--line-2);
   flex: none;
   background: var(--acc);
@@ -594,7 +593,7 @@ svg {
   height: 30px;
   background: var(--bg-2);
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: 3px;
   color: var(--txt);
   font-family: var(--mono);
   font-size: 12.5px;
@@ -618,7 +617,7 @@ svg {
   appearance: none;
   width: 100%;
   height: 8px;
-  border-radius: 5px;
+  border-radius: 3px;
   background: var(--bg-3);
   cursor: pointer;
 }
@@ -658,7 +657,7 @@ svg {
   gap: 2px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 4px;
   padding: 3px;
 }
 .seg button {
@@ -667,7 +666,7 @@ svg {
   gap: 6px;
   height: 26px;
   padding: 0 9px;
-  border-radius: 6px;
+  border-radius: 3px;
   color: var(--txt-3);
   font-weight: 600;
   font-size: 12px;
@@ -699,7 +698,7 @@ svg {
   height: 28px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: 3px;
   color: var(--txt);
   text-align: center;
   font-family: var(--mono);
@@ -723,7 +722,7 @@ svg {
 .tbtn {
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: 4px;
   display: grid;
   place-items: center;
   color: var(--txt-2);
@@ -747,7 +746,7 @@ svg {
   min-width: 15px;
   height: 15px;
   padding: 0 3px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--err);
   color: #fff;
   font-size: 9.5px;
@@ -803,7 +802,7 @@ svg {
   gap: 7px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 0 9px;
   height: 30px;
 }
@@ -831,7 +830,7 @@ svg {
 }
 .tree::-webkit-scrollbar-thumb,.console-body::-webkit-scrollbar-thumb,.editor-scroll::-webkit-scrollbar-thumb {
   background: var(--line-2);
-  border-radius: 6px;
+  border-radius: 3px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -843,7 +842,7 @@ svg {
   align-items: center;
   gap: 7px;
   padding: 4px 7px;
-  border-radius: 7px;
+  border-radius: 3px;
   color: var(--txt-2);
   cursor: pointer;
   transition:		background 0.12s,		color 0.12s;
@@ -981,7 +980,7 @@ svg {
   gap: 7px;
   height: 27px;
   padding: 0 6px 0 10px;
-  border-radius: 7px 7px 0 0;
+  border-radius: 3px 3px 0 0;
   background: transparent;
   color: var(--txt-3);
   max-width: 200px;
@@ -1026,7 +1025,7 @@ svg {
 .etab .etclose {
   width: 16px;
   height: 16px;
-  border-radius: 5px;
+  border-radius: 3px;
   display: grid;
   place-items: center;
   color: var(--txt-3);
@@ -1104,7 +1103,7 @@ svg {
 .gln .foldn {
   color: var(--acc);
   background: rgba(var(--acc-rgb), 0.13);
-  border-radius: 9px;
+  border-radius: 4px;
   font-size: 9px;
   padding: 0 5px;
   height: 13px;
@@ -1147,7 +1146,7 @@ svg {
 .tree.drop-root {
   outline: 2px dashed rgba(var(--acc-rgb), 0.45);
   outline-offset: -4px;
-  border-radius: 8px;
+  border-radius: 4px;
 }
 .code-wrap {
   position: relative;
@@ -1234,7 +1233,7 @@ svg {
   border: 1px solid var(--line);
   background: var(--bg-3);
   color: var(--txt-2);
-  border-radius: 7px;
+  border-radius: 3px;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -1279,7 +1278,7 @@ svg {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 3px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
   cursor: zoom-in;
   animation: mvfade 0.25s ease;
@@ -1381,16 +1380,16 @@ svg {
 }
 .device {
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   transition:		width var(--t),		height var(--t);
   position: relative;
 }
 .device.bordered {
   border: 10px solid #11141b;
-  border-radius: 26px;
-  box-shadow:		0 18px 60px rgba(0, 0, 0, 0.6),		inset 0 0 0 1px #2a3142;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 1px #2a3142;
 }
 .device iframe {
   border: none;
@@ -1413,14 +1412,13 @@ svg {
 .preview-empty .pe-icon {
   width: 56px;
   height: 56px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(var(--acc-rgb), 0.16), rgba(139, 123, 255, 0.12));
-  border: 1px solid rgba(var(--acc-rgb), 0.28);
+  border-radius: 6px;
+  background: var(--bg-3);
+  border: 1px solid var(--line-2);
   display: grid;
   place-items: center;
-  margin: 0 auto 18px;
+  margin: 0 auto 14px;
   color: var(--acc);
-  box-shadow: 0 6px 20px rgba(var(--acc-rgb), 0.16);
 }
 .preview-empty .pe-icon .icon {
   width: 26px;
@@ -1441,22 +1439,21 @@ svg {
   animation: wlIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .wl-logo {
-  width: 84px;
-  height: 84px;
+  width: 54px;
+  height: 54px;
   margin: 0 auto 18px;
-  border-radius: 22px;
+  border-radius: 8px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 10px 30px rgba(var(--acc-rgb), 0.28);
-  animation: wlFloat 5s ease-in-out infinite;
+  box-shadow: none;
 }
 .wl-logo::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(		115deg,		transparent 35%,		rgba(255, 255, 255, 0.5) 50%,		transparent 65%	);
+  display: none;
   transform: translateX(-130%);
-  animation: auroraSheen 4.5s ease-in-out infinite;
+  animation: none;
   pointer-events: none;
 }
 .wl-logo svg {
@@ -1465,7 +1462,7 @@ svg {
   display: block;
 }
 .wl-logo svg .aur-band {
-  animation: aurShimmer 3.4s ease-in-out infinite;
+  animation: none;
 }
 .wl-logo svg .aur-band:nth-child(2) {
   animation-duration: 4.1s;
@@ -1476,7 +1473,7 @@ svg {
   animation-delay: -2.2s;
 }
 .wl-logo svg .aur-star {
-  animation: aurTwinkle 2.8s ease-in-out infinite;
+  animation: none;
 }
 .wl-logo svg .aur-star:nth-child(2) {
   animation-delay: 0.9s;
@@ -1485,13 +1482,7 @@ svg {
   animation-delay: 1.7s;
 }
 .wl-name {
-  background: linear-gradient(90deg, #54e3c2, #5cc8ff, #8b7bff, #7ce0c6, #5cc8ff);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  animation: auroraText 5s linear infinite;
+  color: var(--txt);
 }
 .wl-actions {
   display: flex;
@@ -1506,7 +1497,7 @@ svg {
   gap: 7px;
   height: 38px;
   padding: 0 16px;
-  border-radius: 10px;
+  border-radius: 4px;
   background: var(--bg-2);
   border: 1px solid var(--line-2);
   color: var(--txt);
@@ -1613,7 +1604,7 @@ svg {
   text-align: center;
   padding: 40px;
   background: var(--preview-veil);
-  backdrop-filter: blur(3px);
+  
   animation: fade 0.2s;
 }
 .preview-loading .pl-card {
@@ -1686,7 +1677,7 @@ svg {
   width: 100%;
   background: var(--bg-1);
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 6px;
   padding: 24px 24px 20px;
   box-shadow: var(--sh);
 }
@@ -1699,7 +1690,7 @@ svg {
   flex: none;
   width: 42px;
   height: 42px;
-  border-radius: 11px;
+  border-radius: 4px;
   display: grid;
   place-items: center;
   background: rgba(255, 107, 107, 0.13);
@@ -1748,7 +1739,7 @@ svg {
 .preview-error code {
   background: var(--bg-3);
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 1px 6px;
   font-family: var(--mono);
   font-size: 12px;
@@ -1759,7 +1750,7 @@ svg {
   position: relative;
   background: var(--bg-3);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 14px;
   font-family: var(--mono);
   font-size: 12.5px;
@@ -1775,7 +1766,7 @@ svg {
   border: 1px solid var(--line-2);
   background: var(--bg-2);
   color: var(--txt-2);
-  border-radius: 7px;
+  border-radius: 3px;
   padding: 4px 9px;
   font-size: 11px;
   cursor: pointer;
@@ -1794,7 +1785,7 @@ svg {
   border: 1px solid var(--line-2);
   background: var(--bg-2);
   color: var(--txt);
-  border-radius: 9px;
+  border-radius: 4px;
   padding: 9px 14px;
   font-size: 13px;
   cursor: pointer;
@@ -1822,7 +1813,7 @@ svg {
   margin-top: 8px;
   background: var(--bg-2);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 12px;
   font-family: var(--mono);
   font-size: 12px;
@@ -1843,7 +1834,7 @@ svg {
   margin-top: 14px;
   padding: 7px 12px;
   border: 1px dashed var(--line-2);
-  border-radius: 9px;
+  border-radius: 4px;
   color: var(--txt-3);
   font-size: 12px;
 }
@@ -1874,7 +1865,7 @@ svg {
 .console-tabs button {
   height: 20px;
   padding: 0 7px;
-  border-radius: 5px;
+  border-radius: 3px;
   color: var(--txt-3);
   font-weight: 600;
   font-size: 10.5px;
@@ -1895,7 +1886,7 @@ svg {
   font-family: var(--mono);
   font-size: 9px;
   padding: 0 4px;
-  border-radius: 5px;
+  border-radius: 3px;
   background: var(--bg);
   color: var(--txt-3);
 }
@@ -1975,7 +1966,7 @@ svg {
   min-width: 16px;
   height: 15px;
   padding: 0 4px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--bg-3);
   color: var(--txt-2);
   font-size: 9.5px;
@@ -1988,7 +1979,7 @@ svg {
   height: 24px;
   width: 130px;
   padding: 0 9px;
-  border-radius: 6px;
+  border-radius: 3px;
   background: var(--bg);
   border: 1px solid var(--line);
   color: var(--txt);
@@ -2057,7 +2048,7 @@ svg {
   inset: 0;
   z-index: 200;
   background: rgba(8, 11, 18, 0.82);
-  backdrop-filter: blur(4px);
+  
   display: none;
   place-items: center;
 }
@@ -2067,7 +2058,7 @@ svg {
 }
 .dropzone .dz-card {
   border: 2px dashed var(--acc);
-  border-radius: 20px;
+  border-radius: 6px;
   padding: 46px 64px;
   text-align: center;
   background: var(--bg-1);
@@ -2114,7 +2105,7 @@ svg {
   background: var(--bg-2);
   border: 1px solid var(--line-2);
   border-left: 3px solid var(--acc);
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 11px 14px;
   box-shadow: var(--sh);
   min-width: 240px;
@@ -2258,7 +2249,7 @@ svg {
   --txt-3: #65749c;
   --acc: #22d3ee;
   --acc-2: #3b82f6;
-  --acc-grad: linear-gradient(135deg, #22d3ee, #3b82f6);
+  --acc-grad: var(--acc);
   --acc-rgb: 34, 211, 238;
   --ok: #34d399;
   --warn: #fbbf24;
@@ -2281,7 +2272,7 @@ svg {
   --txt-3: #8b95a7;
   --acc: #88c0d0;
   --acc-2: #81a1c1;
-  --acc-grad: linear-gradient(135deg, #8fbcbb, #81a1c1);
+  --acc-grad: var(--acc);
   --acc-rgb: 136, 192, 208;
   --ok: #a3be8c;
   --warn: #ebcb8b;
@@ -2304,7 +2295,7 @@ svg {
   --txt-3: #9c7888;
   --acc: #fb7185;
   --acc-2: #f472b6;
-  --acc-grad: linear-gradient(135deg, #fb7185, #f472b6);
+  --acc-grad: var(--acc);
   --acc-rgb: 251, 113, 133;
   --ok: #34d399;
   --warn: #fbbf24;
@@ -2327,7 +2318,7 @@ svg {
   --txt-3: #6f9582;
   --acc: #34d399;
   --acc-2: #10b981;
-  --acc-grad: linear-gradient(135deg, #34d399, #10b981);
+  --acc-grad: var(--acc);
   --acc-rgb: 52, 211, 153;
   --ok: #4ade80;
   --warn: #fbbf24;
@@ -2344,7 +2335,7 @@ svg {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: 4px;
   background: var(--bg-3);
   color: var(--txt-2);
   border: 1px solid var(--line);
@@ -2367,7 +2358,7 @@ svg {
   inset: 0;
   z-index: 300;
   background: rgba(8, 11, 18, 0.55);
-  backdrop-filter: blur(3px);
+  
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -2378,7 +2369,7 @@ svg {
   width: min(560px, 92vw);
   background: var(--bg-2);
   border: 1px solid var(--line-2);
-  border-radius: 14px;
+  border-radius: 5px;
   box-shadow: var(--sh);
   overflow: hidden;
   animation: pop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -2408,7 +2399,7 @@ svg {
   font-size: 10.5px;
   color: var(--txt-3);
   border: 1px solid var(--line-2);
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 2px 6px;
 }
 .cmdk-list {
@@ -2423,7 +2414,7 @@ svg {
   width: 100%;
   text-align: left;
   padding: 9px 11px;
-  border-radius: 9px;
+  border-radius: 4px;
   color: var(--txt-2);
   transition: background 0.1s;
 }
@@ -2475,7 +2466,7 @@ svg {
   width: 100%;
   height: 38px;
   padding: 0 12px;
-  border-radius: 9px;
+  border-radius: 4px;
   border: 1px solid var(--line-2);
   background: var(--bg-1);
   color: var(--txt);
@@ -2497,7 +2488,7 @@ svg {
 .fr-opt {
   width: 36px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid var(--line-2);
   background: var(--bg-1);
   color: var(--txt-2);
@@ -2524,7 +2515,7 @@ svg {
 .fr-btn {
   height: 30px;
   padding: 0 14px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid transparent;
   background: var(--acc-grad);
   color: #08111f;
@@ -2547,7 +2538,7 @@ svg {
   width: 100%;
   text-align: left;
   padding: 8px 11px;
-  border-radius: 9px;
+  border-radius: 4px;
   color: var(--txt-2);
   background: none;
   border: none;
@@ -2577,7 +2568,7 @@ svg {
   color: var(--txt-2);
   background: var(--bg-1);
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 6px;
   padding: 1px 8px;
   flex: none;
 }
@@ -2593,7 +2584,7 @@ svg {
   overflow: hidden;
   height: 11px;
   background: var(--bg-3);
-  border-radius: 7px;
+  border-radius: 3px;
 }
 .sk-line:nth-child(2) {
   width: 82%;
@@ -2678,7 +2669,7 @@ svg {
   justify-content: center;
   width: 24px;
   height: 24px;
-  border-radius: 6px;
+  border-radius: 3px;
   color: var(--txt-3);
   transition: var(--t);
 }
@@ -2695,7 +2686,7 @@ svg {
   inset: 0;
   z-index: 300;
   background: rgba(8, 11, 18, 0.55);
-  backdrop-filter: blur(3px);
+  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2708,7 +2699,7 @@ svg {
   flex-direction: column;
   background: var(--bg-2);
   border: 1px solid var(--line-2);
-  border-radius: 14px;
+  border-radius: 5px;
   box-shadow: var(--sh);
   overflow: hidden;
   animation: pop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -2740,7 +2731,7 @@ svg {
   width: 100%;
   text-align: left;
   padding: 9px 11px;
-  border-radius: 9px;
+  border-radius: 4px;
   color: var(--txt-2);
   transition: background 0.1s;
   margin-bottom: 2px;
@@ -2785,7 +2776,7 @@ svg {
   background: var(--acc);
   color: #fff;
   padding: 8px 16px;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 12.5px;
   font-weight: 600;
   transition: var(--t);
@@ -2798,7 +2789,7 @@ svg {
   inset: 0;
   z-index: 400;
   background: rgba(8, 11, 18, 0.55);
-  backdrop-filter: blur(3px);
+  
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -2809,7 +2800,7 @@ svg {
   width: min(420px, 92vw);
   background: var(--bg-2);
   border: 1px solid var(--line-2);
-  border-radius: 14px;
+  border-radius: 5px;
   box-shadow: var(--sh);
   padding: 20px 20px 16px;
   animation: pop 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -2835,7 +2826,7 @@ svg {
 .ui-modal .ui-input {
   height: 38px;
   padding: 0 12px;
-  border-radius: 9px;
+  border-radius: 4px;
   border: 1px solid var(--line-2);
   background: var(--bg-1);
   color: var(--txt);
@@ -2857,7 +2848,7 @@ svg {
 .ui-modal .ui-btn {
   height: 34px;
   padding: 0 14px;
-  border-radius: 9px;
+  border-radius: 4px;
   border: 1px solid var(--line-2);
   background: var(--bg-1);
   color: var(--txt);
@@ -2932,7 +2923,7 @@ svg {
   text-align: left;
   width: 100%;
   padding: 7px 9px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid var(--line);
   background: var(--bg-1);
   color: var(--txt);
@@ -2958,7 +2949,7 @@ svg {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: 1px 5px;
-  border-radius: 5px;
+  border-radius: 3px;
   background: var(--bg-2);
   color: var(--txt-3);
   border: 1px solid var(--line);
@@ -2973,7 +2964,7 @@ svg {
 .tmui-back {
   width: 24px;
   height: 24px;
-  border-radius: 7px;
+  border-radius: 3px;
   border: 1px solid var(--line);
   background: var(--bg-1);
   color: var(--txt);
@@ -2997,7 +2988,7 @@ svg {
   color: var(--txt-3);
   background: var(--bg-2);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 6px 8px;
   margin: 4px 0;
   line-height: 1.45;
@@ -3016,7 +3007,7 @@ svg {
   align-items: center;
   gap: 7px;
   padding: 5px 8px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid var(--line);
   background: var(--bg-1);
   font-size: 12px;
@@ -3049,7 +3040,7 @@ svg {
   width: 20px;
   height: 20px;
   line-height: 1;
-  border-radius: 6px;
+  border-radius: 3px;
   border: 1px solid var(--line);
   background: transparent;
   color: var(--txt-3);
@@ -3069,7 +3060,7 @@ svg {
   max-height: 230px;
   overflow: auto;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 4px;
   margin: 4px 0;
   background: var(--bg-1);
@@ -3079,7 +3070,7 @@ svg {
   align-items: center;
   gap: 6px;
   padding: 3px 5px;
-  border-radius: 6px;
+  border-radius: 3px;
   font-size: 11.5px;
   cursor: pointer;
   color: var(--txt);
@@ -3109,7 +3100,7 @@ svg {
   font-size: 11.5px;
   color: #f85149;
   border: 1px solid #f85149;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 6px 8px;
   margin: 6px 0;
   line-height: 1.45;
@@ -3131,7 +3122,7 @@ svg {
   box-sizing: border-box;
   background: var(--bg-1);
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: 3px;
   color: var(--txt);
   padding: 3px 6px;
   font-size: 10.5px;
@@ -3161,7 +3152,7 @@ svg {
   color: var(--txt-2);
   background: var(--bg-1);
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 4px 7px;
   margin-top: 2px;
 }
@@ -3195,7 +3186,7 @@ svg {
   font-family: var(--mono);
   background: var(--bg-3);
   padding: 1px 5px;
-  border-radius: 5px;
+  border-radius: 3px;
   color: var(--txt-2);
 }
 .mcp-log {
@@ -3209,7 +3200,7 @@ svg {
   font: 10.5px var(--mono);
   color: var(--txt-2);
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: 3px;
   background: var(--bg-1);
   display: flex;
   gap: 7px;
@@ -3345,7 +3336,7 @@ svg {
   gap: 10px;
   padding: 9px 11px;
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 4px;
   cursor: pointer;
   background: var(--bg-2);
 }
@@ -3375,7 +3366,7 @@ svg {
   gap: 8px;
   margin-top: 10px;
   padding: 9px 13px;
-  border-radius: 9px;
+  border-radius: 4px;
   background: var(--acc);
   color: #fff;
   font-weight: 700;

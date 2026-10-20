@@ -1,66 +1,160 @@
 html:not(.aurora-mobile) .mcp-menu {
-  max-height: calc(100vh - 58px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+	max-height: calc(100vh - 58px);
+	overflow-y: auto;
+	overflow-x: hidden;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
 }
 @supports (height: 100dvh) {
-  html:not(.aurora-mobile) .mcp-menu {
-    max-height: calc(100dvh - 58px);
-  }
+	html:not(.aurora-mobile) .mcp-menu {
+		max-height: calc(100dvh - 58px);
+	}
 }
+
 html .mcp-menu #mcpAcoes {
-  position: sticky;
-  bottom: 0;
-  z-index: 3;
-  margin-top: 8px;
-  padding: 7px 0 2px;
-  background: var(--bg-2);
-  border-top: 1px solid var(--line);
+	position: sticky;
+	bottom: 0;
+	z-index: 3;
+	margin: 12px 0 0;
+	padding: 10px var(--gut);
+	background: var(--bg-1);
+	border-top: 1px solid var(--line);
 }
+
+html .mcp-menu #mcpUrlBox {
+	margin-top: 0;
+	padding-bottom: 2px;
+}
+html .mcp-menu #mcpUrlBox .mcp-lab {
+	margin-top: 12px;
+}
+html .mcp-menu #mcpUrlBox .mcp-hint {
+	margin-bottom: 4px;
+}
+
 html .mcp-menu .mcp-log {
-  max-height: 84px;
-  overscroll-behavior: contain;
+	max-height: 84px;
+	overscroll-behavior: contain;
 }
 html .mcp-menu .mcp-btn-wide {
-  flex: 1;
+	flex: 1;
 }
 html .mcp-menu #mcpAgents {
-  overflow: hidden;
+	overflow: hidden;
+	padding: 0 var(--gut) 8px;
 }
+html .mcp-menu .mcp-log {
+	margin: 0 8px 8px;
+}
+
 html .mcp-menu .mcp-adv {
-  margin-top: 7px;
+	margin-top: 7px;
 }
 html .mcp-menu .mcp-adv > summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  margin: 0;
-  cursor: pointer;
-  list-style: none;
-  color: var(--txt-3);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
+	margin: 0;
+	cursor: pointer;
+	list-style: none;
+	color: var(--txt-3);
 }
 html .mcp-menu .mcp-adv > summary::-webkit-details-marker {
-  display: none;
+	display: none;
 }
 html .mcp-menu .mcp-adv > summary::after {
-  content: '+';
-  opacity: 0.7;
+	content: '+';
+	opacity: 0.7;
 }
 html .mcp-menu .mcp-adv[open] > summary::after {
-  content: '−';
+	content: '−';
 }
 html .mcp-menu .mcp-adv > summary:hover {
-  color: var(--txt-2);
+	color: var(--txt-2);
 }
 html .mcp-menu .mcp-mono {
-  width: 100%;
-  box-sizing: border-box;
-  resize: vertical;
-  min-height: 30px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 10px;
+	width: calc(100% - var(--gut) * 2);
+	margin: 0 var(--gut);
+	box-sizing: border-box;
+	resize: vertical;
+	min-height: 30px;
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: 10px;
+}
+
+
+html .mcp-menu #mcpPushSessions {
+	padding: 0 var(--gut) 8px;
+}
+html .mcp-menu #mcpPushSessions:empty {
+	display: none;
+}
+html .mcp-menu .push-sessions {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+html .mcp-menu .push-sessions-title {
+	font: 700 var(--fs-xs) / 1.2 var(--ui);
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--txt-3);
+}
+html .mcp-menu .push-session {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 7px 9px;
+	border: 1px solid var(--line);
+	border-radius: var(--rad-sm);
+	background: var(--bg-2);
+	font: var(--fs-xs) / 1.4 var(--ui);
+	color: var(--txt-2);
+}
+html .mcp-menu .push-session-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	color: var(--txt);
+}
+html .mcp-menu .push-session-head::before {
+	content: '';
+	flex: none;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--acc);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 22%, transparent);
+}
+html .mcp-menu .push-session-head b {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-weight: 600;
+}
+html .mcp-menu .push-session-stop {
+	flex: none;
+	height: 20px;
+	padding: 0 7px;
+	font-size: var(--fs-xs);
+}
+html .mcp-menu .push-session-folder,
+html .mcp-menu .push-session-last {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: var(--mono);
+	color: var(--txt-3);
+}
+html .mcp-menu .push-session-stats {
+	color: var(--txt-3);
+}
+html .mcp-menu .push-session-conflict {
+	color: var(--err);
+	font-weight: 600;
 }
