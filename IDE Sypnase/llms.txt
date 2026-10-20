@@ -1,0 +1,28 @@
+# Synapse Live Preview
+
+> Editor de projetos web que roda no navegador: arquivos, editor com realce, preview ao vivo,
+> terminal, build (npm/CMake), estudio 3D e conector MCP para agentes externos.
+
+## Paginas
+
+- [Aplicacao](https://sypnase-live-preview.vercel.app/): editor completo, executa no cliente e guarda os projetos no proprio navegador.
+- [arquivos](https://sypnase-live-preview.vercel.app/docs/arquivos.html): Arquivos e assets no Synapse Live Preview: importacao de ZIP e pastas, binarios, exportacao e limites de armazenamento.
+- [atualizacoes](https://sypnase-live-preview.vercel.app/docs/atualizacoes.html): Historico de atualizacoes do Synapse Live Preview com as mudancas de cada build.
+- [blepse 3d](https://sypnase-live-preview.vercel.app/docs/blepse-3d.html): Estudio 3D do Synapse Live Preview: modelagem, exportacao GLB e uso dos modelos dentro do projeto web.
+- [build](https://sypnase-live-preview.vercel.app/docs/build.html): Builds no navegador com o Synapse Live Preview: instalacao de dependencias, scripts npm, servidor de desenvolvimento e CMake.
+- [configuracoes](https://sypnase-live-preview.vercel.app/docs/configuracoes.html): Configuracoes do Synapse Live Preview: temas, densidade da interface, fonte do editor, idioma e preferencias de preview.
+- [editor](https://sypnase-live-preview.vercel.app/docs/editor.html): Recursos do editor do Synapse Live Preview: realce de sintaxe, dobras, minimapa, busca, atalhos e historico de versoes.
+- [ia](https://sypnase-live-preview.vercel.app/docs/ia.html): Assistente de IA do Synapse Live Preview: provedores suportados, chaves, contexto de arquivos e edicoes assistidas.
+- [index](https://sypnase-live-preview.vercel.app/docs/): Documentacao do Synapse Live Preview: guias do editor, do preview ao vivo, do terminal, do build e do conector MCP.
+- [interface](https://sypnase-live-preview.vercel.app/docs/interface.html): Mapa da interface do Synapse Live Preview: barra superior, ferramentas, explorador de arquivos, editor, preview e console.
+- [mcp](https://sypnase-live-preview.vercel.app/docs/mcp.html): Conector MCP do Synapse Live Preview: como ligar um agente externo ao editor e controlar o projeto por ferramentas.
+- [preview](https://sypnase-live-preview.vercel.app/docs/preview.html): Como funciona o preview ao vivo do Synapse Live Preview: dispositivos, zoom, recarga, abertura em nova aba e erros de execucao.
+- [primeiros passos](https://sypnase-live-preview.vercel.app/docs/primeiros-passos.html): Como criar ou importar um projeto no Synapse Live Preview e ver o resultado no preview ao vivo em poucos minutos.
+- [problemas](https://sypnase-live-preview.vercel.app/docs/problemas.html): Solucao de problemas do Synapse Live Preview: preview em branco, erros de build, permissoes, armazenamento e suporte.
+- [terminal](https://sypnase-live-preview.vercel.app/docs/terminal.html): Terminal do Synapse Live Preview: comandos reais na pasta do projeto, saida em tempo real e processos em segundo plano.
+
+## Notas
+
+- Sem cadastro: os projetos ficam no armazenamento local do navegador.
+- Suporte: relatorios de erro sao enviados pelo proprio aplicativo (menu de suporte).
+- Agentes so com terminal: um GET na URL do MCP (https://<relay>/mcp/<sessao>/<token>) devolve instrucoes e um CLI pronto em /cli (python), /cli.mjs (node) ou /cli.sh (bash). REST: GET /tools, POST /call/<ferramenta>, GET|PUT|DELETE /file/<caminho>. Sem handshake nem sessao.

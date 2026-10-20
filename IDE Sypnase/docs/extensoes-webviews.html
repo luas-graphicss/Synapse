@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function () {
+				if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+				var caminho = location.pathname || '';
+				if (!caminho || /\/$/.test(caminho) || /\.[a-z0-9]+$/i.test(caminho)) return;
+				var base = document.createElement('base');
+				base.setAttribute('href', caminho + '/');
+				if (document.head) document.head.appendChild(base);
+			})();
+		</script>
+		<link rel="icon" href="../favicon.ico?v=1001" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png?v=1001" />
+		<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png?v=1001" />
+		<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png?v=1001" />
+		<link rel="manifest" href="../site.webmanifest" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="canonical" href="https://sypnase-live-preview.vercel.app/docs/extensoes-webviews.html" />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:type" content="article" />
+		<meta property="og:site_name" content="Synapse Live Preview" />
+		<meta property="og:title" content="Webviews | Documentação da Synapse IDE" />
+		<meta property="og:description" content="Guia de webviews em extensões da Synapse IDE: createWebviewPanel, registerWebviewViewProvider, CSP com nonce, kit de estilos sx-* e postMessage." />
+		<meta property="og:url" content="https://sypnase-live-preview.vercel.app/docs/extensoes-webviews.html" />
+		<meta property="og:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Webviews | Documentação da Synapse IDE" />
+		<meta name="twitter:description" content="Guia de webviews em extensões da Synapse IDE: createWebviewPanel, registerWebviewViewProvider, CSP com nonce, kit de estilos sx-* e postMessage." />
+		<meta name="twitter:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<title>Webviews | Documentação da Synapse IDE</title>
+		<meta name="description" content="Guia de webviews em extensões da Synapse IDE: createWebviewPanel, registerWebviewViewProvider, CSP com nonce, kit de estilos sx-* e postMessage." />
+		<link rel="stylesheet" href="../assets/css/tema.css" />
+		<link rel="stylesheet" href="./assets/docs-shell.css" />
+		<link rel="stylesheet" href="./assets/docs-navigation.css" />
+		<link rel="stylesheet" href="./assets/docs-prose.css" />
+		<link rel="stylesheet" href="./assets/docs-theme.css" />
+		<link rel="stylesheet" href="./assets/docs-typography.css" />
+		<script src="./assets/docs-ide-preference.js"></script>
+		<script src="./assets/docs-theme-sync.js"></script>
+	</head>
+	<body data-docs-category="extensoes-webviews">
+		<header class="docs-topbar">
+			<a class="docs-brand" href="./index.html">
+				<span class="docs-brand-mark">SYNAPSE</span>
+				<span class="docs-brand-text">Documentação oficial</span>
+			</a>
+			<nav class="docs-topbar-links">
+				<span class="docs-topbar-version">build 2026.09</span>
+				<a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+				<a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+			</nav>
+		</header>
+		<div class="docs-frame">
+			<nav class="docs-sidebar" aria-label="Categorias da documentação"></nav>
+			<main class="docs-main">
+				<article class="docs-article">
+					<p class="docs-kicker">Extensões / Webviews</p>
+					<h1 class="docs-title">Webviews: painéis com HTML próprio</h1>
+					<p class="docs-lede">Como abrir um painel no editor ou uma view na barra lateral com HTML seu, trocar mensagens com a extensão, herdar o tema da IDE e respeitar a política de segurança que o host impõe.</p>
+					<div class="docs-meta">
+						<span>revisado em 15/09/2026</span>
+						<span>leitura 8 min</span>
+						<span>público: dev</span>
+					</div>
+					<section>
+						<h2>Dois formatos</h2>
+						<dl class="docs-definition">
+							<dt>Painel (<code>WebviewPanel</code>)</dt>
+							<dd>Ocupa uma aba do editor. Criado sob demanda com <code>synapse.window.createWebviewPanel</code>. Ideal para relatórios, dashboards, editores visuais.</dd>
+							<dt>View (<code>WebviewView</code>)</dt>
+							<dd>Vive na barra lateral, declarada em <code>contributes.views.sidebar</code> e preenchida por <code>registerWebviewViewProvider</code>. Ideal para listas, ferramentas de contexto, coisas sempre visíveis.</dd>
+						</dl>
+						<p>Ambos exigem a permissão <code>webview</code> no manifesto.</p>
+					</section>
+
+					<section>
+						<h2>Abrindo um painel</h2>
+						<pre><code>const painel = synapse.window.createWebviewPanel(
+	'minhaext.relatorio',
+	'Relatório',
+	synapse.ViewColumn.Active,
+	{ enableScripts: true, retainContextWhenHidden: true },
+);
+
+painel.webview.html = montarHtml(painel.webview);
+
+painel.webview.onDidReceiveMessage((mensagem) =&gt; {
+	if (mensagem.type === 'copiar') synapse.env.clipboard.writeText(mensagem.texto);
+});
+
+painel.onDidDispose(() =&gt; limparRecursos());
+context.subscriptions.push(painel);</code></pre>
+						<dl class="docs-definition">
+							<dt><code>enableScripts</code></dt>
+							<dd>Padrão <code>true</code>. Desligue para conteúdo puramente estático.</dd>
+							<dt><code>retainContextWhenHidden</code></dt>
+							<dd>Padrão <code>true</code>. Com <code>false</code> o iframe é descarregado quando a aba perde o foco e o estado JS some; use <code>getState/setState</code> para sobreviver.</dd>
+						</dl>
+					</section>
+
+					<section>
+						<h2>CSP e o nonce</h2>
+						<p>
+							O host renderiza seu HTML em um iframe isolado com uma Content-Security-Policy que só
+							executa scripts marcados com o nonce daquela renderização. Você recebe o nonce em
+							<code>webview.nonce</code> e a fonte pronta em <code>webview.cspSource</code>.
+						</p>
+						<pre><code>function montarHtml(webview) {
+	return `&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+	&lt;meta charset="utf-8" /&gt;
+	&lt;meta http-equiv="Content-Security-Policy"
+		content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src ${webview.cspSource}; img-src data:;" /&gt;
+&lt;/head&gt;
+&lt;body class="sx-pad"&gt;
+	&lt;button class="sx-btn primary" id="ok"&gt;Confirmar&lt;/button&gt;
+	&lt;script nonce="${webview.nonce}"&gt;
+		const api = acquireSynapseApi();
+		document.getElementById('ok').addEventListener('click', () =&gt; api.postMessage({ type: 'ok' }));
+	&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;`;
+}</code></pre>
+						<div class="docs-note docs-note-alert">
+							<span class="docs-note-label">O que não funciona</span>
+							<code>onclick="..."</code>, <code>javascript:</code> em links, <code>eval</code>,
+							scripts externos por URL e <code>fetch</code> para fora. A webview não tem rede; peça
+							à extensão (que pode ter <code>network:https://host</code>) e receba por mensagem.
+						</div>
+					</section>
+
+					<section>
+						<h2>A API dentro da webview</h2>
+						<p>
+							<code>acquireSynapseApi()</code> só pode ser chamada uma vez por documento e devolve:
+						</p>
+						<dl class="docs-definition">
+							<dt><code>postMessage(dados)</code></dt>
+							<dd>Envia para <code>webview.onDidReceiveMessage</code> na extensão. Só JSON serializável.</dd>
+							<dt><code>getState()</code> / <code>setState(estado)</code></dt>
+							<dd>Persistem um objeto pequeno enquanto o painel existe, mesmo com <code>retainContextWhenHidden: false</code>.</dd>
+						</dl>
+						<p>
+							No sentido contrário, a extensão chama <code>webview.postMessage(dados)</code> e a
+							webview escuta com <code>window.addEventListener('message', (e) =&gt; e.data)</code>.
+						</p>
+					</section>
+
+					<section>
+						<h2>Tema e kit de estilos</h2>
+						<p>
+							O host injeta automaticamente as variáveis <code>--synapse-*</code> (fundo, texto,
+							acento, bordas, fontes) e um kit de classes utilitárias com prefixo <code>sx-</code>,
+							por isso um painel simples nem precisa de CSS próprio.
+						</p>
+						<table class="docs-table">
+							<thead><tr><th>Classe</th><th>Uso</th></tr></thead>
+							<tbody>
+								<tr><td><code>sx-pad</code>, <code>sx-stack</code>, <code>sx-row</code>, <code>sx-grow</code></td><td>Espaçamento e layout em coluna/linha.</td></tr>
+								<tr><td><code>sx-btn</code> (+ <code>primary</code>, <code>sm</code>)</td><td>Botões no estilo da IDE.</td></tr>
+								<tr><td><code>sx-list</code>, <code>sx-list-item</code>, <code>sx-empty</code></td><td>Listas clicáveis e estado vazio.</td></tr>
+								<tr><td><code>sx-label</code>, <code>sx-meta</code>, <code>sx-hint</code>, <code>sx-mono</code></td><td>Tipografia secundária e monoespaçada.</td></tr>
+								<tr><td><code>sx-badge</code> (+ <code>acc</code>), <code>sx-swatch</code></td><td>Contadores e amostras de cor.</td></tr>
+							</tbody>
+						</table>
+						<p>
+							Quando o usuário troca de tema, a webview recebe a mensagem
+							<code>{ type: 'synapse:theme', kind: 'dark' | 'light' }</code> e as variáveis são
+							atualizadas sem recarregar.
+						</p>
+					</section>
+
+					<section>
+						<h2>View na barra lateral</h2>
+						<pre><code>// manifesto
+"contributes": { "views": { "sidebar": [{ "id": "minhaext.cores", "name": "Cores", "icon": "palette" }] } },
+"activationEvents": ["onView:minhaext.cores"]
+
+// extension.js
+synapse.window.registerWebviewViewProvider('minhaext.cores', {
+	resolveWebviewView(view) {
+		view.webview.options = { enableScripts: true };
+		view.webview.html = montarHtml(view.webview);
+		view.onDidChangeVisibility(() =&gt; view.visible &amp;&amp; atualizar(view.webview));
+	},
+});</code></pre>
+					</section>
+
+					<section>
+						<h2>Depurando</h2>
+						<ul>
+							<li>Erros de script dentro da webview aparecem no <strong>Console</strong> do Extension Development Host com o prefixo <code>[webview]</code>.</li>
+							<li>Violações de CSP aparecem como <code>Refused to execute inline script</code>; confira o nonce.</li>
+							<li>O <strong>Inspetor</strong> mostra quantos painéis e views a extensão tem abertos.</li>
+							<li>Exemplo completo: <code>exemplos/extensoes/paleta-de-cores</code>.</li>
+						</ul>
+					</section>
+
+				</article>
+				<footer class="docs-pager"></footer>
+				<p class="docs-page-footer">Webview em branco? Quase sempre é script sem nonce ou HTML montado antes de o painel existir.</p>
+			</main>
+			<aside class="docs-outline" aria-label="Nesta página"></aside>
+		</div>
+		<script src="./assets/docs-catalog.js"></script>
+		<script src="./assets/docs-current-category.js"></script>
+		<script src="./assets/docs-sidebar.js"></script>
+		<script src="./assets/docs-filter.js"></script>
+		<script src="./assets/docs-outline.js"></script>
+		<script src="./assets/docs-pager.js"></script>
+		<script src="./assets/docs-boot.js"></script>
+		<script src="../assets/js/i18n/phrase-registration.js"></script>
+		<script src="./assets/docs-phrases.js"></script>
+		<script src="./assets/docs-error-silencer.js"></script>
+		<script src="../assets/js/i18n/idiomas.js"></script>
+	</body>
+</html>

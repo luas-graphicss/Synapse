@@ -1,7 +1,7 @@
 (function (root) {
-    'use strict';
+	'use strict';
 
-    if (typeof root.ignorarErro === 'function') return;
+	if (typeof root.ignorarErro === 'function') return;
 
-    root.ignorarErro = function ignorarErro() {};
+	root.ignorarErro = function ignorarErro() {};
 })(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -1,0 +1,2364 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function () {
+				if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+				var caminho = location.pathname || '';
+				if (!caminho || /\/$/.test(caminho) || /\.[a-z0-9]+$/i.test(caminho)) return;
+				var base = document.createElement('base');
+				base.setAttribute('href', caminho + '/');
+				if (document.head) document.head.appendChild(base);
+			})();
+		</script>
+		<link rel="icon" href="../favicon.ico?v=1001" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png?v=1001" />
+		<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png?v=1001" />
+		<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png?v=1001" />
+		<link rel="manifest" href="../site.webmanifest" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="canonical" href="https://sypnase-live-preview.vercel.app/docs/extensoes-api.html" />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:type" content="article" />
+		<meta property="og:site_name" content="Synapse Live Preview" />
+		<meta property="og:title" content="Referência da API synapse | Documentação da Synapse IDE" />
+		<meta property="og:description" content="Referência completa da API de extensões (synapse.*) gerada automaticamente a partir de synapse.d.ts." />
+		<meta property="og:url" content="https://sypnase-live-preview.vercel.app/docs/extensoes-api.html" />
+		<meta property="og:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Referência da API synapse | Documentação da Synapse IDE" />
+		<meta name="twitter:description" content="Referência completa da API de extensões (synapse.*) gerada automaticamente a partir de synapse.d.ts." />
+		<meta name="twitter:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<title>Referência da API synapse | Documentação da Synapse IDE</title>
+		<meta name="description" content="Namespaces, funções, tipos e eventos disponíveis para extensões da Synapse IDE. Gerado de synapse.d.ts v2.4.0." />
+		<link rel="stylesheet" href="../assets/css/tema.css" />
+		<link rel="stylesheet" href="./assets/docs-shell.css" />
+		<link rel="stylesheet" href="./assets/docs-navigation.css" />
+		<link rel="stylesheet" href="./assets/docs-prose.css" />
+		<link rel="stylesheet" href="./assets/docs-theme.css" />
+		<link rel="stylesheet" href="./assets/docs-typography.css" />
+		<link rel="stylesheet" href="./assets/docs-api.css" />
+		<script src="./assets/docs-ide-preference.js"></script>
+		<script src="./assets/docs-theme-sync.js"></script>
+	</head>
+	<body data-docs-category="extensoes-api">
+		<header class="docs-topbar">
+			<a class="docs-brand" href="./index.html">
+				<span class="docs-brand-mark">SYNAPSE</span>
+				<span class="docs-brand-text">Documentação oficial</span>
+			</a>
+			<nav class="docs-topbar-links">
+				<span class="docs-topbar-version">build 2026.09</span>
+				<a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+				<a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+			</nav>
+		</header>
+		<div class="docs-frame">
+			<nav class="docs-sidebar" aria-label="Categorias da documentação"></nav>
+			<main class="docs-main">
+				<article class="docs-article docs-api">
+					<p class="docs-kicker">Extensões / Referência da API</p>
+					<h1 class="docs-title">Referência da API <code>synapse</code></h1>
+					<p class="docs-lede">
+						Tudo que uma extensão pode chamar dentro do Extension Host. Esta página é gerada
+						automaticamente de <code>assets/extensoes/synapse.d.ts</code>; edite o arquivo de tipos,
+						não este HTML.
+					</p>
+					<div class="docs-meta">
+						<span>API v2.4.0</span>
+						<span>gerado em 15/09/2026</span>
+						<span>8 namespaces · 57 funções · 93 tipos</span>
+					</div>
+					<div class="docs-note">
+						<span class="docs-note-label">Como regenerar</span>
+						Rode <code>node docs/assets/gerar-referencia-api.mjs</code> na raiz do repositório depois de alterar
+						<code>synapse.d.ts</code>. O IntelliSense da IDE e o assistente de nova extensão usam o mesmo arquivo.
+					</div>
+<section id="indice">
+		<h2>Índice</h2>
+		<h3>Namespaces</h3>
+		<ul class="api-index"><li><a href="#synapse-commands"><code>synapse.commands</code></a> <span>Comandos</span></li><li><a href="#synapse-window"><code>synapse.window</code></a> <span>Janela e UI</span></li><li><a href="#synapse-workspace"><code>synapse.workspace</code></a> <span>Workspace e arquivos</span></li><li><a href="#synapse-languages"><code>synapse.languages</code></a> <span>Linguagens</span></li><li><a href="#synapse-preview"><code>synapse.preview</code></a> <span>Preview</span></li><li><a href="#synapse-keybindings"><code>synapse.keybindings</code></a> <span>Atalhos</span></li><li><a href="#synapse-env"><code>synapse.env</code></a> <span>Ambiente</span></li><li><a href="#synapse-test"><code>synapse.test</code></a> <span>Testes</span></li></ul>
+		<h3>Tipos</h3>
+		<ul class="api-index api-index-types"><li><a href="#synapse-disposable"><code>Disposable</code></a></li><li><a href="#synapse-event"><code>Event</code></a></li><li><a href="#synapse-eventemitter"><code>EventEmitter</code></a></li><li><a href="#synapse-cancellationtoken"><code>CancellationToken</code></a></li><li><a href="#synapse-cancellationtokensource"><code>CancellationTokenSource</code></a></li><li><a href="#synapse-uri"><code>Uri</code></a></li><li><a href="#synapse-position"><code>Position</code></a></li><li><a href="#synapse-range"><code>Range</code></a></li><li><a href="#synapse-selection"><code>Selection</code></a></li><li><a href="#synapse-textedit"><code>TextEdit</code></a></li><li><a href="#synapse-snippetstring"><code>SnippetString</code></a></li><li><a href="#synapse-workspaceedit"><code>WorkspaceEdit</code></a></li><li><a href="#synapse-filesystemerror"><code>FileSystemError</code></a></li><li><a href="#synapse-markdownstring"><code>MarkdownString</code></a></li><li><a href="#synapse-endofline"><code>EndOfLine</code></a></li><li><a href="#synapse-textline"><code>TextLine</code></a></li><li><a href="#synapse-textdocument"><code>TextDocument</code></a></li><li><a href="#synapse-texteditorrevealtype"><code>TextEditorRevealType</code></a></li><li><a href="#synapse-texteditorselectionchangekind"><code>TextEditorSelectionChangeKind</code></a></li><li><a href="#synapse-decorationrangebehavior"><code>DecorationRangeBehavior</code></a></li><li><a href="#synapse-decorationrenderoptions"><code>DecorationRenderOptions</code></a></li><li><a href="#synapse-decorationoptions"><code>DecorationOptions</code></a></li><li><a href="#synapse-texteditordecorationtype"><code>TextEditorDecorationType</code></a></li><li><a href="#synapse-texteditoredit"><code>TextEditorEdit</code></a></li><li><a href="#synapse-viewcolumn"><code>ViewColumn</code></a></li><li><a href="#synapse-texteditor"><code>TextEditor</code></a></li><li><a href="#synapse-memento"><code>Memento</code></a></li><li><a href="#synapse-extensioncontext"><code>ExtensionContext</code></a></li><li><a href="#synapse-outputchannel"><code>OutputChannel</code></a></li><li><a href="#synapse-statusbaralignment"><code>StatusBarAlignment</code></a></li><li><a href="#synapse-statusbaritem"><code>StatusBarItem</code></a></li><li><a href="#synapse-quickpickitem"><code>QuickPickItem</code></a></li><li><a href="#synapse-quickpickoptions"><code>QuickPickOptions</code></a></li><li><a href="#synapse-inputboxoptions"><code>InputBoxOptions</code></a></li><li><a href="#synapse-messageitem"><code>MessageItem</code></a></li><li><a href="#synapse-messageoptions"><code>MessageOptions</code></a></li><li><a href="#synapse-progresslocation"><code>ProgressLocation</code></a></li><li><a href="#synapse-progressoptions"><code>ProgressOptions</code></a></li><li><a href="#synapse-progress"><code>Progress</code></a></li><li><a href="#synapse-colorthemekind"><code>ColorThemeKind</code></a></li><li><a href="#synapse-colortheme"><code>ColorTheme</code></a></li><li><a href="#synapse-webview"><code>Webview</code></a></li><li><a href="#synapse-webviewoptions"><code>WebviewOptions</code></a></li><li><a href="#synapse-webviewpanel"><code>WebviewPanel</code></a></li><li><a href="#synapse-webviewview"><code>WebviewView</code></a></li><li><a href="#synapse-webviewviewprovider"><code>WebviewViewProvider</code></a></li><li><a href="#synapse-configurationtarget"><code>ConfigurationTarget</code></a></li><li><a href="#synapse-workspaceconfiguration"><code>WorkspaceConfiguration</code></a></li><li><a href="#synapse-configurationchangeevent"><code>ConfigurationChangeEvent</code></a></li><li><a href="#synapse-filetype"><code>FileType</code></a></li><li><a href="#synapse-filestat"><code>FileStat</code></a></li><li><a href="#synapse-filesystem"><code>FileSystem</code></a></li><li><a href="#synapse-filesystemwatcher"><code>FileSystemWatcher</code></a></li><li><a href="#synapse-filechangetype"><code>FileChangeType</code></a></li><li><a href="#synapse-workspacefolder"><code>WorkspaceFolder</code></a></li><li><a href="#synapse-projectinfo"><code>ProjectInfo</code></a></li><li><a href="#synapse-textdocumentcontentchangeevent"><code>TextDocumentContentChangeEvent</code></a></li><li><a href="#synapse-textdocumentchangeevent"><code>TextDocumentChangeEvent</code></a></li><li><a href="#synapse-documentselector"><code>DocumentSelector</code></a></li><li><a href="#synapse-documentfilter"><code>DocumentFilter</code></a></li><li><a href="#synapse-completionitemkind"><code>CompletionItemKind</code></a></li><li><a href="#synapse-completiontriggerkind"><code>CompletionTriggerKind</code></a></li><li><a href="#synapse-completioncontext"><code>CompletionContext</code></a></li><li><a href="#synapse-completionitem"><code>CompletionItem</code></a></li><li><a href="#synapse-completionlist"><code>CompletionList</code></a></li><li><a href="#synapse-completionitemprovider"><code>CompletionItemProvider</code></a></li><li><a href="#synapse-hover"><code>Hover</code></a></li><li><a href="#synapse-hoverprovider"><code>HoverProvider</code></a></li><li><a href="#synapse-location"><code>Location</code></a></li><li><a href="#synapse-definitionprovider"><code>DefinitionProvider</code></a></li><li><a href="#synapse-formattingoptions"><code>FormattingOptions</code></a></li><li><a href="#synapse-documentformattingeditprovider"><code>DocumentFormattingEditProvider</code></a></li><li><a href="#synapse-codeactionkind"><code>CodeActionKind</code></a></li><li><a href="#synapse-codeactiontriggerkind"><code>CodeActionTriggerKind</code></a></li><li><a href="#synapse-codeactioncontext"><code>CodeActionContext</code></a></li><li><a href="#synapse-codeaction"><code>CodeAction</code></a></li><li><a href="#synapse-codeactionprovider"><code>CodeActionProvider</code></a></li><li><a href="#synapse-symbolkind"><code>SymbolKind</code></a></li><li><a href="#synapse-documentsymbol"><code>DocumentSymbol</code></a></li><li><a href="#synapse-symbolinformation"><code>SymbolInformation</code></a></li><li><a href="#synapse-documentsymbolprovider"><code>DocumentSymbolProvider</code></a></li><li><a href="#synapse-diagnosticseverity"><code>DiagnosticSeverity</code></a></li><li><a href="#synapse-diagnostictag"><code>DiagnosticTag</code></a></li><li><a href="#synapse-diagnostic"><code>Diagnostic</code></a></li><li><a href="#synapse-diagnosticcollection"><code>DiagnosticCollection</code></a></li><li><a href="#synapse-languageconfiguration"><code>LanguageConfiguration</code></a></li><li><a href="#synapse-uikind"><code>UIKind</code></a></li><li><a href="#synapse-clipboard"><code>Clipboard</code></a></li><li><a href="#synapse-previewstate"><code>PreviewState</code></a></li><li><a href="#synapse-previewviewport"><code>PreviewViewport</code></a></li><li><a href="#synapse-testcaseresult"><code>TestCaseResult</code></a></li><li><a href="#synapse-testreport"><code>TestReport</code></a></li><li><a href="#synapse-expectation"><code>Expectation</code></a></li></ul>
+	</section>
+<section id="synapse-raiz"><h2><code>synapse</code> — raiz</h2><ul class="api-members"><li class="api-member" id="synapse-version">
+		<div class="api-member-head"><code>const version: string</code><span class="api-kind">const</span></div>
+		<p>Versão semântica da API exposta pelo host (comparada com <code>engines.synapse</code> do manifesto).</p>
+	</li></ul></section>
+<section id="synapse-commands" class="api-namespace">
+		<h2><code>synapse.commands</code> — Comandos</h2>
+		<p>Comandos: registrar, executar e listar.</p>
+		
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-commands-registercommand">
+					<div class="api-member-head"><code>registerCommand(command: string, callback: (...args: any[]) =&gt; any, thisArg?: any): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra um comando; o id deve estar em <code>contributes.commands</code> para aparecer na paleta.</p>
+				</li><li class="api-member" id="synapse-commands-registertexteditorcommand">
+					<div class="api-member-head"><code>registerTextEditorCommand(command: string, callback: (textEditor: TextEditor, edit: TextEditorEdit, ...args: any[]) =&gt; void, thisArg?: any): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra um comando que recebe o editor ativo e um <code>TextEditorEdit</code>.</p>
+				</li><li class="api-member" id="synapse-commands-executecommand">
+					<div class="api-member-head"><code>executeCommand&lt;T = unknown&gt;(command: string, ...rest: any[]): Promise&lt;T&gt;</code><span class="api-kind">função</span></div>
+					<p>Executa qualquer comando da IDE ou de outra extensão.</p>
+				</li><li class="api-member" id="synapse-commands-getcommands">
+					<div class="api-member-head"><code>getCommands(filterInternal?: boolean): Promise&lt;string[]&gt;</code><span class="api-kind">função</span></div>
+					<p>Lista os ids de comandos disponíveis.</p>
+				</li></ul>
+		
+	</section>
+<section id="synapse-window" class="api-namespace">
+		<h2><code>synapse.window</code> — Janela e UI</h2>
+		<p>Janela: mensagens, seletores, status bar, editores, webviews e tema.</p>
+		<h3>Propriedades e eventos</h3><ul class="api-members"><li class="api-member" id="synapse-window-activetexteditor">
+		<div class="api-member-head"><code>const activeTextEditor: TextEditor | undefined</code><span class="api-kind">const</span></div>
+		<p>Editor ativo ou <code>undefined</code>.</p>
+	</li><li class="api-member" id="synapse-window-visibletexteditors">
+		<div class="api-member-head"><code>const visibleTextEditors: readonly TextEditor[]</code><span class="api-kind">const</span></div>
+		<p>Editores visíveis (no máximo um).</p>
+	</li><li class="api-member" id="synapse-window-activecolortheme">
+		<div class="api-member-head"><code>const activeColorTheme: ColorTheme</code><span class="api-kind">const</span></div>
+		<p>Tema de cores ativo.</p>
+	</li><li class="api-member" id="synapse-window-ondidchangeactivetexteditor">
+		<div class="api-member-head"><code>const onDidChangeActiveTextEditor: Event&lt;TextEditor | undefined&gt;</code><span class="api-kind">const</span></div>
+		<p>Dispara quando o editor ativo muda.</p>
+	</li><li class="api-member" id="synapse-window-ondidchangetexteditorselection">
+		<div class="api-member-head"><code>const onDidChangeTextEditorSelection: Event&lt;{ textEditor: TextEditor; selections: readonly Selection[]; kind: TextEditorSelectionChangeKind }&gt;</code><span class="api-kind">const</span></div>
+		<p>Dispara quando a seleção muda.</p>
+	</li><li class="api-member" id="synapse-window-ondidchangetexteditorvisibleranges">
+		<div class="api-member-head"><code>const onDidChangeTextEditorVisibleRanges: Event&lt;{ textEditor: TextEditor; visibleRanges: readonly Range[] }&gt;</code><span class="api-kind">const</span></div>
+		<p>Dispara quando a área visível muda.</p>
+	</li><li class="api-member" id="synapse-window-ondidchangeactivecolortheme">
+		<div class="api-member-head"><code>const onDidChangeActiveColorTheme: Event&lt;ColorTheme&gt;</code><span class="api-kind">const</span></div>
+		<p>Dispara quando o tema muda.</p>
+	</li></ul>
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-window-showinformationmessage">
+					<div class="api-member-head"><code>showInformationMessage&lt;T extends string | MessageItem&gt;(message: string, ...items: T[]): Promise&lt;T | undefined&gt;</code><br /><code>showInformationMessage&lt;T extends string | MessageItem&gt;(message: string, options: MessageOptions, ...items: T[]): Promise&lt;T | undefined&gt;</code><span class="api-kind">função</span></div>
+					<p>Mostra mensagem informativa com botões opcionais; resolve o rótulo escolhido.</p>
+				</li><li class="api-member" id="synapse-window-showwarningmessage">
+					<div class="api-member-head"><code>showWarningMessage&lt;T extends string | MessageItem&gt;(message: string, ...items: T[]): Promise&lt;T | undefined&gt;</code><br /><code>showWarningMessage&lt;T extends string | MessageItem&gt;(message: string, options: MessageOptions, ...items: T[]): Promise&lt;T | undefined&gt;</code><span class="api-kind">função</span></div>
+					<p>Mostra aviso.</p>
+				</li><li class="api-member" id="synapse-window-showerrormessage">
+					<div class="api-member-head"><code>showErrorMessage&lt;T extends string | MessageItem&gt;(message: string, ...items: T[]): Promise&lt;T | undefined&gt;</code><br /><code>showErrorMessage&lt;T extends string | MessageItem&gt;(message: string, options: MessageOptions, ...items: T[]): Promise&lt;T | undefined&gt;</code><span class="api-kind">função</span></div>
+					<p>Mostra erro.</p>
+				</li><li class="api-member" id="synapse-window-showquickpick">
+					<div class="api-member-head"><code>showQuickPick&lt;T extends QuickPickItem | string&gt;(items: readonly T[] | Promise&lt;readonly T[]&gt;, options?: QuickPickOptions, token?: CancellationToken): Promise&lt;T | T[] | undefined&gt;</code><span class="api-kind">função</span></div>
+					<p>Seletor filtrável; resolve o item (ou itens com <code>canPickMany</code>).</p>
+				</li><li class="api-member" id="synapse-window-showinputbox">
+					<div class="api-member-head"><code>showInputBox(options?: InputBoxOptions, token?: CancellationToken): Promise&lt;string | undefined&gt;</code><span class="api-kind">função</span></div>
+					<p>Caixa de texto; resolve <code>undefined</code> ao cancelar.</p>
+				</li><li class="api-member" id="synapse-window-createstatusbaritem">
+					<div class="api-member-head"><code>createStatusBarItem(alignment?: StatusBarAlignment, priority?: number): StatusBarItem</code><br /><code>createStatusBarItem(id: string, alignment?: StatusBarAlignment, priority?: number): StatusBarItem</code><span class="api-kind">função</span></div>
+					<p>Cria um item de status bar.</p>
+				</li><li class="api-member" id="synapse-window-setstatusbarmessage">
+					<div class="api-member-head"><code>setStatusBarMessage(text: string, hideAfterTimeoutOrPromise?: number | Promise&lt;any&gt;): Disposable</code><span class="api-kind">função</span></div>
+					<p>Mensagem temporária na status bar.</p>
+				</li><li class="api-member" id="synapse-window-withprogress">
+					<div class="api-member-head"><code>withProgress&lt;R&gt;(options: ProgressOptions, task: (progress: Progress&lt;{ message?: string; increment?: number }&gt;, token: CancellationToken) =&gt; Promise&lt;R&gt;): Promise&lt;R&gt;</code><span class="api-kind">função</span></div>
+					<p>Executa uma tarefa exibindo progresso.</p>
+				</li><li class="api-member" id="synapse-window-showtextdocument">
+					<div class="api-member-head"><code>showTextDocument(document: TextDocument | Uri | string, options?: { viewColumn?: ViewColumn; preserveFocus?: boolean; preview?: boolean; selection?: Range }): Promise&lt;TextEditor&gt;</code><span class="api-kind">função</span></div>
+					<p>Abre um documento no editor.</p>
+				</li><li class="api-member" id="synapse-window-createtexteditordecorationtype">
+					<div class="api-member-head"><code>createTextEditorDecorationType(options: DecorationRenderOptions): TextEditorDecorationType</code><span class="api-kind">função</span></div>
+					<p>Cria um tipo de decoração reutilizável.</p>
+				</li><li class="api-member" id="synapse-window-createoutputchannel">
+					<div class="api-member-head"><code>createOutputChannel(name: string): OutputChannel</code><span class="api-kind">função</span></div>
+					<p>Cria um canal de saída no console.</p>
+				</li><li class="api-member" id="synapse-window-createwebviewpanel">
+					<div class="api-member-head"><code>createWebviewPanel(viewType: string, title: string, showOptions: ViewColumn | { viewColumn: ViewColumn; preserveFocus?: boolean }, options?: WebviewOptions): WebviewPanel</code><span class="api-kind">função</span></div>
+					<p>Abre um painel de webview (permissão <code>webview</code>).</p>
+				</li><li class="api-member" id="synapse-window-registerwebviewviewprovider">
+					<div class="api-member-head"><code>registerWebviewViewProvider(viewId: string, provider: WebviewViewProvider, options?: { webviewOptions?: { retainContextWhenHidden?: boolean } }): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra o provider de uma view declarada em <code>contributes.views</code>.</p>
+				</li></ul>
+		
+	</section>
+<section id="synapse-workspace" class="api-namespace">
+		<h2><code>synapse.workspace</code> — Workspace e arquivos</h2>
+		<p>Workspace: arquivos, documentos, configuração, projetos.</p>
+		<h3>Propriedades e eventos</h3><ul class="api-members"><li class="api-member" id="synapse-workspace-fs">
+		<div class="api-member-head"><code>const fs: FileSystem</code><span class="api-kind">const</span></div>
+		<p>Sistema de arquivos do projeto.</p>
+	</li><li class="api-member" id="synapse-workspace-name">
+		<div class="api-member-head"><code>const name: string</code><span class="api-kind">const</span></div>
+		<p>Nome do projeto ativo.</p>
+	</li><li class="api-member" id="synapse-workspace-workspacefolders">
+		<div class="api-member-head"><code>const workspaceFolders: readonly WorkspaceFolder[] | undefined</code><span class="api-kind">const</span></div>
+		<p>Pastas raiz (uma por projeto ativo).</p>
+	</li><li class="api-member" id="synapse-workspace-textdocuments">
+		<div class="api-member-head"><code>const textDocuments: readonly TextDocument[]</code><span class="api-kind">const</span></div>
+		<p>Documentos abertos.</p>
+	</li><li class="api-member" id="synapse-workspace-projects">
+		<div class="api-member-head"><code>const projects: readonly ProjectInfo[]</code><span class="api-kind">const</span></div>
+		<p>Projetos abertos (todos só com <code>workspace.all</code>).</p>
+	</li><li class="api-member" id="synapse-workspace-ondidchangeconfiguration">
+		<div class="api-member-head"><code>const onDidChangeConfiguration: Event&lt;ConfigurationChangeEvent&gt;</code><span class="api-kind">const</span></div>
+		<p>Dispara quando a configuração muda.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidopentextdocument">
+		<div class="api-member-head"><code>const onDidOpenTextDocument: Event&lt;TextDocument&gt;</code><span class="api-kind">const</span></div>
+		<p>Documento aberto.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidchangetextdocument">
+		<div class="api-member-head"><code>const onDidChangeTextDocument: Event&lt;TextDocumentChangeEvent&gt;</code><span class="api-kind">const</span></div>
+		<p>Documento alterado.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidclosetextdocument">
+		<div class="api-member-head"><code>const onDidCloseTextDocument: Event&lt;TextDocument&gt;</code><span class="api-kind">const</span></div>
+		<p>Documento fechado.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidsavetextdocument">
+		<div class="api-member-head"><code>const onDidSaveTextDocument: Event&lt;TextDocument&gt;</code><span class="api-kind">const</span></div>
+		<p>Documento salvo.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidcreatefiles">
+		<div class="api-member-head"><code>const onDidCreateFiles: Event&lt;{ files: readonly Uri[] }&gt;</code><span class="api-kind">const</span></div>
+		<p>Arquivos criados.</p>
+	</li><li class="api-member" id="synapse-workspace-ondiddeletefiles">
+		<div class="api-member-head"><code>const onDidDeleteFiles: Event&lt;{ files: readonly Uri[] }&gt;</code><span class="api-kind">const</span></div>
+		<p>Arquivos apagados.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidrenamefiles">
+		<div class="api-member-head"><code>const onDidRenameFiles: Event&lt;{ files: readonly { oldUri: Uri; newUri: Uri }[] }&gt;</code><span class="api-kind">const</span></div>
+		<p>Arquivos renomeados.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidopenproject">
+		<div class="api-member-head"><code>const onDidOpenProject: Event&lt;ProjectInfo&gt;</code><span class="api-kind">const</span></div>
+		<p>Projeto aberto.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidcloseproject">
+		<div class="api-member-head"><code>const onDidCloseProject: Event&lt;ProjectInfo&gt;</code><span class="api-kind">const</span></div>
+		<p>Projeto fechado.</p>
+	</li><li class="api-member" id="synapse-workspace-ondidchangeactiveproject">
+		<div class="api-member-head"><code>const onDidChangeActiveProject: Event&lt;ProjectInfo&gt;</code><span class="api-kind">const</span></div>
+		<p>Projeto ativo trocado.</p>
+	</li></ul>
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-workspace-readfile">
+					<div class="api-member-head"><code>readFile(path: Uri | string): Promise&lt;string&gt;</code><span class="api-kind">função</span></div>
+					<p>Atalho para ler texto de um arquivo.</p>
+				</li><li class="api-member" id="synapse-workspace-writefile">
+					<div class="api-member-head"><code>writeFile(path: Uri | string, content: string): Promise&lt;void&gt;</code><span class="api-kind">função</span></div>
+					<p>Atalho para gravar texto em um arquivo.</p>
+				</li><li class="api-member" id="synapse-workspace-stat">
+					<div class="api-member-head"><code>stat(path: Uri | string): Promise&lt;FileStat&gt;</code><span class="api-kind">função</span></div>
+					<p>Metadados de um arquivo.</p>
+				</li><li class="api-member" id="synapse-workspace-findfiles">
+					<div class="api-member-head"><code>findFiles(include: string, exclude?: string, maxResults?: number): Promise&lt;Uri[]&gt;</code><span class="api-kind">função</span></div>
+					<p>Procura arquivos por glob.</p>
+				</li><li class="api-member" id="synapse-workspace-findfilepaths">
+					<div class="api-member-head"><code>findFilePaths(include: string, exclude?: string, maxResults?: number): Promise&lt;string[]&gt;</code><span class="api-kind">função</span></div>
+					<p>Igual a <code>findFiles</code>, devolvendo caminhos relativos.</p>
+				</li><li class="api-member" id="synapse-workspace-opentextdocument">
+					<div class="api-member-head"><code>openTextDocument(uri: Uri | string): Promise&lt;TextDocument&gt;</code><span class="api-kind">função</span></div>
+					<p>Abre (ou lê) um documento.</p>
+				</li><li class="api-member" id="synapse-workspace-getconfiguration">
+					<div class="api-member-head"><code>getConfiguration(section?: string): WorkspaceConfiguration</code><span class="api-kind">função</span></div>
+					<p>Configuração da seção (padrão: a da própria extensão).</p>
+				</li><li class="api-member" id="synapse-workspace-applyedit">
+					<div class="api-member-head"><code>applyEdit(edit: WorkspaceEdit, options?: { label?: string }): Promise&lt;boolean&gt;</code><span class="api-kind">função</span></div>
+					<p>Aplica um <code>WorkspaceEdit</code> como uma única entrada de undo.</p>
+				</li><li class="api-member" id="synapse-workspace-createfilesystemwatcher">
+					<div class="api-member-head"><code>createFileSystemWatcher(globPattern: string, ignoreCreateEvents?: boolean, ignoreChangeEvents?: boolean, ignoreDeleteEvents?: boolean): FileSystemWatcher</code><span class="api-kind">função</span></div>
+					<p>Observa arquivos por glob.</p>
+				</li><li class="api-member" id="synapse-workspace-asrelativepath">
+					<div class="api-member-head"><code>asRelativePath(pathOrUri: string | Uri, includeWorkspaceFolder?: boolean): string</code><span class="api-kind">função</span></div>
+					<p>Converte URI em caminho relativo.</p>
+				</li><li class="api-member" id="synapse-workspace-getworkspacefolder">
+					<div class="api-member-head"><code>getWorkspaceFolder(uri: Uri): WorkspaceFolder | undefined</code><span class="api-kind">função</span></div>
+					<p>Pasta raiz que contém o URI.</p>
+				</li><li class="api-member" id="synapse-workspace-listprojects">
+					<div class="api-member-head"><code>listProjects(): Promise&lt;ProjectInfo[]&gt;</code><span class="api-kind">função</span></div>
+					<p>Lista projetos abertos consultando o host.</p>
+				</li></ul>
+		
+	</section>
+<section id="synapse-languages" class="api-namespace">
+		<h2><code>synapse.languages</code> — Linguagens</h2>
+		<p>Linguagens: providers, diagnósticos e configuração.</p>
+		
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-languages-registercompletionitemprovider">
+					<div class="api-member-head"><code>registerCompletionItemProvider(selector: DocumentSelector, provider: CompletionItemProvider, ...triggerCharacters: string[]): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra completions (caracteres gatilho opcionais).</p>
+				</li><li class="api-member" id="synapse-languages-registerhoverprovider">
+					<div class="api-member-head"><code>registerHoverProvider(selector: DocumentSelector, provider: HoverProvider): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra hover.</p>
+				</li><li class="api-member" id="synapse-languages-registerdefinitionprovider">
+					<div class="api-member-head"><code>registerDefinitionProvider(selector: DocumentSelector, provider: DefinitionProvider): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra definição.</p>
+				</li><li class="api-member" id="synapse-languages-registerdocumentformattingeditprovider">
+					<div class="api-member-head"><code>registerDocumentFormattingEditProvider(selector: DocumentSelector, provider: DocumentFormattingEditProvider): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra formatador.</p>
+				</li><li class="api-member" id="synapse-languages-registercodeactionsprovider">
+					<div class="api-member-head"><code>registerCodeActionsProvider(selector: DocumentSelector, provider: CodeActionProvider, metadata?: { providedCodeActionKinds?: readonly CodeActionKind[] }): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra ações de código.</p>
+				</li><li class="api-member" id="synapse-languages-registerdocumentsymbolprovider">
+					<div class="api-member-head"><code>registerDocumentSymbolProvider(selector: DocumentSelector, provider: DocumentSymbolProvider): Disposable</code><span class="api-kind">função</span></div>
+					<p>Registra símbolos do documento.</p>
+				</li><li class="api-member" id="synapse-languages-creatediagnosticcollection">
+					<div class="api-member-head"><code>createDiagnosticCollection(name?: string): DiagnosticCollection</code><span class="api-kind">função</span></div>
+					<p>Cria coleção de diagnósticos.</p>
+				</li><li class="api-member" id="synapse-languages-setlanguageconfiguration">
+					<div class="api-member-head"><code>setLanguageConfiguration(languageId: string, configuration: LanguageConfiguration): Disposable</code><span class="api-kind">função</span></div>
+					<p>Define comentários, colchetes, dobra e indentação de uma linguagem.</p>
+				</li><li class="api-member" id="synapse-languages-getlanguages">
+					<div class="api-member-head"><code>getLanguages(): Promise&lt;string[]&gt;</code><span class="api-kind">função</span></div>
+					<p>Ids de linguagens conhecidas.</p>
+				</li><li class="api-member" id="synapse-languages-match">
+					<div class="api-member-head"><code>match(selector: DocumentSelector, document: TextDocument): number</code><span class="api-kind">função</span></div>
+					<p>Pontuação de casamento entre seletor e documento (0 = não casa).</p>
+				</li></ul>
+		
+	</section>
+<section id="synapse-preview" class="api-namespace">
+		<h2><code>synapse.preview</code> — Preview</h2>
+		<p>Preview ao vivo (permissão <code>preview</code> para injetar scripts).</p>
+		<h3>Propriedades e eventos</h3><ul class="api-members"><li class="api-member" id="synapse-preview-ondidreload">
+		<div class="api-member-head"><code>const onDidReload: Event&lt;{ projectId: string | null; projectName: string; mode: string; url: string }&gt;</code><span class="api-kind">const</span></div>
+		<p>Dispara depois de cada recarga do preview.</p>
+	</li></ul>
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-preview-injectscript">
+					<div class="api-member-head"><code>injectScript(source: string): Promise&lt;void&gt;</code><span class="api-kind">função</span></div>
+					<p>Injeta um script no documento do preview.</p>
+				</li><li class="api-member" id="synapse-preview-reload">
+					<div class="api-member-head"><code>reload(options?: { full?: boolean }): Promise&lt;void&gt;</code><span class="api-kind">função</span></div>
+					<p>Recarrega o preview (<code>full</code> força recompilação).</p>
+				</li><li class="api-member" id="synapse-preview-setviewport">
+					<div class="api-member-head"><code>setViewport(options: PreviewViewport | string): Promise&lt;void&gt;</code><span class="api-kind">função</span></div>
+					<p>Muda o viewport.</p>
+				</li><li class="api-member" id="synapse-preview-getviewport">
+					<div class="api-member-head"><code>getViewport(): Promise&lt;Required&lt;PreviewViewport&gt;&gt;</code><span class="api-kind">função</span></div>
+					<p>Lê o viewport atual.</p>
+				</li><li class="api-member" id="synapse-preview-getstate">
+					<div class="api-member-head"><code>getState(): Promise&lt;PreviewState&gt;</code><span class="api-kind">função</span></div>
+					<p>Estado atual.</p>
+				</li></ul>
+		
+	</section>
+<section id="synapse-keybindings" class="api-namespace">
+		<h2><code>synapse.keybindings</code> — Atalhos</h2>
+		<p>Atalhos resolvidos para os comandos da extensão.</p>
+		
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-keybindings-list">
+					<div class="api-member-head"><code>list(): { command: string; binding: string; when?: string }[]</code><span class="api-kind">função</span></div>
+					<p>Lista <code>{ command, binding, when }</code>.</p>
+				</li><li class="api-member" id="synapse-keybindings-bindingfor">
+					<div class="api-member-head"><code>bindingFor(command: string): string</code><span class="api-kind">função</span></div>
+					<p>Atalho atual de um comando ou string vazia.</p>
+				</li></ul>
+		
+	</section>
+<section id="synapse-env" class="api-namespace">
+		<h2><code>synapse.env</code> — Ambiente</h2>
+		<p>Ambiente da IDE.</p>
+		<h3>Propriedades e eventos</h3><ul class="api-members"><li class="api-member" id="synapse-env-language">
+		<div class="api-member-head"><code>const language: string</code><span class="api-kind">const</span></div>
+		<p>Idioma da interface (<code>pt</code>, <code>en</code>, <code>es</code>, <code>zh</code>).</p>
+	</li><li class="api-member" id="synapse-env-appversion">
+		<div class="api-member-head"><code>const appVersion: string</code><span class="api-kind">const</span></div>
+		<p>Versão da IDE.</p>
+	</li><li class="api-member" id="synapse-env-appname">
+		<div class="api-member-head"><code>const appName: string</code><span class="api-kind">const</span></div>
+		<p>Nome da aplicação.</p>
+	</li><li class="api-member" id="synapse-env-uikind">
+		<div class="api-member-head"><code>const uiKind: 'desktop' | 'celular'</code><span class="api-kind">const</span></div>
+		<p><code>desktop</code> ou <code>celular</code>.</p>
+	</li><li class="api-member" id="synapse-env-ismobile">
+		<div class="api-member-head"><code>const isMobile: boolean</code><span class="api-kind">const</span></div>
+		<p><code>true</code> no layout de celular.</p>
+	</li><li class="api-member" id="synapse-env-clipboard">
+		<div class="api-member-head"><code>const clipboard: Clipboard</code><span class="api-kind">const</span></div>
+		<p>Área de transferência.</p>
+	</li></ul>
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-env-openexternal">
+					<div class="api-member-head"><code>openExternal(target: Uri | string): Promise&lt;boolean&gt;</code><span class="api-kind">função</span></div>
+					<p>Abre URL externa após a política de URLs da IDE.</p>
+				</li></ul>
+		
+	</section>
+<section id="synapse-test" class="api-namespace">
+		<h2><code>synapse.test</code> — Testes</h2>
+		<p>Mini framework de testes executado dentro do Extension Host (arquivos <code>test/*.test.js</code>).</p>
+		
+		<h3>Funções</h3><ul class="api-members"><li class="api-member" id="synapse-test-describe">
+					<div class="api-member-head"><code>describe(name: string, body: () =&gt; void): void</code><span class="api-kind">função</span></div>
+					<p>Agrupa casos.</p>
+				</li><li class="api-member" id="synapse-test-it">
+					<div class="api-member-head"><code>it(name: string, body: () =&gt; any | Promise&lt;any&gt;): void</code><span class="api-kind">função</span></div>
+					<p>Define um caso; pode ser assíncrono.</p>
+				</li><li class="api-member" id="synapse-test-test">
+					<div class="api-member-head"><code>test(name: string, body: () =&gt; any | Promise&lt;any&gt;): void</code><span class="api-kind">função</span></div>
+					<p>Alias de <code>it</code>.</p>
+				</li><li class="api-member" id="synapse-test-skip">
+					<div class="api-member-head"><code>skip(name: string, body?: () =&gt; any): void</code><span class="api-kind">função</span></div>
+					<p>Caso pulado.</p>
+				</li><li class="api-member" id="synapse-test-beforeeach">
+					<div class="api-member-head"><code>beforeEach(body: () =&gt; any | Promise&lt;any&gt;): void</code><span class="api-kind">função</span></div>
+					<p>Executa antes de cada caso da suíte atual.</p>
+				</li><li class="api-member" id="synapse-test-aftereach">
+					<div class="api-member-head"><code>afterEach(body: () =&gt; any | Promise&lt;any&gt;): void</code><span class="api-kind">função</span></div>
+					<p>Executa depois de cada caso da suíte atual.</p>
+				</li><li class="api-member" id="synapse-test-beforeall">
+					<div class="api-member-head"><code>beforeAll(body: () =&gt; any | Promise&lt;any&gt;): void</code><span class="api-kind">função</span></div>
+					<p>Executa uma vez antes da suíte atual.</p>
+				</li><li class="api-member" id="synapse-test-afterall">
+					<div class="api-member-head"><code>afterAll(body: () =&gt; any | Promise&lt;any&gt;): void</code><span class="api-kind">função</span></div>
+					<p>Executa uma vez depois da suíte atual.</p>
+				</li><li class="api-member" id="synapse-test-expect">
+					<div class="api-member-head"><code>expect&lt;T&gt;(actual: T): Expectation&lt;T&gt;</code><span class="api-kind">função</span></div>
+					<p>Cria asserções para um valor.</p>
+				</li><li class="api-member" id="synapse-test-run">
+					<div class="api-member-head"><code>run(): Promise&lt;TestReport&gt;</code><span class="api-kind">função</span></div>
+					<p>Executa as suítes registradas e envia o relatório ao painel de saída.</p>
+				</li></ul>
+		
+	</section>
+<section id="tipos"><h2>Tipos</h2><p>Classes, interfaces e enums compartilhados pelos namespaces acima.</p><section class="api-type" id="synapse-disposable">
+		<h3><code>class</code> Disposable</h3>
+		<pre class="api-signature"><code>class Disposable</code></pre>
+		<p>Recurso que pode ser liberado; use em <code>context.subscriptions</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-disposable-constructor">
+		<div class="api-member-head"><code>constructor(callOnDispose: () =&gt; void)</code><span class="api-kind">construtor</span></div>
+		<p>Cria um descartável que executa <code>callOnDispose</code> uma única vez.</p>
+	</li><li class="api-member" id="synapse-disposable-from">
+		<div class="api-member-head"><code>static from(...disposables: { dispose(): any }[]): Disposable</code><span class="api-kind">método</span></div>
+		<p>Agrupa vários descartáveis em um só.</p>
+	</li><li class="api-member" id="synapse-disposable-dispose">
+		<div class="api-member-head"><code>dispose(): void</code><span class="api-kind">método</span></div>
+		<p>Libera o recurso. Chamadas repetidas são ignoradas.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-event">
+		<h3><code>interface</code> Event</h3>
+		<pre class="api-signature"><code>interface Event&lt;T&gt;</code></pre>
+		<p>Assinatura de evento: chamar com um ouvinte devolve o descartável da inscrição.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-event--listener-e-t-any-thisargs-any-disposables-disposable-disposable">
+		<div class="api-member-head"><code>(listener: (e: T) =&gt; any, thisArgs?: any, disposables?: Disposable[]): Disposable</code><span class="api-kind">member</span></div>
+		<p>Registra <code>listener</code>; <code>thisArgs</code> é o <code>this</code> do ouvinte e <code>disposables</code> recebe a inscrição.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-eventemitter">
+		<h3><code>class</code> EventEmitter</h3>
+		<pre class="api-signature"><code>class EventEmitter&lt;T&gt;</code></pre>
+		<p>Emissor de eventos tipado; use <code>event</code> para expor e <code>fire</code> para disparar.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-eventemitter-event">
+		<div class="api-member-head"><code>readonly event: Event&lt;T&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Evento que outros podem assinar.</p>
+	</li><li class="api-member" id="synapse-eventemitter-fire">
+		<div class="api-member-head"><code>fire(data: T): void</code><span class="api-kind">método</span></div>
+		<p>Notifica todos os ouvintes com <code>data</code>.</p>
+	</li><li class="api-member" id="synapse-eventemitter-dispose">
+		<div class="api-member-head"><code>dispose(): void</code><span class="api-kind">método</span></div>
+		<p>Remove todos os ouvintes.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-cancellationtoken">
+		<h3><code>interface</code> CancellationToken</h3>
+		<pre class="api-signature"><code>interface CancellationToken</code></pre>
+		<p>Sinal de cancelamento cooperativo entregue a providers e tarefas longas.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-cancellationtoken-iscancellationrequested">
+		<div class="api-member-head"><code>readonly isCancellationRequested: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> quando o cancelamento já foi pedido.</p>
+	</li><li class="api-member" id="synapse-cancellationtoken-oncancellationrequested">
+		<div class="api-member-head"><code>readonly onCancellationRequested: Event&lt;void&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Dispara quando o cancelamento é pedido.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-cancellationtokensource">
+		<h3><code>class</code> CancellationTokenSource</h3>
+		<pre class="api-signature"><code>class CancellationTokenSource</code></pre>
+		<p>Fonte de um <code>CancellationToken</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-cancellationtokensource-token">
+		<div class="api-member-head"><code>readonly token: CancellationToken</code><span class="api-kind">propriedade</span></div>
+		<p>Token associado a esta fonte.</p>
+	</li><li class="api-member" id="synapse-cancellationtokensource-cancel">
+		<div class="api-member-head"><code>cancel(): void</code><span class="api-kind">método</span></div>
+		<p>Pede o cancelamento.</p>
+	</li><li class="api-member" id="synapse-cancellationtokensource-dispose">
+		<div class="api-member-head"><code>dispose(): void</code><span class="api-kind">método</span></div>
+		<p>Cancela e libera os ouvintes.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-uri">
+		<h3><code>class</code> Uri</h3>
+		<pre class="api-signature"><code>class Uri</code></pre>
+		<p>Identificador de recurso. Arquivos do projeto usam o esquema <code>synapse:/projeto/&lt;caminho&gt;</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-uri-scheme">
+		<div class="api-member-head"><code>readonly scheme: string</code><span class="api-kind">propriedade</span></div>
+		<p>Esquema do URI (<code>synapse</code>, <code>https</code>...).</p>
+	</li><li class="api-member" id="synapse-uri-authority">
+		<div class="api-member-head"><code>readonly authority: string</code><span class="api-kind">propriedade</span></div>
+		<p>Autoridade (host) quando houver.</p>
+	</li><li class="api-member" id="synapse-uri-path">
+		<div class="api-member-head"><code>readonly path: string</code><span class="api-kind">propriedade</span></div>
+		<p>Caminho absoluto dentro do esquema.</p>
+	</li><li class="api-member" id="synapse-uri-query">
+		<div class="api-member-head"><code>readonly query: string</code><span class="api-kind">propriedade</span></div>
+		<p>Query string sem <code>?</code>.</p>
+	</li><li class="api-member" id="synapse-uri-fragment">
+		<div class="api-member-head"><code>readonly fragment: string</code><span class="api-kind">propriedade</span></div>
+		<p>Fragmento sem <code>#</code>.</p>
+	</li><li class="api-member" id="synapse-uri-fspath">
+		<div class="api-member-head"><code>readonly fsPath: string</code><span class="api-kind">propriedade</span></div>
+		<p>Caminho relativo ao projeto (sem o prefixo <code>synapse:/projeto/</code>).</p>
+	</li><li class="api-member" id="synapse-uri-file">
+		<div class="api-member-head"><code>static file(path: string): Uri</code><span class="api-kind">método</span></div>
+		<p>Cria um URI de arquivo do projeto a partir de um caminho relativo.</p>
+	</li><li class="api-member" id="synapse-uri-parse">
+		<div class="api-member-head"><code>static parse(value: string): Uri</code><span class="api-kind">método</span></div>
+		<p>Interpreta uma string como URI.</p>
+	</li><li class="api-member" id="synapse-uri-joinpath">
+		<div class="api-member-head"><code>static joinPath(base: Uri, ...pathSegments: string[]): Uri</code><span class="api-kind">método</span></div>
+		<p>Concatena segmentos ao caminho de <code>base</code>.</p>
+	</li><li class="api-member" id="synapse-uri-isuri">
+		<div class="api-member-head"><code>static isUri(value: any): value is Uri</code><span class="api-kind">método</span></div>
+		<p>Verifica se <code>value</code> é um <code>Uri</code>.</p>
+	</li><li class="api-member" id="synapse-uri-with">
+		<div class="api-member-head"><code>with(change: { scheme?: string; authority?: string; path?: string; query?: string; fragment?: string }): Uri</code><span class="api-kind">método</span></div>
+		<p>Devolve uma cópia com os campos informados substituídos.</p>
+	</li><li class="api-member" id="synapse-uri-tostring">
+		<div class="api-member-head"><code>toString(): string</code><span class="api-kind">método</span></div>
+		<p>Serializa em string.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-position">
+		<h3><code>class</code> Position</h3>
+		<pre class="api-signature"><code>class Position</code></pre>
+		<p>Posição zero-based (linha, coluna) em um documento.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-position-line">
+		<div class="api-member-head"><code>readonly line: number</code><span class="api-kind">propriedade</span></div>
+		<p>Linha, começando em 0.</p>
+	</li><li class="api-member" id="synapse-position-character">
+		<div class="api-member-head"><code>readonly character: number</code><span class="api-kind">propriedade</span></div>
+		<p>Coluna (índice de caractere), começando em 0.</p>
+	</li><li class="api-member" id="synapse-position-constructor">
+		<div class="api-member-head"><code>constructor(line: number, character: number)</code><span class="api-kind">construtor</span></div>
+		<p>Cria uma posição.</p>
+	</li><li class="api-member" id="synapse-position-isbefore">
+		<div class="api-member-head"><code>isBefore(other: Position): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se esta posição vem antes de <code>other</code>.</p>
+	</li><li class="api-member" id="synapse-position-isbeforeorequal">
+		<div class="api-member-head"><code>isBeforeOrEqual(other: Position): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se vem antes ou é igual a <code>other</code>.</p>
+	</li><li class="api-member" id="synapse-position-isafter">
+		<div class="api-member-head"><code>isAfter(other: Position): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se vem depois de <code>other</code>.</p>
+	</li><li class="api-member" id="synapse-position-isafterorequal">
+		<div class="api-member-head"><code>isAfterOrEqual(other: Position): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se vem depois ou é igual a <code>other</code>.</p>
+	</li><li class="api-member" id="synapse-position-isequal">
+		<div class="api-member-head"><code>isEqual(other: Position): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se linha e coluna coincidem.</p>
+	</li><li class="api-member" id="synapse-position-compareto">
+		<div class="api-member-head"><code>compareTo(other: Position): number</code><span class="api-kind">método</span></div>
+		<p>Comparador: negativo, zero ou positivo.</p>
+	</li><li class="api-member" id="synapse-position-translate">
+		<div class="api-member-head"><code>translate(lineDelta?: number, characterDelta?: number): Position</code><span class="api-kind">método</span></div>
+		<p>Nova posição deslocada por linhas/colunas.</p>
+	</li><li class="api-member" id="synapse-position-with">
+		<div class="api-member-head"><code>with(line?: number, character?: number): Position</code><span class="api-kind">método</span></div>
+		<p>Nova posição com linha e/ou coluna substituídas.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-range">
+		<h3><code>class</code> Range</h3>
+		<pre class="api-signature"><code>class Range</code></pre>
+		<p>Intervalo entre duas posições (início sempre anterior ou igual ao fim).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-range-start">
+		<div class="api-member-head"><code>readonly start: Position</code><span class="api-kind">propriedade</span></div>
+		<p>Início do intervalo.</p>
+	</li><li class="api-member" id="synapse-range-end">
+		<div class="api-member-head"><code>readonly end: Position</code><span class="api-kind">propriedade</span></div>
+		<p>Fim do intervalo.</p>
+	</li><li class="api-member" id="synapse-range-isempty">
+		<div class="api-member-head"><code>readonly isEmpty: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> quando início e fim coincidem.</p>
+	</li><li class="api-member" id="synapse-range-issingleline">
+		<div class="api-member-head"><code>readonly isSingleLine: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> quando o intervalo está em uma única linha.</p>
+	</li><li class="api-member" id="synapse-range-constructor">
+		<div class="api-member-head"><code>constructor(start: Position, end: Position)</code><span class="api-kind">construtor</span></div>
+		<p>Cria a partir de duas posições.</p>
+	</li><li class="api-member" id="synapse-range-constructor">
+		<div class="api-member-head"><code>constructor(startLine: number, startCharacter: number, endLine: number, endCharacter: number)</code><span class="api-kind">construtor</span></div>
+		<p>Cria a partir de quatro números.</p>
+	</li><li class="api-member" id="synapse-range-contains">
+		<div class="api-member-head"><code>contains(positionOrRange: Position | Range): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se contém a posição ou intervalo.</p>
+	</li><li class="api-member" id="synapse-range-isequal">
+		<div class="api-member-head"><code>isEqual(other: Range): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se os limites coincidem.</p>
+	</li><li class="api-member" id="synapse-range-intersection">
+		<div class="api-member-head"><code>intersection(range: Range): Range | undefined</code><span class="api-kind">método</span></div>
+		<p>Interseção com <code>range</code> ou <code>undefined</code>.</p>
+	</li><li class="api-member" id="synapse-range-union">
+		<div class="api-member-head"><code>union(other: Range): Range</code><span class="api-kind">método</span></div>
+		<p>Menor intervalo que cobre os dois.</p>
+	</li><li class="api-member" id="synapse-range-with">
+		<div class="api-member-head"><code>with(start?: Position, end?: Position): Range</code><span class="api-kind">método</span></div>
+		<p>Cópia com início e/ou fim substituídos.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-selection">
+		<h3><code>class</code> Selection</h3>
+		<pre class="api-signature"><code>class Selection extends Range</code></pre>
+		<p>Intervalo com direção: <code>anchor</code> é onde a seleção começou e <code>active</code> onde está o cursor.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-selection-anchor">
+		<div class="api-member-head"><code>readonly anchor: Position</code><span class="api-kind">propriedade</span></div>
+		<p>Posição fixa da seleção.</p>
+	</li><li class="api-member" id="synapse-selection-active">
+		<div class="api-member-head"><code>readonly active: Position</code><span class="api-kind">propriedade</span></div>
+		<p>Posição do cursor.</p>
+	</li><li class="api-member" id="synapse-selection-isreversed">
+		<div class="api-member-head"><code>readonly isReversed: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> quando <code>active</code> vem antes de <code>anchor</code>.</p>
+	</li><li class="api-member" id="synapse-selection-constructor">
+		<div class="api-member-head"><code>constructor(anchor: Position, active: Position)</code><span class="api-kind">construtor</span></div>
+		<p>Cria a partir de duas posições.</p>
+	</li><li class="api-member" id="synapse-selection-constructor">
+		<div class="api-member-head"><code>constructor(anchorLine: number, anchorCharacter: number, activeLine: number, activeCharacter: number)</code><span class="api-kind">construtor</span></div>
+		<p>Cria a partir de quatro números.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-textedit">
+		<h3><code>class</code> TextEdit</h3>
+		<pre class="api-signature"><code>class TextEdit</code></pre>
+		<p>Edição de texto: substitui <code>range</code> por <code>newText</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-textedit-range">
+		<div class="api-member-head"><code>range: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo afetado.</p>
+	</li><li class="api-member" id="synapse-textedit-newtext">
+		<div class="api-member-head"><code>newText: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto novo.</p>
+	</li><li class="api-member" id="synapse-textedit-constructor">
+		<div class="api-member-head"><code>constructor(range: Range, newText: string)</code><span class="api-kind">construtor</span></div>
+		<p>Cria uma edição.</p>
+	</li><li class="api-member" id="synapse-textedit-replace">
+		<div class="api-member-head"><code>static replace(range: Range, newText: string): TextEdit</code><span class="api-kind">método</span></div>
+		<p>Edição que substitui um intervalo.</p>
+	</li><li class="api-member" id="synapse-textedit-insert">
+		<div class="api-member-head"><code>static insert(position: Position, newText: string): TextEdit</code><span class="api-kind">método</span></div>
+		<p>Edição que insere em uma posição.</p>
+	</li><li class="api-member" id="synapse-textedit-delete">
+		<div class="api-member-head"><code>static delete(range: Range): TextEdit</code><span class="api-kind">método</span></div>
+		<p>Edição que apaga um intervalo.</p>
+	</li><li class="api-member" id="synapse-textedit-setendofline">
+		<div class="api-member-head"><code>static setEndOfLine(eol: EndOfLine): TextEdit</code><span class="api-kind">método</span></div>
+		<p>Edição que troca o fim de linha do documento.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-snippetstring">
+		<h3><code>class</code> SnippetString</h3>
+		<pre class="api-signature"><code>class SnippetString</code></pre>
+		<p>Construtor de snippet no formato TextMate (<code>$1</code>, <code>${1:texto}</code>, <code>${1|a,b|}</code>, <code>$TM_FILENAME</code>).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-snippetstring-value">
+		<div class="api-member-head"><code>value: string</code><span class="api-kind">propriedade</span></div>
+		<p>Corpo do snippet.</p>
+	</li><li class="api-member" id="synapse-snippetstring-constructor">
+		<div class="api-member-head"><code>constructor(value?: string)</code><span class="api-kind">construtor</span></div>
+		<p>Inicia com um corpo opcional.</p>
+	</li><li class="api-member" id="synapse-snippetstring-appendtext">
+		<div class="api-member-head"><code>appendText(text: string): SnippetString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta texto literal (com escape automático).</p>
+	</li><li class="api-member" id="synapse-snippetstring-appendtabstop">
+		<div class="api-member-head"><code>appendTabstop(number?: number): SnippetString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta um tabstop <code>$n</code>.</p>
+	</li><li class="api-member" id="synapse-snippetstring-appendplaceholder">
+		<div class="api-member-head"><code>appendPlaceholder(value: string | ((snippet: SnippetString) =&gt; any), number?: number): SnippetString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta um placeholder <code>${n:valor}</code>.</p>
+	</li><li class="api-member" id="synapse-snippetstring-appendchoice">
+		<div class="api-member-head"><code>appendChoice(values: readonly string[], number?: number): SnippetString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta uma escolha <code>${n|a,b,c|}</code>.</p>
+	</li><li class="api-member" id="synapse-snippetstring-appendvariable">
+		<div class="api-member-head"><code>appendVariable(name: string, defaultValue: string | ((snippet: SnippetString) =&gt; any)): SnippetString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta uma variável <code>${NOME:padrão}</code>.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-workspaceedit">
+		<h3><code>class</code> WorkspaceEdit</h3>
+		<pre class="api-signature"><code>class WorkspaceEdit</code></pre>
+		<p>Conjunto de edições em vários arquivos, aplicado atomicamente por <code>workspace.applyEdit</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-workspaceedit-size">
+		<div class="api-member-head"><code>readonly size: number</code><span class="api-kind">propriedade</span></div>
+		<p>Quantidade de arquivos afetados.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-replace">
+		<div class="api-member-head"><code>replace(uri: Uri | string, range: Range, newText: string): void</code><span class="api-kind">método</span></div>
+		<p>Substitui <code>range</code> em <code>uri</code>.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-insert">
+		<div class="api-member-head"><code>insert(uri: Uri | string, position: Position, newText: string): void</code><span class="api-kind">método</span></div>
+		<p>Insere em <code>position</code> em <code>uri</code>.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-delete">
+		<div class="api-member-head"><code>delete(uri: Uri | string, range: Range): void</code><span class="api-kind">método</span></div>
+		<p>Apaga <code>range</code> em <code>uri</code>.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-has">
+		<div class="api-member-head"><code>has(uri: Uri | string): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se há edições para <code>uri</code>.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-set">
+		<div class="api-member-head"><code>set(uri: Uri | string, edits: readonly TextEdit[]): void</code><span class="api-kind">método</span></div>
+		<p>Define a lista de edições de <code>uri</code>.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-get">
+		<div class="api-member-head"><code>get(uri: Uri | string): TextEdit[]</code><span class="api-kind">método</span></div>
+		<p>Edições registradas para <code>uri</code>.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-expectversion">
+		<div class="api-member-head"><code>expectVersion(uri: Uri | string, version: number): void</code><span class="api-kind">método</span></div>
+		<p>Falha a aplicação se a versão do documento mudou (evita sobrescrever digitação).</p>
+	</li><li class="api-member" id="synapse-workspaceedit-createfile">
+		<div class="api-member-head"><code>createFile(uri: Uri | string, options?: { overwrite?: boolean; ignoreIfExists?: boolean; contents?: string }): void</code><span class="api-kind">método</span></div>
+		<p>Cria um arquivo (opcionalmente com conteúdo).</p>
+	</li><li class="api-member" id="synapse-workspaceedit-deletefile">
+		<div class="api-member-head"><code>deleteFile(uri: Uri | string, options?: { ignoreIfNotExists?: boolean }): void</code><span class="api-kind">método</span></div>
+		<p>Apaga um arquivo.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-renamefile">
+		<div class="api-member-head"><code>renameFile(oldUri: Uri | string, newUri: Uri | string, options?: { overwrite?: boolean; ignoreIfExists?: boolean }): void</code><span class="api-kind">método</span></div>
+		<p>Renomeia/move um arquivo.</p>
+	</li><li class="api-member" id="synapse-workspaceedit-entries">
+		<div class="api-member-head"><code>entries(): [Uri, TextEdit[]][]</code><span class="api-kind">método</span></div>
+		<p>Pares <code>[uri, edições]</code>.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-filesystemerror">
+		<h3><code>class</code> FileSystemError</h3>
+		<pre class="api-signature"><code>class FileSystemError extends Error</code></pre>
+		<p>Erro tipado das operações de arquivo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-filesystemerror-code">
+		<div class="api-member-head"><code>readonly code: string</code><span class="api-kind">propriedade</span></div>
+		<p>Código: <code>FileNotFound</code>, <code>FileExists</code>, <code>FileNotADirectory</code>, <code>FileIsADirectory</code>, <code>NoPermissions</code>, <code>Unavailable</code>.</p>
+	</li><li class="api-member" id="synapse-filesystemerror-filenotfound">
+		<div class="api-member-head"><code>static FileNotFound(messageOrUri?: string | Uri): FileSystemError</code><span class="api-kind">método</span></div>
+		<p>Arquivo inexistente.</p>
+	</li><li class="api-member" id="synapse-filesystemerror-fileexists">
+		<div class="api-member-head"><code>static FileExists(messageOrUri?: string | Uri): FileSystemError</code><span class="api-kind">método</span></div>
+		<p>Arquivo já existe.</p>
+	</li><li class="api-member" id="synapse-filesystemerror-filenotadirectory">
+		<div class="api-member-head"><code>static FileNotADirectory(messageOrUri?: string | Uri): FileSystemError</code><span class="api-kind">método</span></div>
+		<p>Esperava diretório.</p>
+	</li><li class="api-member" id="synapse-filesystemerror-fileisadirectory">
+		<div class="api-member-head"><code>static FileIsADirectory(messageOrUri?: string | Uri): FileSystemError</code><span class="api-kind">método</span></div>
+		<p>Esperava arquivo.</p>
+	</li><li class="api-member" id="synapse-filesystemerror-nopermissions">
+		<div class="api-member-head"><code>static NoPermissions(messageOrUri?: string | Uri): FileSystemError</code><span class="api-kind">método</span></div>
+		<p>Permissão <code>workspace.*</code> ausente.</p>
+	</li><li class="api-member" id="synapse-filesystemerror-unavailable">
+		<div class="api-member-head"><code>static Unavailable(messageOrUri?: string | Uri): FileSystemError</code><span class="api-kind">método</span></div>
+		<p>Projeto indisponível.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-markdownstring">
+		<h3><code>class</code> MarkdownString</h3>
+		<pre class="api-signature"><code>class MarkdownString</code></pre>
+		<p>Texto rico para hovers, tooltips e detalhes de completions.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-markdownstring-value">
+		<div class="api-member-head"><code>value: string</code><span class="api-kind">propriedade</span></div>
+		<p>Markdown bruto.</p>
+	</li><li class="api-member" id="synapse-markdownstring-istrusted">
+		<div class="api-member-head"><code>isTrusted?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Permite links <code>command:</code> quando <code>true</code>.</p>
+	</li><li class="api-member" id="synapse-markdownstring-constructor">
+		<div class="api-member-head"><code>constructor(value?: string)</code><span class="api-kind">construtor</span></div>
+		<p>Cria com conteúdo inicial.</p>
+	</li><li class="api-member" id="synapse-markdownstring-appendtext">
+		<div class="api-member-head"><code>appendText(value: string): MarkdownString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta texto com escape.</p>
+	</li><li class="api-member" id="synapse-markdownstring-appendmarkdown">
+		<div class="api-member-head"><code>appendMarkdown(value: string): MarkdownString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta markdown sem escape.</p>
+	</li><li class="api-member" id="synapse-markdownstring-appendcodeblock">
+		<div class="api-member-head"><code>appendCodeblock(value: string, language?: string): MarkdownString</code><span class="api-kind">método</span></div>
+		<p>Acrescenta um bloco de código com linguagem.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-endofline">
+		<h3><code>enum</code> EndOfLine</h3>
+		<pre class="api-signature"><code>enum EndOfLine</code></pre>
+		<p>Fim de linha do documento.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-endofline-lf-1">
+		<div class="api-member-head"><code>LF = 1</code><span class="api-kind">member</span></div>
+		<p><code>\n</code>.</p>
+	</li><li class="api-member" id="synapse-endofline-crlf-2">
+		<div class="api-member-head"><code>CRLF = 2</code><span class="api-kind">member</span></div>
+		<p><code>\r\n</code>.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-textline">
+		<h3><code>interface</code> TextLine</h3>
+		<pre class="api-signature"><code>interface TextLine</code></pre>
+		<p>Uma linha de um <code>TextDocument</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-textline-linenumber">
+		<div class="api-member-head"><code>readonly lineNumber: number</code><span class="api-kind">propriedade</span></div>
+		<p>Índice da linha.</p>
+	</li><li class="api-member" id="synapse-textline-text">
+		<div class="api-member-head"><code>readonly text: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto sem quebra de linha.</p>
+	</li><li class="api-member" id="synapse-textline-range">
+		<div class="api-member-head"><code>readonly range: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo sem a quebra.</p>
+	</li><li class="api-member" id="synapse-textline-rangeincludinglinebreak">
+		<div class="api-member-head"><code>readonly rangeIncludingLineBreak: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo incluindo a quebra.</p>
+	</li><li class="api-member" id="synapse-textline-firstnonwhitespacecharacterindex">
+		<div class="api-member-head"><code>readonly firstNonWhitespaceCharacterIndex: number</code><span class="api-kind">propriedade</span></div>
+		<p>Coluna do primeiro caractere não-branco.</p>
+	</li><li class="api-member" id="synapse-textline-isemptyorwhitespace">
+		<div class="api-member-head"><code>readonly isEmptyOrWhitespace: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> se a linha só tem espaços.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-textdocument">
+		<h3><code>interface</code> TextDocument</h3>
+		<pre class="api-signature"><code>interface TextDocument</code></pre>
+		<p>Documento de texto aberto ou lido do projeto.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-textdocument-uri">
+		<div class="api-member-head"><code>readonly uri: Uri</code><span class="api-kind">propriedade</span></div>
+		<p>URI do documento.</p>
+	</li><li class="api-member" id="synapse-textdocument-filename">
+		<div class="api-member-head"><code>readonly fileName: string</code><span class="api-kind">propriedade</span></div>
+		<p>Caminho relativo ao projeto.</p>
+	</li><li class="api-member" id="synapse-textdocument-languageid">
+		<div class="api-member-head"><code>readonly languageId: string</code><span class="api-kind">propriedade</span></div>
+		<p>Identificador da linguagem (<code>javascript</code>, <code>python</code>...).</p>
+	</li><li class="api-member" id="synapse-textdocument-version">
+		<div class="api-member-head"><code>readonly version: number</code><span class="api-kind">propriedade</span></div>
+		<p>Versão incremental; muda a cada edição.</p>
+	</li><li class="api-member" id="synapse-textdocument-isdirty">
+		<div class="api-member-head"><code>readonly isDirty: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> se há alterações não salvas.</p>
+	</li><li class="api-member" id="synapse-textdocument-isclosed">
+		<div class="api-member-head"><code>readonly isClosed: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> depois que a aba foi fechada.</p>
+	</li><li class="api-member" id="synapse-textdocument-linecount">
+		<div class="api-member-head"><code>readonly lineCount: number</code><span class="api-kind">propriedade</span></div>
+		<p>Quantidade de linhas.</p>
+	</li><li class="api-member" id="synapse-textdocument-eol">
+		<div class="api-member-head"><code>readonly eol: EndOfLine</code><span class="api-kind">propriedade</span></div>
+		<p>Fim de linha detectado.</p>
+	</li><li class="api-member" id="synapse-textdocument-gettext">
+		<div class="api-member-head"><code>getText(range?: Range): string</code><span class="api-kind">método</span></div>
+		<p>Texto completo ou de um intervalo.</p>
+	</li><li class="api-member" id="synapse-textdocument-lineat">
+		<div class="api-member-head"><code>lineAt(lineOrPosition: number | Position): TextLine</code><span class="api-kind">método</span></div>
+		<p>Linha pelo índice ou posição.</p>
+	</li><li class="api-member" id="synapse-textdocument-offsetat">
+		<div class="api-member-head"><code>offsetAt(position: Position): number</code><span class="api-kind">método</span></div>
+		<p>Converte posição em offset absoluto.</p>
+	</li><li class="api-member" id="synapse-textdocument-positionat">
+		<div class="api-member-head"><code>positionAt(offset: number): Position</code><span class="api-kind">método</span></div>
+		<p>Converte offset em posição.</p>
+	</li><li class="api-member" id="synapse-textdocument-validateposition">
+		<div class="api-member-head"><code>validatePosition(position: Position): Position</code><span class="api-kind">método</span></div>
+		<p>Ajusta a posição aos limites do documento.</p>
+	</li><li class="api-member" id="synapse-textdocument-validaterange">
+		<div class="api-member-head"><code>validateRange(range: Range): Range</code><span class="api-kind">método</span></div>
+		<p>Ajusta o intervalo aos limites do documento.</p>
+	</li><li class="api-member" id="synapse-textdocument-getwordrangeatposition">
+		<div class="api-member-head"><code>getWordRangeAtPosition(position: Position, regex?: RegExp): Range | undefined</code><span class="api-kind">método</span></div>
+		<p>Intervalo da palavra sob a posição (regex opcional).</p>
+	</li><li class="api-member" id="synapse-textdocument-save">
+		<div class="api-member-head"><code>save(): Promise&lt;boolean&gt;</code><span class="api-kind">método</span></div>
+		<p>Salva o documento.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-texteditorrevealtype">
+		<h3><code>enum</code> TextEditorRevealType</h3>
+		<pre class="api-signature"><code>enum TextEditorRevealType</code></pre>
+		<p>Como o editor deve rolar ao revelar um intervalo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-texteditorrevealtype-default-0">
+		<div class="api-member-head"><code>Default = 0</code><span class="api-kind">member</span></div>
+		<p>Rola o mínimo necessário.</p>
+	</li><li class="api-member" id="synapse-texteditorrevealtype-incenter-1">
+		<div class="api-member-head"><code>InCenter = 1</code><span class="api-kind">member</span></div>
+		<p>Centraliza o intervalo.</p>
+	</li><li class="api-member" id="synapse-texteditorrevealtype-incenterifoutsideviewport-2">
+		<div class="api-member-head"><code>InCenterIfOutsideViewport = 2</code><span class="api-kind">member</span></div>
+		<p>Centraliza só se estiver fora da tela.</p>
+	</li><li class="api-member" id="synapse-texteditorrevealtype-attop-3">
+		<div class="api-member-head"><code>AtTop = 3</code><span class="api-kind">member</span></div>
+		<p>Alinha ao topo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-texteditorselectionchangekind">
+		<h3><code>enum</code> TextEditorSelectionChangeKind</h3>
+		<pre class="api-signature"><code>enum TextEditorSelectionChangeKind</code></pre>
+		<p>Origem de uma mudança de seleção.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-texteditorselectionchangekind-keyboard-1">
+		<div class="api-member-head"><code>Keyboard = 1</code><span class="api-kind">member</span></div>
+		<p>Teclado.</p>
+	</li><li class="api-member" id="synapse-texteditorselectionchangekind-mouse-2">
+		<div class="api-member-head"><code>Mouse = 2</code><span class="api-kind">member</span></div>
+		<p>Mouse.</p>
+	</li><li class="api-member" id="synapse-texteditorselectionchangekind-command-3">
+		<div class="api-member-head"><code>Command = 3</code><span class="api-kind">member</span></div>
+		<p>Comando ou API.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-decorationrangebehavior">
+		<h3><code>enum</code> DecorationRangeBehavior</h3>
+		<pre class="api-signature"><code>enum DecorationRangeBehavior</code></pre>
+		<p>Como decorações crescem quando o usuário digita nas bordas.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-decorationrangebehavior-openopen-0">
+		<div class="api-member-head"><code>OpenOpen = 0</code><span class="api-kind">member</span></div>
+		<p>Cresce dos dois lados.</p>
+	</li><li class="api-member" id="synapse-decorationrangebehavior-closedclosed-1">
+		<div class="api-member-head"><code>ClosedClosed = 1</code><span class="api-kind">member</span></div>
+		<p>Não cresce.</p>
+	</li><li class="api-member" id="synapse-decorationrangebehavior-openclosed-2">
+		<div class="api-member-head"><code>OpenClosed = 2</code><span class="api-kind">member</span></div>
+		<p>Cresce só no fim.</p>
+	</li><li class="api-member" id="synapse-decorationrangebehavior-closedopen-3">
+		<div class="api-member-head"><code>ClosedOpen = 3</code><span class="api-kind">member</span></div>
+		<p>Cresce só no início.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-decorationrenderoptions">
+		<h3><code>interface</code> DecorationRenderOptions</h3>
+		<pre class="api-signature"><code>interface DecorationRenderOptions</code></pre>
+		<p>Aparência de um tipo de decoração.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-decorationrenderoptions-backgroundcolor">
+		<div class="api-member-head"><code>backgroundColor?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Cor de fundo (CSS).</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-color">
+		<div class="api-member-head"><code>color?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Cor do texto (CSS).</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-border">
+		<div class="api-member-head"><code>border?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Borda CSS completa, ex.: <code>1px solid red</code>.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-fontstyle">
+		<div class="api-member-head"><code>fontStyle?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Estilo de fonte (<code>italic</code>).</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-fontweight">
+		<div class="api-member-head"><code>fontWeight?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Peso de fonte (<code>bold</code>).</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-textdecoration">
+		<div class="api-member-head"><code>textDecoration?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Decoração de texto (<code>underline</code>, <code>line-through</code>).</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-opacity">
+		<div class="api-member-head"><code>opacity?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Opacidade de 0 a 1.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-cursor">
+		<div class="api-member-head"><code>cursor?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Cursor CSS.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-iswholeline">
+		<div class="api-member-head"><code>isWholeLine?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Decora a linha inteira.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-rangebehavior">
+		<div class="api-member-head"><code>rangeBehavior?: DecorationRangeBehavior</code><span class="api-kind">propriedade</span></div>
+		<p>Comportamento nas bordas.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-after">
+		<div class="api-member-head"><code>after?: { contentText?: string; color?: string; margin?: string; fontStyle?: string }</code><span class="api-kind">propriedade</span></div>
+		<p>Texto exibido após o intervalo.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-before">
+		<div class="api-member-head"><code>before?: { contentText?: string; color?: string; margin?: string; fontStyle?: string }</code><span class="api-kind">propriedade</span></div>
+		<p>Texto exibido antes do intervalo.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-guttericonpath">
+		<div class="api-member-head"><code>gutterIconPath?: string</code><span class="api-kind">propriedade</span></div>
+		<p>SVG inline (até 16 KB) exibido na calha.</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-guttericonsize">
+		<div class="api-member-head"><code>gutterIconSize?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Tamanho do ícone da calha (<code>contain</code>, <code>16px</code>).</p>
+	</li><li class="api-member" id="synapse-decorationrenderoptions-overviewrulercolor">
+		<div class="api-member-head"><code>overviewRulerColor?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Cor da marca na barra de rolagem.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-decorationoptions">
+		<h3><code>interface</code> DecorationOptions</h3>
+		<pre class="api-signature"><code>interface DecorationOptions</code></pre>
+		<p>Intervalo decorado com tooltip opcional.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-decorationoptions-range">
+		<div class="api-member-head"><code>range: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo.</p>
+	</li><li class="api-member" id="synapse-decorationoptions-hovermessage">
+		<div class="api-member-head"><code>hoverMessage?: string | MarkdownString | (string | MarkdownString)[]</code><span class="api-kind">propriedade</span></div>
+		<p>Tooltip ao passar o mouse.</p>
+	</li><li class="api-member" id="synapse-decorationoptions-renderoptions">
+		<div class="api-member-head"><code>renderOptions?: DecorationRenderOptions</code><span class="api-kind">propriedade</span></div>
+		<p>Sobrescreve a aparência só para este intervalo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-texteditordecorationtype">
+		<h3><code>interface</code> TextEditorDecorationType</h3>
+		<pre class="api-signature"><code>interface TextEditorDecorationType extends Disposable</code></pre>
+		<p>Identificador de um estilo de decoração criado por <code>window.createTextEditorDecorationType</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-texteditordecorationtype-key">
+		<div class="api-member-head"><code>readonly key: string</code><span class="api-kind">propriedade</span></div>
+		<p>Chave interna única.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-texteditoredit">
+		<h3><code>interface</code> TextEditorEdit</h3>
+		<pre class="api-signature"><code>interface TextEditorEdit</code></pre>
+		<p>Acumulador de edições dentro de <code>TextEditor.edit</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-texteditoredit-replace">
+		<div class="api-member-head"><code>replace(location: Position | Range | Selection, value: string): void</code><span class="api-kind">método</span></div>
+		<p>Substitui posição/intervalo/seleção.</p>
+	</li><li class="api-member" id="synapse-texteditoredit-insert">
+		<div class="api-member-head"><code>insert(location: Position, value: string): void</code><span class="api-kind">método</span></div>
+		<p>Insere texto.</p>
+	</li><li class="api-member" id="synapse-texteditoredit-delete">
+		<div class="api-member-head"><code>delete(location: Range | Selection): void</code><span class="api-kind">método</span></div>
+		<p>Apaga intervalo/seleção.</p>
+	</li><li class="api-member" id="synapse-texteditoredit-setendofline">
+		<div class="api-member-head"><code>setEndOfLine(endOfLine: EndOfLine): void</code><span class="api-kind">método</span></div>
+		<p>Troca o fim de linha.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-viewcolumn">
+		<h3><code>enum</code> ViewColumn</h3>
+		<pre class="api-signature"><code>enum ViewColumn</code></pre>
+		<p>Coluna do editor onde abrir um documento ou painel.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-viewcolumn-active--1">
+		<div class="api-member-head"><code>Active = -1</code><span class="api-kind">member</span></div>
+		<p>Coluna atual.</p>
+	</li><li class="api-member" id="synapse-viewcolumn-beside--2">
+		<div class="api-member-head"><code>Beside = -2</code><span class="api-kind">member</span></div>
+		<p>Ao lado da atual.</p>
+	</li><li class="api-member" id="synapse-viewcolumn-one-1">
+		<div class="api-member-head"><code>One = 1</code><span class="api-kind">member</span></div>
+		<p>Primeira coluna.</p>
+	</li><li class="api-member" id="synapse-viewcolumn-two-2">
+		<div class="api-member-head"><code>Two = 2</code><span class="api-kind">member</span></div>
+		<p>Segunda coluna.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-texteditor">
+		<h3><code>interface</code> TextEditor</h3>
+		<pre class="api-signature"><code>interface TextEditor</code></pre>
+		<p>Editor de texto visível.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-texteditor-document">
+		<div class="api-member-head"><code>readonly document: TextDocument</code><span class="api-kind">propriedade</span></div>
+		<p>Documento aberto.</p>
+	</li><li class="api-member" id="synapse-texteditor-selection">
+		<div class="api-member-head"><code>selection: Selection</code><span class="api-kind">propriedade</span></div>
+		<p>Seleção principal; atribuir move o cursor.</p>
+	</li><li class="api-member" id="synapse-texteditor-selections">
+		<div class="api-member-head"><code>selections: readonly Selection[]</code><span class="api-kind">propriedade</span></div>
+		<p>Todas as seleções (multi-cursor).</p>
+	</li><li class="api-member" id="synapse-texteditor-visibleranges">
+		<div class="api-member-head"><code>readonly visibleRanges: readonly Range[]</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalos visíveis na tela.</p>
+	</li><li class="api-member" id="synapse-texteditor-options">
+		<div class="api-member-head"><code>readonly options: { tabSize: number; insertSpaces: boolean }</code><span class="api-kind">propriedade</span></div>
+		<p>Opções de indentação do editor.</p>
+	</li><li class="api-member" id="synapse-texteditor-edit">
+		<div class="api-member-head"><code>edit(callback: (editBuilder: TextEditorEdit) =&gt; void, options?: { undoStopBefore?: boolean; undoStopAfter?: boolean }): Promise&lt;boolean&gt;</code><span class="api-kind">método</span></div>
+		<p>Aplica edições em lote; resolve <code>false</code> se o documento mudou no meio.</p>
+	</li><li class="api-member" id="synapse-texteditor-insertsnippet">
+		<div class="api-member-head"><code>insertSnippet(snippet: SnippetString | string, location?: Position | Range | readonly Position[] | readonly Range[]): Promise&lt;boolean&gt;</code><span class="api-kind">método</span></div>
+		<p>Insere um snippet na posição/seleção.</p>
+	</li><li class="api-member" id="synapse-texteditor-setdecorations">
+		<div class="api-member-head"><code>setDecorations(decorationType: TextEditorDecorationType, rangesOrOptions: readonly Range[] | readonly DecorationOptions[]): void</code><span class="api-kind">método</span></div>
+		<p>Aplica decorações de um tipo (lista vazia limpa).</p>
+	</li><li class="api-member" id="synapse-texteditor-revealrange">
+		<div class="api-member-head"><code>revealRange(range: Range, revealType?: TextEditorRevealType): void</code><span class="api-kind">método</span></div>
+		<p>Rola até o intervalo.</p>
+	</li><li class="api-member" id="synapse-texteditor-show">
+		<div class="api-member-head"><code>show(column?: ViewColumn): void</code><span class="api-kind">método</span></div>
+		<p>Dá foco ao editor.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-memento">
+		<h3><code>interface</code> Memento</h3>
+		<pre class="api-signature"><code>interface Memento</code></pre>
+		<p>Armazenamento chave/valor persistente por extensão.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-memento-get">
+		<div class="api-member-head"><code>get&lt;T&gt;(key: string, defaultValue?: T): T | undefined</code><span class="api-kind">método</span></div>
+		<p>Lê um valor (ou <code>defaultValue</code>).</p>
+	</li><li class="api-member" id="synapse-memento-update">
+		<div class="api-member-head"><code>update(key: string, value: any): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Grava um valor; <code>undefined</code> remove.</p>
+	</li><li class="api-member" id="synapse-memento-keys">
+		<div class="api-member-head"><code>keys(): readonly string[]</code><span class="api-kind">método</span></div>
+		<p>Chaves gravadas.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-extensioncontext">
+		<h3><code>interface</code> ExtensionContext</h3>
+		<pre class="api-signature"><code>interface ExtensionContext</code></pre>
+		<p>Contexto recebido em <code>activate(context)</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-extensioncontext-subscriptions">
+		<div class="api-member-head"><code>readonly subscriptions: Disposable[]</code><span class="api-kind">propriedade</span></div>
+		<p>Descartáveis liberados automaticamente em <code>deactivate</code>.</p>
+	</li><li class="api-member" id="synapse-extensioncontext-globalstate">
+		<div class="api-member-head"><code>readonly globalState: Memento</code><span class="api-kind">propriedade</span></div>
+		<p>Estado global (todos os projetos).</p>
+	</li><li class="api-member" id="synapse-extensioncontext-workspacestate">
+		<div class="api-member-head"><code>readonly workspaceState: Memento</code><span class="api-kind">propriedade</span></div>
+		<p>Estado do projeto ativo.</p>
+	</li><li class="api-member" id="synapse-extensioncontext-extensionuri">
+		<div class="api-member-head"><code>readonly extensionUri: string</code><span class="api-kind">propriedade</span></div>
+		<p>URI raiz da extensão.</p>
+	</li><li class="api-member" id="synapse-extensioncontext-extensionpath">
+		<div class="api-member-head"><code>readonly extensionPath: string</code><span class="api-kind">propriedade</span></div>
+		<p>Alias de <code>extensionUri</code>.</p>
+	</li><li class="api-member" id="synapse-extensioncontext-extension">
+		<div class="api-member-head"><code>readonly extension: { readonly id: string; readonly packageJSON: any }</code><span class="api-kind">propriedade</span></div>
+		<p>Identificação e manifesto normalizado.</p>
+	</li><li class="api-member" id="synapse-extensioncontext-asabsolutepath">
+		<div class="api-member-head"><code>asAbsolutePath(relativePath: string): string</code><span class="api-kind">método</span></div>
+		<p>Resolve um caminho relativo à pasta da extensão.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-outputchannel">
+		<h3><code>interface</code> OutputChannel</h3>
+		<pre class="api-signature"><code>interface OutputChannel extends Disposable</code></pre>
+		<p>Canal de texto no console da IDE, filtrável por extensão.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-outputchannel-name">
+		<div class="api-member-head"><code>readonly name: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome do canal.</p>
+	</li><li class="api-member" id="synapse-outputchannel-append">
+		<div class="api-member-head"><code>append(value: string): void</code><span class="api-kind">método</span></div>
+		<p>Acrescenta texto sem quebra.</p>
+	</li><li class="api-member" id="synapse-outputchannel-appendline">
+		<div class="api-member-head"><code>appendLine(value: string): void</code><span class="api-kind">método</span></div>
+		<p>Acrescenta uma linha.</p>
+	</li><li class="api-member" id="synapse-outputchannel-clear">
+		<div class="api-member-head"><code>clear(): void</code><span class="api-kind">método</span></div>
+		<p>Limpa as mensagens desta extensão.</p>
+	</li><li class="api-member" id="synapse-outputchannel-show">
+		<div class="api-member-head"><code>show(preserveFocus?: boolean): void</code><span class="api-kind">método</span></div>
+		<p>Abre o console.</p>
+	</li><li class="api-member" id="synapse-outputchannel-hide">
+		<div class="api-member-head"><code>hide(): void</code><span class="api-kind">método</span></div>
+		<p>Sem efeito; mantido por compatibilidade.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-statusbaralignment">
+		<h3><code>enum</code> StatusBarAlignment</h3>
+		<pre class="api-signature"><code>enum StatusBarAlignment</code></pre>
+		<p>Lado da barra de status.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-statusbaralignment-left-1">
+		<div class="api-member-head"><code>Left = 1</code><span class="api-kind">member</span></div>
+		<p>Esquerda.</p>
+	</li><li class="api-member" id="synapse-statusbaralignment-right-2">
+		<div class="api-member-head"><code>Right = 2</code><span class="api-kind">member</span></div>
+		<p>Direita.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-statusbaritem">
+		<h3><code>interface</code> StatusBarItem</h3>
+		<pre class="api-signature"><code>interface StatusBarItem extends Disposable</code></pre>
+		<p>Item da barra de status.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-statusbaritem-id">
+		<div class="api-member-head"><code>readonly id: string</code><span class="api-kind">propriedade</span></div>
+		<p>Identificador estável.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-alignment">
+		<div class="api-member-head"><code>readonly alignment: StatusBarAlignment</code><span class="api-kind">propriedade</span></div>
+		<p>Lado.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-priority">
+		<div class="api-member-head"><code>readonly priority: number</code><span class="api-kind">propriedade</span></div>
+		<p>Prioridade (maior = mais perto da borda).</p>
+	</li><li class="api-member" id="synapse-statusbaritem-text">
+		<div class="api-member-head"><code>text: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto; aceita <code>$(icone)</code> do catálogo da IDE.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-tooltip">
+		<div class="api-member-head"><code>tooltip: string | MarkdownString | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>Tooltip.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-command">
+		<div class="api-member-head"><code>command: string | { command: string; arguments?: any[] } | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>Comando executado ao clicar.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-color">
+		<div class="api-member-head"><code>color: string | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>Cor do texto (CSS ou token).</p>
+	</li><li class="api-member" id="synapse-statusbaritem-backgroundcolor">
+		<div class="api-member-head"><code>backgroundColor: string | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>Cor de fundo.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-name">
+		<div class="api-member-head"><code>name: string | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>Nome acessível.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-show">
+		<div class="api-member-head"><code>show(): void</code><span class="api-kind">método</span></div>
+		<p>Mostra o item.</p>
+	</li><li class="api-member" id="synapse-statusbaritem-hide">
+		<div class="api-member-head"><code>hide(): void</code><span class="api-kind">método</span></div>
+		<p>Esconde o item.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-quickpickitem">
+		<h3><code>interface</code> QuickPickItem</h3>
+		<pre class="api-signature"><code>interface QuickPickItem</code></pre>
+		<p>Item de <code>window.showQuickPick</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-quickpickitem-label">
+		<div class="api-member-head"><code>label: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto principal.</p>
+	</li><li class="api-member" id="synapse-quickpickitem-description">
+		<div class="api-member-head"><code>description?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto secundário na mesma linha.</p>
+	</li><li class="api-member" id="synapse-quickpickitem-detail">
+		<div class="api-member-head"><code>detail?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Linha de detalhe abaixo.</p>
+	</li><li class="api-member" id="synapse-quickpickitem-picked">
+		<div class="api-member-head"><code>picked?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Pré-selecionado quando <code>canPickMany</code>.</p>
+	</li><li class="api-member" id="synapse-quickpickitem-alwaysshow">
+		<div class="api-member-head"><code>alwaysShow?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Sempre visível independente do filtro.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-quickpickoptions">
+		<h3><code>interface</code> QuickPickOptions</h3>
+		<pre class="api-signature"><code>interface QuickPickOptions</code></pre>
+		<p>Opções de <code>window.showQuickPick</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-quickpickoptions-title">
+		<div class="api-member-head"><code>title?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Título do seletor.</p>
+	</li><li class="api-member" id="synapse-quickpickoptions-placeholder">
+		<div class="api-member-head"><code>placeHolder?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto de ajuda no campo.</p>
+	</li><li class="api-member" id="synapse-quickpickoptions-matchondescription">
+		<div class="api-member-head"><code>matchOnDescription?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Filtra também por <code>description</code>.</p>
+	</li><li class="api-member" id="synapse-quickpickoptions-matchondetail">
+		<div class="api-member-head"><code>matchOnDetail?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Filtra também por <code>detail</code>.</p>
+	</li><li class="api-member" id="synapse-quickpickoptions-canpickmany">
+		<div class="api-member-head"><code>canPickMany?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Permite múltiplos itens.</p>
+	</li><li class="api-member" id="synapse-quickpickoptions-ignorefocusout">
+		<div class="api-member-head"><code>ignoreFocusOut?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Não fecha ao perder foco.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-inputboxoptions">
+		<h3><code>interface</code> InputBoxOptions</h3>
+		<pre class="api-signature"><code>interface InputBoxOptions</code></pre>
+		<p>Opções de <code>window.showInputBox</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-inputboxoptions-title">
+		<div class="api-member-head"><code>title?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Título.</p>
+	</li><li class="api-member" id="synapse-inputboxoptions-value">
+		<div class="api-member-head"><code>value?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Valor inicial.</p>
+	</li><li class="api-member" id="synapse-inputboxoptions-prompt">
+		<div class="api-member-head"><code>prompt?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto de ajuda.</p>
+	</li><li class="api-member" id="synapse-inputboxoptions-placeholder">
+		<div class="api-member-head"><code>placeHolder?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Placeholder.</p>
+	</li><li class="api-member" id="synapse-inputboxoptions-password">
+		<div class="api-member-head"><code>password?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Oculta os caracteres.</p>
+	</li><li class="api-member" id="synapse-inputboxoptions-ignorefocusout">
+		<div class="api-member-head"><code>ignoreFocusOut?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Não fecha ao perder foco.</p>
+	</li><li class="api-member" id="synapse-inputboxoptions-validateinput">
+		<div class="api-member-head"><code>validateInput?(value: string): string | { message: string } | null | undefined | Promise&lt;string | { message: string } | null | undefined&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Validação: devolva uma mensagem para bloquear o envio.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-messageitem">
+		<h3><code>interface</code> MessageItem</h3>
+		<pre class="api-signature"><code>interface MessageItem</code></pre>
+		<p>Item de mensagem com ação.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-messageitem-title">
+		<div class="api-member-head"><code>title: string</code><span class="api-kind">propriedade</span></div>
+		<p>Rótulo do botão.</p>
+	</li><li class="api-member" id="synapse-messageitem-iscloseaffordance">
+		<div class="api-member-head"><code>isCloseAffordance?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Marca o botão de fechar.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-messageoptions">
+		<h3><code>interface</code> MessageOptions</h3>
+		<pre class="api-signature"><code>interface MessageOptions</code></pre>
+		<p>Opções de <code>window.show*Message</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-messageoptions-modal">
+		<div class="api-member-head"><code>modal?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Exige interação do usuário (diálogo em vez de toast).</p>
+	</li><li class="api-member" id="synapse-messageoptions-detail">
+		<div class="api-member-head"><code>detail?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto complementar em diálogo modal.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-progresslocation">
+		<h3><code>enum</code> ProgressLocation</h3>
+		<pre class="api-signature"><code>enum ProgressLocation</code></pre>
+		<p>Onde mostrar o progresso.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-progresslocation-notification-15">
+		<div class="api-member-head"><code>Notification = 15</code><span class="api-kind">member</span></div>
+		<p>Notificação com barra.</p>
+	</li><li class="api-member" id="synapse-progresslocation-window-10">
+		<div class="api-member-head"><code>Window = 10</code><span class="api-kind">member</span></div>
+		<p>Barra de status.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-progressoptions">
+		<h3><code>interface</code> ProgressOptions</h3>
+		<pre class="api-signature"><code>interface ProgressOptions</code></pre>
+		<p>Opções de <code>window.withProgress</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-progressoptions-location">
+		<div class="api-member-head"><code>location: ProgressLocation | { viewId: string }</code><span class="api-kind">propriedade</span></div>
+		<p>Local.</p>
+	</li><li class="api-member" id="synapse-progressoptions-title">
+		<div class="api-member-head"><code>title?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Título.</p>
+	</li><li class="api-member" id="synapse-progressoptions-cancellable">
+		<div class="api-member-head"><code>cancellable?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Mostra botão cancelar.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-progress">
+		<h3><code>interface</code> Progress</h3>
+		<pre class="api-signature"><code>interface Progress&lt;T&gt;</code></pre>
+		<p>Relator de progresso recebido na tarefa.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-progress-report">
+		<div class="api-member-head"><code>report(value: T): void</code><span class="api-kind">método</span></div>
+		<p>Envia um passo (<code>message</code>, <code>increment</code> em %).</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-colorthemekind">
+		<h3><code>enum</code> ColorThemeKind</h3>
+		<pre class="api-signature"><code>enum ColorThemeKind</code></pre>
+		<p>Tipo de tema.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-colorthemekind-light-1">
+		<div class="api-member-head"><code>Light = 1</code><span class="api-kind">member</span></div>
+		<p>Claro.</p>
+	</li><li class="api-member" id="synapse-colorthemekind-dark-2">
+		<div class="api-member-head"><code>Dark = 2</code><span class="api-kind">member</span></div>
+		<p>Escuro.</p>
+	</li><li class="api-member" id="synapse-colorthemekind-highcontrast-3">
+		<div class="api-member-head"><code>HighContrast = 3</code><span class="api-kind">member</span></div>
+		<p>Alto contraste escuro.</p>
+	</li><li class="api-member" id="synapse-colorthemekind-highcontrastlight-4">
+		<div class="api-member-head"><code>HighContrastLight = 4</code><span class="api-kind">member</span></div>
+		<p>Alto contraste claro.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-colortheme">
+		<h3><code>interface</code> ColorTheme</h3>
+		<pre class="api-signature"><code>interface ColorTheme</code></pre>
+		<p>Tema de cores ativo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-colortheme-kind">
+		<div class="api-member-head"><code>readonly kind: ColorThemeKind</code><span class="api-kind">propriedade</span></div>
+		<p>Tipo.</p>
+	</li><li class="api-member" id="synapse-colortheme-id">
+		<div class="api-member-head"><code>readonly id: string</code><span class="api-kind">propriedade</span></div>
+		<p>Identificador (<code>padrao</code>, <code>ext:publisher.nome/Label</code>).</p>
+	</li><li class="api-member" id="synapse-colortheme-tokens">
+		<div class="api-member-head"><code>readonly tokens: Readonly&lt;Record&lt;string, string&gt;&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Tokens CSS resolvidos (<code>bg</code>, <code>txt</code>, <code>acc</code>...).</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-webview">
+		<h3><code>interface</code> Webview</h3>
+		<pre class="api-signature"><code>interface Webview</code></pre>
+		<p>Conteúdo HTML isolado em iframe sandbox.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-webview-html">
+		<div class="api-member-head"><code>html: string</code><span class="api-kind">propriedade</span></div>
+		<p>HTML completo; scripts precisam do nonce em <code>cspSource</code>.</p>
+	</li><li class="api-member" id="synapse-webview-options">
+		<div class="api-member-head"><code>options: WebviewOptions</code><span class="api-kind">propriedade</span></div>
+		<p>Opções do webview.</p>
+	</li><li class="api-member" id="synapse-webview-cspsource">
+		<div class="api-member-head"><code>readonly cspSource: string</code><span class="api-kind">propriedade</span></div>
+		<p>Origem a colocar no CSP (<code>'nonce-…'</code>).</p>
+	</li><li class="api-member" id="synapse-webview-ondidreceivemessage">
+		<div class="api-member-head"><code>readonly onDidReceiveMessage: Event&lt;any&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Mensagens vindas do iframe (<code>acquireSynapseApi().postMessage</code>).</p>
+	</li><li class="api-member" id="synapse-webview-postmessage">
+		<div class="api-member-head"><code>postMessage(message: any): Promise&lt;boolean&gt;</code><span class="api-kind">método</span></div>
+		<p>Envia mensagem ao iframe.</p>
+	</li><li class="api-member" id="synapse-webview-aswebviewuri">
+		<div class="api-member-head"><code>asWebviewUri(localResource: Uri | string): string</code><span class="api-kind">método</span></div>
+		<p>Converte um asset da extensão em URL utilizável no HTML.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-webviewoptions">
+		<h3><code>interface</code> WebviewOptions</h3>
+		<pre class="api-signature"><code>interface WebviewOptions</code></pre>
+		<p>Opções de webview.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-webviewoptions-enablescripts">
+		<div class="api-member-head"><code>enableScripts?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Permite <code>&lt;script&gt;</code>.</p>
+	</li><li class="api-member" id="synapse-webviewoptions-enableforms">
+		<div class="api-member-head"><code>enableForms?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Permite formulários.</p>
+	</li><li class="api-member" id="synapse-webviewoptions-localresourceroots">
+		<div class="api-member-head"><code>localResourceRoots?: readonly (Uri | string)[]</code><span class="api-kind">propriedade</span></div>
+		<p>Pastas da extensão liberadas para <code>asWebviewUri</code>.</p>
+	</li><li class="api-member" id="synapse-webviewoptions-retaincontextwhenhidden">
+		<div class="api-member-head"><code>retainContextWhenHidden?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Mantém o DOM ao esconder.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-webviewpanel">
+		<h3><code>interface</code> WebviewPanel</h3>
+		<pre class="api-signature"><code>interface WebviewPanel extends Disposable</code></pre>
+		<p>Painel de webview aberto como aba do editor.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-webviewpanel-viewtype">
+		<div class="api-member-head"><code>readonly viewType: string</code><span class="api-kind">propriedade</span></div>
+		<p>Tipo declarado em <code>createWebviewPanel</code>.</p>
+	</li><li class="api-member" id="synapse-webviewpanel-title">
+		<div class="api-member-head"><code>title: string</code><span class="api-kind">propriedade</span></div>
+		<p>Título da aba.</p>
+	</li><li class="api-member" id="synapse-webviewpanel-webview">
+		<div class="api-member-head"><code>readonly webview: Webview</code><span class="api-kind">propriedade</span></div>
+		<p>Webview interno.</p>
+	</li><li class="api-member" id="synapse-webviewpanel-active">
+		<div class="api-member-head"><code>readonly active: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> quando é a aba ativa.</p>
+	</li><li class="api-member" id="synapse-webviewpanel-visible">
+		<div class="api-member-head"><code>readonly visible: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> quando visível.</p>
+	</li><li class="api-member" id="synapse-webviewpanel-ondidchangeviewstate">
+		<div class="api-member-head"><code>readonly onDidChangeViewState: Event&lt;{ webviewPanel: WebviewPanel }&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Dispara ao trocar <code>active</code>/<code>visible</code>.</p>
+	</li><li class="api-member" id="synapse-webviewpanel-ondiddispose">
+		<div class="api-member-head"><code>readonly onDidDispose: Event&lt;void&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Dispara ao fechar.</p>
+	</li><li class="api-member" id="synapse-webviewpanel-reveal">
+		<div class="api-member-head"><code>reveal(viewColumn?: ViewColumn, preserveFocus?: boolean): void</code><span class="api-kind">método</span></div>
+		<p>Traz o painel para frente.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-webviewview">
+		<h3><code>interface</code> WebviewView</h3>
+		<pre class="api-signature"><code>interface WebviewView</code></pre>
+		<p>View de webview na barra lateral (declarada em <code>contributes.views</code>).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-webviewview-viewtype">
+		<div class="api-member-head"><code>readonly viewType: string</code><span class="api-kind">propriedade</span></div>
+		<p>Id da view.</p>
+	</li><li class="api-member" id="synapse-webviewview-webview">
+		<div class="api-member-head"><code>readonly webview: Webview</code><span class="api-kind">propriedade</span></div>
+		<p>Webview interno.</p>
+	</li><li class="api-member" id="synapse-webviewview-title">
+		<div class="api-member-head"><code>title: string</code><span class="api-kind">propriedade</span></div>
+		<p>Título exibido.</p>
+	</li><li class="api-member" id="synapse-webviewview-description">
+		<div class="api-member-head"><code>description: string</code><span class="api-kind">propriedade</span></div>
+		<p>Descrição ao lado do título.</p>
+	</li><li class="api-member" id="synapse-webviewview-visible">
+		<div class="api-member-head"><code>readonly visible: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> quando visível.</p>
+	</li><li class="api-member" id="synapse-webviewview-ondiddispose">
+		<div class="api-member-head"><code>readonly onDidDispose: Event&lt;void&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Dispara ao fechar.</p>
+	</li><li class="api-member" id="synapse-webviewview-ondidchangevisibility">
+		<div class="api-member-head"><code>readonly onDidChangeVisibility: Event&lt;void&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Dispara ao mudar a visibilidade.</p>
+	</li><li class="api-member" id="synapse-webviewview-show">
+		<div class="api-member-head"><code>show(preserveFocus?: boolean): void</code><span class="api-kind">método</span></div>
+		<p>Revela a view.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-webviewviewprovider">
+		<h3><code>interface</code> WebviewViewProvider</h3>
+		<pre class="api-signature"><code>interface WebviewViewProvider</code></pre>
+		<p>Provider que preenche uma <code>WebviewView</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-webviewviewprovider-resolvewebviewview">
+		<div class="api-member-head"><code>resolveWebviewView(webviewView: WebviewView, context: { state: any }, token: CancellationToken): void | Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Chamado quando a view é exibida pela primeira vez.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-configurationtarget">
+		<h3><code>enum</code> ConfigurationTarget</h3>
+		<pre class="api-signature"><code>enum ConfigurationTarget</code></pre>
+		<p>Escopo de gravação de configuração.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-configurationtarget-global-1">
+		<div class="api-member-head"><code>Global = 1</code><span class="api-kind">member</span></div>
+		<p>Todos os projetos.</p>
+	</li><li class="api-member" id="synapse-configurationtarget-workspace-2">
+		<div class="api-member-head"><code>Workspace = 2</code><span class="api-kind">member</span></div>
+		<p>Projeto ativo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-workspaceconfiguration">
+		<h3><code>interface</code> WorkspaceConfiguration</h3>
+		<pre class="api-signature"><code>interface WorkspaceConfiguration</code></pre>
+		<p>Configuração contribuída em <code>contributes.configuration</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-workspaceconfiguration-get">
+		<div class="api-member-head"><code>get&lt;T&gt;(section: string, defaultValue?: T): T | undefined</code><span class="api-kind">método</span></div>
+		<p>Lê <code>section</code> (ou <code>defaultValue</code>).</p>
+	</li><li class="api-member" id="synapse-workspaceconfiguration-has">
+		<div class="api-member-head"><code>has(section: string): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se a chave existe.</p>
+	</li><li class="api-member" id="synapse-workspaceconfiguration-update">
+		<div class="api-member-head"><code>update(section: string, value: any, target?: ConfigurationTarget | boolean): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Grava um valor visível no painel de Configurações.</p>
+	</li><li class="api-member" id="synapse-workspaceconfiguration-inspect">
+		<div class="api-member-head"><code>inspect&lt;T&gt;(section: string): { key: string; defaultValue?: T; globalValue?: T; workspaceValue?: T } | undefined</code><span class="api-kind">método</span></div>
+		<p>Detalhes por escopo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-configurationchangeevent">
+		<h3><code>interface</code> ConfigurationChangeEvent</h3>
+		<pre class="api-signature"><code>interface ConfigurationChangeEvent</code></pre>
+		<p>Evento de mudança de configuração.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-configurationchangeevent-affectsconfiguration">
+		<div class="api-member-head"><code>affectsConfiguration(section: string): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se <code>section</code> (ou filha) mudou.</p>
+	</li><li class="api-member" id="synapse-configurationchangeevent-keys">
+		<div class="api-member-head"><code>readonly keys: readonly string[]</code><span class="api-kind">propriedade</span></div>
+		<p>Chaves alteradas.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-filetype">
+		<h3><code>enum</code> FileType</h3>
+		<pre class="api-signature"><code>enum FileType</code></pre>
+		<p>Tipo de entrada no sistema de arquivos.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-filetype-unknown-0">
+		<div class="api-member-head"><code>Unknown = 0</code><span class="api-kind">member</span></div>
+		<p>Desconhecido.</p>
+	</li><li class="api-member" id="synapse-filetype-file-1">
+		<div class="api-member-head"><code>File = 1</code><span class="api-kind">member</span></div>
+		<p>Arquivo.</p>
+	</li><li class="api-member" id="synapse-filetype-directory-2">
+		<div class="api-member-head"><code>Directory = 2</code><span class="api-kind">member</span></div>
+		<p>Diretório.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-filestat">
+		<h3><code>interface</code> FileStat</h3>
+		<pre class="api-signature"><code>interface FileStat</code></pre>
+		<p>Metadados de um arquivo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-filestat-type">
+		<div class="api-member-head"><code>type: FileType</code><span class="api-kind">propriedade</span></div>
+		<p>Tipo.</p>
+	</li><li class="api-member" id="synapse-filestat-ctime">
+		<div class="api-member-head"><code>ctime: number</code><span class="api-kind">propriedade</span></div>
+		<p>Timestamp de criação.</p>
+	</li><li class="api-member" id="synapse-filestat-mtime">
+		<div class="api-member-head"><code>mtime: number</code><span class="api-kind">propriedade</span></div>
+		<p>Timestamp de modificação.</p>
+	</li><li class="api-member" id="synapse-filestat-size">
+		<div class="api-member-head"><code>size: number</code><span class="api-kind">propriedade</span></div>
+		<p>Tamanho em bytes.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-filesystem">
+		<h3><code>interface</code> FileSystem</h3>
+		<pre class="api-signature"><code>interface FileSystem</code></pre>
+		<p>Operações de arquivo sobre o projeto ativo (permissões <code>workspace.read</code> / <code>workspace.write</code>).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-filesystem-readfile">
+		<div class="api-member-head"><code>readFile(uri: Uri | string): Promise&lt;Uint8Array&gt;</code><span class="api-kind">método</span></div>
+		<p>Lê bytes.</p>
+	</li><li class="api-member" id="synapse-filesystem-readtext">
+		<div class="api-member-head"><code>readText(uri: Uri | string): Promise&lt;string&gt;</code><span class="api-kind">método</span></div>
+		<p>Lê como texto UTF-8.</p>
+	</li><li class="api-member" id="synapse-filesystem-writefile">
+		<div class="api-member-head"><code>writeFile(uri: Uri | string, content: Uint8Array | string): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Grava bytes ou texto.</p>
+	</li><li class="api-member" id="synapse-filesystem-readdirectory">
+		<div class="api-member-head"><code>readDirectory(uri: Uri | string): Promise&lt;[string, FileType][]&gt;</code><span class="api-kind">método</span></div>
+		<p>Lista <code>[nome, tipo]</code> de um diretório.</p>
+	</li><li class="api-member" id="synapse-filesystem-stat">
+		<div class="api-member-head"><code>stat(uri: Uri | string): Promise&lt;FileStat&gt;</code><span class="api-kind">método</span></div>
+		<p>Metadados.</p>
+	</li><li class="api-member" id="synapse-filesystem-createdirectory">
+		<div class="api-member-head"><code>createDirectory(uri: Uri | string): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Cria diretório (marcador vazio).</p>
+	</li><li class="api-member" id="synapse-filesystem-delete">
+		<div class="api-member-head"><code>delete(uri: Uri | string, options?: { recursive?: boolean }): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Apaga arquivo ou pasta.</p>
+	</li><li class="api-member" id="synapse-filesystem-rename">
+		<div class="api-member-head"><code>rename(source: Uri | string, target: Uri | string, options?: { overwrite?: boolean }): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Renomeia/move.</p>
+	</li><li class="api-member" id="synapse-filesystem-copy">
+		<div class="api-member-head"><code>copy(source: Uri | string, target: Uri | string, options?: { overwrite?: boolean }): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Copia.</p>
+	</li><li class="api-member" id="synapse-filesystem-iswritablefilesystem">
+		<div class="api-member-head"><code>isWritableFileSystem(scheme: string): boolean | undefined</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se a extensão pode gravar.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-filesystemwatcher">
+		<h3><code>interface</code> FileSystemWatcher</h3>
+		<pre class="api-signature"><code>interface FileSystemWatcher extends Disposable</code></pre>
+		<p>Observa arquivos que casam com um glob.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-filesystemwatcher-ondidcreate">
+		<div class="api-member-head"><code>readonly onDidCreate: Event&lt;Uri&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Arquivo criado.</p>
+	</li><li class="api-member" id="synapse-filesystemwatcher-ondidchange">
+		<div class="api-member-head"><code>readonly onDidChange: Event&lt;Uri&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Arquivo alterado.</p>
+	</li><li class="api-member" id="synapse-filesystemwatcher-ondiddelete">
+		<div class="api-member-head"><code>readonly onDidDelete: Event&lt;Uri&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Arquivo apagado.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-filechangetype">
+		<h3><code>enum</code> FileChangeType</h3>
+		<pre class="api-signature"><code>enum FileChangeType</code></pre>
+		<p>Tipo de evento de arquivo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-filechangetype-changed-1">
+		<div class="api-member-head"><code>Changed = 1</code><span class="api-kind">member</span></div>
+		<p>Alterado.</p>
+	</li><li class="api-member" id="synapse-filechangetype-created-2">
+		<div class="api-member-head"><code>Created = 2</code><span class="api-kind">member</span></div>
+		<p>Criado.</p>
+	</li><li class="api-member" id="synapse-filechangetype-deleted-3">
+		<div class="api-member-head"><code>Deleted = 3</code><span class="api-kind">member</span></div>
+		<p>Apagado.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-workspacefolder">
+		<h3><code>interface</code> WorkspaceFolder</h3>
+		<pre class="api-signature"><code>interface WorkspaceFolder</code></pre>
+		<p>Pasta raiz do projeto ativo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-workspacefolder-uri">
+		<div class="api-member-head"><code>readonly uri: Uri</code><span class="api-kind">propriedade</span></div>
+		<p>URI raiz (<code>synapse:/projeto/</code>).</p>
+	</li><li class="api-member" id="synapse-workspacefolder-name">
+		<div class="api-member-head"><code>readonly name: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome do projeto.</p>
+	</li><li class="api-member" id="synapse-workspacefolder-index">
+		<div class="api-member-head"><code>readonly index: number</code><span class="api-kind">propriedade</span></div>
+		<p>Sempre 0.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-projectinfo">
+		<h3><code>interface</code> ProjectInfo</h3>
+		<pre class="api-signature"><code>interface ProjectInfo</code></pre>
+		<p>Projeto aberto na IDE.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-projectinfo-id">
+		<div class="api-member-head"><code>readonly id: string</code><span class="api-kind">propriedade</span></div>
+		<p>Id interno.</p>
+	</li><li class="api-member" id="synapse-projectinfo-name">
+		<div class="api-member-head"><code>readonly name: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome.</p>
+	</li><li class="api-member" id="synapse-projectinfo-kind">
+		<div class="api-member-head"><code>readonly kind?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Tipo detectado (<code>static</code>, <code>build</code>...).</p>
+	</li><li class="api-member" id="synapse-projectinfo-active">
+		<div class="api-member-head"><code>readonly active: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> para o projeto ativo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-textdocumentcontentchangeevent">
+		<h3><code>interface</code> TextDocumentContentChangeEvent</h3>
+		<pre class="api-signature"><code>interface TextDocumentContentChangeEvent</code></pre>
+		<p>Uma alteração de conteúdo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-textdocumentcontentchangeevent-range">
+		<div class="api-member-head"><code>readonly range: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo substituído.</p>
+	</li><li class="api-member" id="synapse-textdocumentcontentchangeevent-rangeoffset">
+		<div class="api-member-head"><code>readonly rangeOffset: number</code><span class="api-kind">propriedade</span></div>
+		<p>Offset do início.</p>
+	</li><li class="api-member" id="synapse-textdocumentcontentchangeevent-rangelength">
+		<div class="api-member-head"><code>readonly rangeLength: number</code><span class="api-kind">propriedade</span></div>
+		<p>Tamanho substituído.</p>
+	</li><li class="api-member" id="synapse-textdocumentcontentchangeevent-text">
+		<div class="api-member-head"><code>readonly text: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto inserido.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-textdocumentchangeevent">
+		<h3><code>interface</code> TextDocumentChangeEvent</h3>
+		<pre class="api-signature"><code>interface TextDocumentChangeEvent</code></pre>
+		<p>Evento de alteração de documento.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-textdocumentchangeevent-document">
+		<div class="api-member-head"><code>readonly document: TextDocument</code><span class="api-kind">propriedade</span></div>
+		<p>Documento.</p>
+	</li><li class="api-member" id="synapse-textdocumentchangeevent-contentchanges">
+		<div class="api-member-head"><code>readonly contentChanges: readonly TextDocumentContentChangeEvent[]</code><span class="api-kind">propriedade</span></div>
+		<p>Alterações.</p>
+	</li><li class="api-member" id="synapse-textdocumentchangeevent-reason">
+		<div class="api-member-head"><code>readonly reason: number | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>1 = undo, 2 = redo, <code>undefined</code> = digitação.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-documentselector">
+		<h3><code>type</code> DocumentSelector</h3>
+		<pre class="api-signature"><code>type DocumentSelector = string | DocumentFilter | readonly (string | DocumentFilter)[]</code></pre>
+		<p>Seletor de documentos: id de linguagem, filtro ou lista.</p>
+		
+	</section><section class="api-type" id="synapse-documentfilter">
+		<h3><code>interface</code> DocumentFilter</h3>
+		<pre class="api-signature"><code>interface DocumentFilter</code></pre>
+		<p>Filtro por linguagem e/ou glob de caminho.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-documentfilter-language">
+		<div class="api-member-head"><code>language?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Id da linguagem ou <code>*</code>.</p>
+	</li><li class="api-member" id="synapse-documentfilter-pattern">
+		<div class="api-member-head"><code>pattern?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Glob do caminho relativo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-completionitemkind">
+		<h3><code>enum</code> CompletionItemKind</h3>
+		<pre class="api-signature"><code>enum CompletionItemKind</code></pre>
+		<p>Tipo de item de completion.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-completionitemkind-text-0">
+		<div class="api-member-head"><code>Text = 0</code><span class="api-kind">member</span></div>
+		<p>Texto.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-method-1">
+		<div class="api-member-head"><code>Method = 1</code><span class="api-kind">member</span></div>
+		<p>Método.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-function-2">
+		<div class="api-member-head"><code>Function = 2</code><span class="api-kind">member</span></div>
+		<p>Função.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-constructor-3">
+		<div class="api-member-head"><code>Constructor = 3</code><span class="api-kind">member</span></div>
+		<p>Construtor.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-field-4">
+		<div class="api-member-head"><code>Field = 4</code><span class="api-kind">member</span></div>
+		<p>Campo.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-variable-5">
+		<div class="api-member-head"><code>Variable = 5</code><span class="api-kind">member</span></div>
+		<p>Variável.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-class-6">
+		<div class="api-member-head"><code>Class = 6</code><span class="api-kind">member</span></div>
+		<p>Classe.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-interface-7">
+		<div class="api-member-head"><code>Interface = 7</code><span class="api-kind">member</span></div>
+		<p>Interface.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-module-8">
+		<div class="api-member-head"><code>Module = 8</code><span class="api-kind">member</span></div>
+		<p>Módulo.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-property-9">
+		<div class="api-member-head"><code>Property = 9</code><span class="api-kind">member</span></div>
+		<p>Propriedade.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-unit-10">
+		<div class="api-member-head"><code>Unit = 10</code><span class="api-kind">member</span></div>
+		<p>Unidade.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-value-11">
+		<div class="api-member-head"><code>Value = 11</code><span class="api-kind">member</span></div>
+		<p>Valor.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-enum-12">
+		<div class="api-member-head"><code>Enum = 12</code><span class="api-kind">member</span></div>
+		<p>Enum.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-keyword-13">
+		<div class="api-member-head"><code>Keyword = 13</code><span class="api-kind">member</span></div>
+		<p>Palavra-chave.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-snippet-14">
+		<div class="api-member-head"><code>Snippet = 14</code><span class="api-kind">member</span></div>
+		<p>Snippet.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-color-15">
+		<div class="api-member-head"><code>Color = 15</code><span class="api-kind">member</span></div>
+		<p>Cor.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-file-16">
+		<div class="api-member-head"><code>File = 16</code><span class="api-kind">member</span></div>
+		<p>Arquivo.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-reference-17">
+		<div class="api-member-head"><code>Reference = 17</code><span class="api-kind">member</span></div>
+		<p>Referência.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-folder-18">
+		<div class="api-member-head"><code>Folder = 18</code><span class="api-kind">member</span></div>
+		<p>Pasta.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-enummember-19">
+		<div class="api-member-head"><code>EnumMember = 19</code><span class="api-kind">member</span></div>
+		<p>Membro de enum.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-constant-20">
+		<div class="api-member-head"><code>Constant = 20</code><span class="api-kind">member</span></div>
+		<p>Constante.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-struct-21">
+		<div class="api-member-head"><code>Struct = 21</code><span class="api-kind">member</span></div>
+		<p>Struct.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-event-22">
+		<div class="api-member-head"><code>Event = 22</code><span class="api-kind">member</span></div>
+		<p>Evento.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-operator-23">
+		<div class="api-member-head"><code>Operator = 23</code><span class="api-kind">member</span></div>
+		<p>Operador.</p>
+	</li><li class="api-member" id="synapse-completionitemkind-typeparameter-24">
+		<div class="api-member-head"><code>TypeParameter = 24</code><span class="api-kind">member</span></div>
+		<p>Parâmetro de tipo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-completiontriggerkind">
+		<h3><code>enum</code> CompletionTriggerKind</h3>
+		<pre class="api-signature"><code>enum CompletionTriggerKind</code></pre>
+		<p>Como a completion foi disparada.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-completiontriggerkind-invoke-0">
+		<div class="api-member-head"><code>Invoke = 0</code><span class="api-kind">member</span></div>
+		<p>Digitação ou Ctrl+Espaço.</p>
+	</li><li class="api-member" id="synapse-completiontriggerkind-triggercharacter-1">
+		<div class="api-member-head"><code>TriggerCharacter = 1</code><span class="api-kind">member</span></div>
+		<p>Caractere gatilho.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-completioncontext">
+		<h3><code>interface</code> CompletionContext</h3>
+		<pre class="api-signature"><code>interface CompletionContext</code></pre>
+		<p>Contexto de completion.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-completioncontext-triggerkind">
+		<div class="api-member-head"><code>readonly triggerKind: CompletionTriggerKind</code><span class="api-kind">propriedade</span></div>
+		<p>Gatilho.</p>
+	</li><li class="api-member" id="synapse-completioncontext-triggercharacter">
+		<div class="api-member-head"><code>readonly triggerCharacter: string | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>Caractere que disparou.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-completionitem">
+		<h3><code>class</code> CompletionItem</h3>
+		<pre class="api-signature"><code>class CompletionItem</code></pre>
+		<p>Sugestão de completion.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-completionitem-label">
+		<div class="api-member-head"><code>label: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto exibido.</p>
+	</li><li class="api-member" id="synapse-completionitem-kind">
+		<div class="api-member-head"><code>kind?: CompletionItemKind</code><span class="api-kind">propriedade</span></div>
+		<p>Tipo (ícone).</p>
+	</li><li class="api-member" id="synapse-completionitem-detail">
+		<div class="api-member-head"><code>detail?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto de detalhe à direita.</p>
+	</li><li class="api-member" id="synapse-completionitem-documentation">
+		<div class="api-member-head"><code>documentation?: string | MarkdownString</code><span class="api-kind">propriedade</span></div>
+		<p>Documentação.</p>
+	</li><li class="api-member" id="synapse-completionitem-sorttext">
+		<div class="api-member-head"><code>sortText?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto usado na ordenação.</p>
+	</li><li class="api-member" id="synapse-completionitem-filtertext">
+		<div class="api-member-head"><code>filterText?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Texto usado no filtro.</p>
+	</li><li class="api-member" id="synapse-completionitem-inserttext">
+		<div class="api-member-head"><code>insertText?: string | SnippetString</code><span class="api-kind">propriedade</span></div>
+		<p>Texto inserido (ou snippet).</p>
+	</li><li class="api-member" id="synapse-completionitem-range">
+		<div class="api-member-head"><code>range?: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo substituído.</p>
+	</li><li class="api-member" id="synapse-completionitem-commitcharacters">
+		<div class="api-member-head"><code>commitCharacters?: string[]</code><span class="api-kind">propriedade</span></div>
+		<p>Caracteres que confirmam a sugestão.</p>
+	</li><li class="api-member" id="synapse-completionitem-command">
+		<div class="api-member-head"><code>command?: { command: string; title?: string; arguments?: any[] }</code><span class="api-kind">propriedade</span></div>
+		<p>Comando executado após inserir.</p>
+	</li><li class="api-member" id="synapse-completionitem-preselect">
+		<div class="api-member-head"><code>preselect?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Sugestão pré-selecionada.</p>
+	</li><li class="api-member" id="synapse-completionitem-constructor">
+		<div class="api-member-head"><code>constructor(label: string, kind?: CompletionItemKind)</code><span class="api-kind">construtor</span></div>
+		<p>Cria com rótulo e tipo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-completionlist">
+		<h3><code>class</code> CompletionList</h3>
+		<pre class="api-signature"><code>class CompletionList</code></pre>
+		<p>Lista de completions com flag de incompletude (reconsulta ao digitar).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-completionlist-isincomplete">
+		<div class="api-member-head"><code>isIncomplete: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> para pedir de novo a cada tecla.</p>
+	</li><li class="api-member" id="synapse-completionlist-items">
+		<div class="api-member-head"><code>items: CompletionItem[]</code><span class="api-kind">propriedade</span></div>
+		<p>Itens.</p>
+	</li><li class="api-member" id="synapse-completionlist-constructor">
+		<div class="api-member-head"><code>constructor(items?: CompletionItem[], isIncomplete?: boolean)</code><span class="api-kind">construtor</span></div>
+		<p>Cria a lista.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-completionitemprovider">
+		<h3><code>interface</code> CompletionItemProvider</h3>
+		<pre class="api-signature"><code>interface CompletionItemProvider</code></pre>
+		<p>Provider de completions.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-completionitemprovider-providecompletionitems">
+		<div class="api-member-head"><code>provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): CompletionItem[] | CompletionList | null | undefined | Promise&lt;CompletionItem[] | CompletionList | null | undefined&gt;</code><span class="api-kind">método</span></div>
+		<p>Devolve sugestões para a posição.</p>
+	</li><li class="api-member" id="synapse-completionitemprovider-resolvecompletionitem">
+		<div class="api-member-head"><code>resolveCompletionItem?(item: CompletionItem, token: CancellationToken): CompletionItem | Promise&lt;CompletionItem&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Completa detalhes do item selecionado.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-hover">
+		<h3><code>class</code> Hover</h3>
+		<pre class="api-signature"><code>class Hover</code></pre>
+		<p>Conteúdo de hover.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-hover-contents">
+		<div class="api-member-head"><code>contents: (MarkdownString | string)[]</code><span class="api-kind">propriedade</span></div>
+		<p>Conteúdos.</p>
+	</li><li class="api-member" id="synapse-hover-range">
+		<div class="api-member-head"><code>range?: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo destacado.</p>
+	</li><li class="api-member" id="synapse-hover-constructor">
+		<div class="api-member-head"><code>constructor(contents: MarkdownString | string | (MarkdownString | string)[], range?: Range)</code><span class="api-kind">construtor</span></div>
+		<p>Cria o hover.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-hoverprovider">
+		<h3><code>interface</code> HoverProvider</h3>
+		<pre class="api-signature"><code>interface HoverProvider</code></pre>
+		<p>Provider de hover.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-hoverprovider-providehover">
+		<div class="api-member-head"><code>provideHover(document: TextDocument, position: Position, token: CancellationToken): Hover | null | undefined | Promise&lt;Hover | null | undefined&gt;</code><span class="api-kind">método</span></div>
+		<p>Devolve o hover para a posição.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-location">
+		<h3><code>class</code> Location</h3>
+		<pre class="api-signature"><code>class Location</code></pre>
+		<p>Posição em um arquivo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-location-uri">
+		<div class="api-member-head"><code>uri: Uri</code><span class="api-kind">propriedade</span></div>
+		<p>Arquivo.</p>
+	</li><li class="api-member" id="synapse-location-range">
+		<div class="api-member-head"><code>range: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo.</p>
+	</li><li class="api-member" id="synapse-location-constructor">
+		<div class="api-member-head"><code>constructor(uri: Uri | string, rangeOrPosition: Range | Position)</code><span class="api-kind">construtor</span></div>
+		<p>Cria a localização.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-definitionprovider">
+		<h3><code>interface</code> DefinitionProvider</h3>
+		<pre class="api-signature"><code>interface DefinitionProvider</code></pre>
+		<p>Provider de &quot;ir para definição&quot;.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-definitionprovider-providedefinition">
+		<div class="api-member-head"><code>provideDefinition(document: TextDocument, position: Position, token: CancellationToken): Location | Location[] | null | undefined | Promise&lt;Location | Location[] | null | undefined&gt;</code><span class="api-kind">método</span></div>
+		<p>Devolve uma ou mais localizações.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-formattingoptions">
+		<h3><code>interface</code> FormattingOptions</h3>
+		<pre class="api-signature"><code>interface FormattingOptions</code></pre>
+		<p>Opções de formatação do editor.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-formattingoptions-tabsize">
+		<div class="api-member-head"><code>tabSize: number</code><span class="api-kind">propriedade</span></div>
+		<p>Tamanho da tabulação.</p>
+	</li><li class="api-member" id="synapse-formattingoptions-insertspaces">
+		<div class="api-member-head"><code>insertSpaces: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Usa espaços.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-documentformattingeditprovider">
+		<h3><code>interface</code> DocumentFormattingEditProvider</h3>
+		<pre class="api-signature"><code>interface DocumentFormattingEditProvider</code></pre>
+		<p>Provider de formatação de documento inteiro.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-documentformattingeditprovider-providedocumentformattingedits">
+		<div class="api-member-head"><code>provideDocumentFormattingEdits(document: TextDocument, options: FormattingOptions, token: CancellationToken): TextEdit[] | null | undefined | Promise&lt;TextEdit[] | null | undefined&gt;</code><span class="api-kind">método</span></div>
+		<p>Devolve edições que formatam o documento.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-codeactionkind">
+		<h3><code>class</code> CodeActionKind</h3>
+		<pre class="api-signature"><code>class CodeActionKind</code></pre>
+		<p>Categoria hierárquica de ação (<code>quickfix</code>, <code>refactor.extract</code>...).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-codeactionkind-empty">
+		<div class="api-member-head"><code>static readonly Empty: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Vazio.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-quickfix">
+		<div class="api-member-head"><code>static readonly QuickFix: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Correção rápida.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-refactor">
+		<div class="api-member-head"><code>static readonly Refactor: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Refatoração.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-refactorextract">
+		<div class="api-member-head"><code>static readonly RefactorExtract: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Extrair.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-refactorinline">
+		<div class="api-member-head"><code>static readonly RefactorInline: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Inline.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-refactorrewrite">
+		<div class="api-member-head"><code>static readonly RefactorRewrite: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Reescrever.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-source">
+		<div class="api-member-head"><code>static readonly Source: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Ação de arquivo.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-sourceorganizeimports">
+		<div class="api-member-head"><code>static readonly SourceOrganizeImports: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Organizar imports.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-sourcefixall">
+		<div class="api-member-head"><code>static readonly SourceFixAll: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Corrigir tudo.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-value">
+		<div class="api-member-head"><code>readonly value: string</code><span class="api-kind">propriedade</span></div>
+		<p>Valor textual.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-constructor">
+		<div class="api-member-head"><code>constructor(value: string)</code><span class="api-kind">construtor</span></div>
+		<p>Cria com valor.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-append">
+		<div class="api-member-head"><code>append(parts: string): CodeActionKind</code><span class="api-kind">método</span></div>
+		<p>Acrescenta segmento.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-contains">
+		<div class="api-member-head"><code>contains(other: CodeActionKind): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se <code>other</code> está dentro desta categoria.</p>
+	</li><li class="api-member" id="synapse-codeactionkind-intersects">
+		<div class="api-member-head"><code>intersects(other: CodeActionKind): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se uma contém a outra.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-codeactiontriggerkind">
+		<h3><code>enum</code> CodeActionTriggerKind</h3>
+		<pre class="api-signature"><code>enum CodeActionTriggerKind</code></pre>
+		<p>Como as ações foram pedidas.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-codeactiontriggerkind-invoke-1">
+		<div class="api-member-head"><code>Invoke = 1</code><span class="api-kind">member</span></div>
+		<p>Menu ou atalho.</p>
+	</li><li class="api-member" id="synapse-codeactiontriggerkind-automatic-2">
+		<div class="api-member-head"><code>Automatic = 2</code><span class="api-kind">member</span></div>
+		<p>Automático ao mover cursor.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-codeactioncontext">
+		<h3><code>interface</code> CodeActionContext</h3>
+		<pre class="api-signature"><code>interface CodeActionContext</code></pre>
+		<p>Contexto das ações de código.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-codeactioncontext-diagnostics">
+		<div class="api-member-head"><code>readonly diagnostics: readonly Diagnostic[]</code><span class="api-kind">propriedade</span></div>
+		<p>Diagnósticos no intervalo.</p>
+	</li><li class="api-member" id="synapse-codeactioncontext-only">
+		<div class="api-member-head"><code>readonly only: CodeActionKind | undefined</code><span class="api-kind">propriedade</span></div>
+		<p>Filtro de categorias pedido.</p>
+	</li><li class="api-member" id="synapse-codeactioncontext-triggerkind">
+		<div class="api-member-head"><code>readonly triggerKind: CodeActionTriggerKind</code><span class="api-kind">propriedade</span></div>
+		<p>Gatilho.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-codeaction">
+		<h3><code>class</code> CodeAction</h3>
+		<pre class="api-signature"><code>class CodeAction</code></pre>
+		<p>Ação de código: edição e/ou comando.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-codeaction-title">
+		<div class="api-member-head"><code>title: string</code><span class="api-kind">propriedade</span></div>
+		<p>Título no menu.</p>
+	</li><li class="api-member" id="synapse-codeaction-edit">
+		<div class="api-member-head"><code>edit?: WorkspaceEdit</code><span class="api-kind">propriedade</span></div>
+		<p>Edições aplicadas ao escolher.</p>
+	</li><li class="api-member" id="synapse-codeaction-diagnostics">
+		<div class="api-member-head"><code>diagnostics?: Diagnostic[]</code><span class="api-kind">propriedade</span></div>
+		<p>Diagnósticos resolvidos.</p>
+	</li><li class="api-member" id="synapse-codeaction-kind">
+		<div class="api-member-head"><code>kind?: CodeActionKind</code><span class="api-kind">propriedade</span></div>
+		<p>Categoria.</p>
+	</li><li class="api-member" id="synapse-codeaction-command">
+		<div class="api-member-head"><code>command?: { command: string; title?: string; arguments?: any[] }</code><span class="api-kind">propriedade</span></div>
+		<p>Comando executado ao escolher.</p>
+	</li><li class="api-member" id="synapse-codeaction-ispreferred">
+		<div class="api-member-head"><code>isPreferred?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Ação sugerida em destaque.</p>
+	</li><li class="api-member" id="synapse-codeaction-constructor">
+		<div class="api-member-head"><code>constructor(title: string, kind?: CodeActionKind)</code><span class="api-kind">construtor</span></div>
+		<p>Cria a ação.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-codeactionprovider">
+		<h3><code>interface</code> CodeActionProvider</h3>
+		<pre class="api-signature"><code>interface CodeActionProvider</code></pre>
+		<p>Provider de ações de código.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-codeactionprovider-providecodeactions">
+		<div class="api-member-head"><code>provideCodeActions(document: TextDocument, range: Range | Selection, context: CodeActionContext, token: CancellationToken): (CodeAction | { command: string; title: string; arguments?: any[] })[] | null | undefined | Promise&lt;(CodeAction | { command: string; title: string; arguments?: any[] })[] | null | undefined&gt;</code><span class="api-kind">método</span></div>
+		<p>Devolve ações para o intervalo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-symbolkind">
+		<h3><code>enum</code> SymbolKind</h3>
+		<pre class="api-signature"><code>enum SymbolKind</code></pre>
+		<p>Tipo de símbolo.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-symbolkind-file-0">
+		<div class="api-member-head"><code>File = 0</code><span class="api-kind">member</span></div>
+		<p>Arquivo.</p>
+	</li><li class="api-member" id="synapse-symbolkind-module-1">
+		<div class="api-member-head"><code>Module = 1</code><span class="api-kind">member</span></div>
+		<p>Módulo.</p>
+	</li><li class="api-member" id="synapse-symbolkind-namespace-2">
+		<div class="api-member-head"><code>Namespace = 2</code><span class="api-kind">member</span></div>
+		<p>Namespace.</p>
+	</li><li class="api-member" id="synapse-symbolkind-package-3">
+		<div class="api-member-head"><code>Package = 3</code><span class="api-kind">member</span></div>
+		<p>Pacote.</p>
+	</li><li class="api-member" id="synapse-symbolkind-class-4">
+		<div class="api-member-head"><code>Class = 4</code><span class="api-kind">member</span></div>
+		<p>Classe.</p>
+	</li><li class="api-member" id="synapse-symbolkind-method-5">
+		<div class="api-member-head"><code>Method = 5</code><span class="api-kind">member</span></div>
+		<p>Método.</p>
+	</li><li class="api-member" id="synapse-symbolkind-property-6">
+		<div class="api-member-head"><code>Property = 6</code><span class="api-kind">member</span></div>
+		<p>Propriedade.</p>
+	</li><li class="api-member" id="synapse-symbolkind-field-7">
+		<div class="api-member-head"><code>Field = 7</code><span class="api-kind">member</span></div>
+		<p>Campo.</p>
+	</li><li class="api-member" id="synapse-symbolkind-constructor-8">
+		<div class="api-member-head"><code>Constructor = 8</code><span class="api-kind">member</span></div>
+		<p>Construtor.</p>
+	</li><li class="api-member" id="synapse-symbolkind-enum-9">
+		<div class="api-member-head"><code>Enum = 9</code><span class="api-kind">member</span></div>
+		<p>Enum.</p>
+	</li><li class="api-member" id="synapse-symbolkind-interface-10">
+		<div class="api-member-head"><code>Interface = 10</code><span class="api-kind">member</span></div>
+		<p>Interface.</p>
+	</li><li class="api-member" id="synapse-symbolkind-function-11">
+		<div class="api-member-head"><code>Function = 11</code><span class="api-kind">member</span></div>
+		<p>Função.</p>
+	</li><li class="api-member" id="synapse-symbolkind-variable-12">
+		<div class="api-member-head"><code>Variable = 12</code><span class="api-kind">member</span></div>
+		<p>Variável.</p>
+	</li><li class="api-member" id="synapse-symbolkind-constant-13">
+		<div class="api-member-head"><code>Constant = 13</code><span class="api-kind">member</span></div>
+		<p>Constante.</p>
+	</li><li class="api-member" id="synapse-symbolkind-string-14">
+		<div class="api-member-head"><code>String = 14</code><span class="api-kind">member</span></div>
+		<p>String.</p>
+	</li><li class="api-member" id="synapse-symbolkind-number-15">
+		<div class="api-member-head"><code>Number = 15</code><span class="api-kind">member</span></div>
+		<p>Número.</p>
+	</li><li class="api-member" id="synapse-symbolkind-boolean-16">
+		<div class="api-member-head"><code>Boolean = 16</code><span class="api-kind">member</span></div>
+		<p>Booleano.</p>
+	</li><li class="api-member" id="synapse-symbolkind-array-17">
+		<div class="api-member-head"><code>Array = 17</code><span class="api-kind">member</span></div>
+		<p>Array.</p>
+	</li><li class="api-member" id="synapse-symbolkind-object-18">
+		<div class="api-member-head"><code>Object = 18</code><span class="api-kind">member</span></div>
+		<p>Objeto.</p>
+	</li><li class="api-member" id="synapse-symbolkind-key-19">
+		<div class="api-member-head"><code>Key = 19</code><span class="api-kind">member</span></div>
+		<p>Chave.</p>
+	</li><li class="api-member" id="synapse-symbolkind-null-20">
+		<div class="api-member-head"><code>Null = 20</code><span class="api-kind">member</span></div>
+		<p>Null.</p>
+	</li><li class="api-member" id="synapse-symbolkind-enummember-21">
+		<div class="api-member-head"><code>EnumMember = 21</code><span class="api-kind">member</span></div>
+		<p>Membro de enum.</p>
+	</li><li class="api-member" id="synapse-symbolkind-struct-22">
+		<div class="api-member-head"><code>Struct = 22</code><span class="api-kind">member</span></div>
+		<p>Struct.</p>
+	</li><li class="api-member" id="synapse-symbolkind-event-23">
+		<div class="api-member-head"><code>Event = 23</code><span class="api-kind">member</span></div>
+		<p>Evento.</p>
+	</li><li class="api-member" id="synapse-symbolkind-operator-24">
+		<div class="api-member-head"><code>Operator = 24</code><span class="api-kind">member</span></div>
+		<p>Operador.</p>
+	</li><li class="api-member" id="synapse-symbolkind-typeparameter-25">
+		<div class="api-member-head"><code>TypeParameter = 25</code><span class="api-kind">member</span></div>
+		<p>Parâmetro de tipo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-documentsymbol">
+		<h3><code>class</code> DocumentSymbol</h3>
+		<pre class="api-signature"><code>class DocumentSymbol</code></pre>
+		<p>Símbolo hierárquico (outline).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-documentsymbol-name">
+		<div class="api-member-head"><code>name: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome.</p>
+	</li><li class="api-member" id="synapse-documentsymbol-detail">
+		<div class="api-member-head"><code>detail: string</code><span class="api-kind">propriedade</span></div>
+		<p>Detalhe (assinatura).</p>
+	</li><li class="api-member" id="synapse-documentsymbol-kind">
+		<div class="api-member-head"><code>kind: SymbolKind</code><span class="api-kind">propriedade</span></div>
+		<p>Tipo.</p>
+	</li><li class="api-member" id="synapse-documentsymbol-range">
+		<div class="api-member-head"><code>range: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo completo.</p>
+	</li><li class="api-member" id="synapse-documentsymbol-selectionrange">
+		<div class="api-member-head"><code>selectionRange: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo do nome.</p>
+	</li><li class="api-member" id="synapse-documentsymbol-children">
+		<div class="api-member-head"><code>children: DocumentSymbol[]</code><span class="api-kind">propriedade</span></div>
+		<p>Filhos.</p>
+	</li><li class="api-member" id="synapse-documentsymbol-constructor">
+		<div class="api-member-head"><code>constructor(name: string, detail: string, kind: SymbolKind, range: Range, selectionRange: Range)</code><span class="api-kind">construtor</span></div>
+		<p>Cria o símbolo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-symbolinformation">
+		<h3><code>class</code> SymbolInformation</h3>
+		<pre class="api-signature"><code>class SymbolInformation</code></pre>
+		<p>Símbolo plano com localização.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-symbolinformation-name">
+		<div class="api-member-head"><code>name: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome.</p>
+	</li><li class="api-member" id="synapse-symbolinformation-kind">
+		<div class="api-member-head"><code>kind: SymbolKind</code><span class="api-kind">propriedade</span></div>
+		<p>Tipo.</p>
+	</li><li class="api-member" id="synapse-symbolinformation-containername">
+		<div class="api-member-head"><code>containerName: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome do contêiner.</p>
+	</li><li class="api-member" id="synapse-symbolinformation-location">
+		<div class="api-member-head"><code>location: Location</code><span class="api-kind">propriedade</span></div>
+		<p>Localização.</p>
+	</li><li class="api-member" id="synapse-symbolinformation-constructor">
+		<div class="api-member-head"><code>constructor(name: string, kind: SymbolKind, containerName: string, location: Location)</code><span class="api-kind">construtor</span></div>
+		<p>Cria o símbolo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-documentsymbolprovider">
+		<h3><code>interface</code> DocumentSymbolProvider</h3>
+		<pre class="api-signature"><code>interface DocumentSymbolProvider</code></pre>
+		<p>Provider de símbolos do documento (outline, breadcrumbs).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-documentsymbolprovider-providedocumentsymbols">
+		<div class="api-member-head"><code>provideDocumentSymbols(document: TextDocument, token: CancellationToken): DocumentSymbol[] | SymbolInformation[] | null | undefined | Promise&lt;DocumentSymbol[] | SymbolInformation[] | null | undefined&gt;</code><span class="api-kind">método</span></div>
+		<p>Devolve símbolos.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-diagnosticseverity">
+		<h3><code>enum</code> DiagnosticSeverity</h3>
+		<pre class="api-signature"><code>enum DiagnosticSeverity</code></pre>
+		<p>Severidade de diagnóstico.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-diagnosticseverity-error-0">
+		<div class="api-member-head"><code>Error = 0</code><span class="api-kind">member</span></div>
+		<p>Erro.</p>
+	</li><li class="api-member" id="synapse-diagnosticseverity-warning-1">
+		<div class="api-member-head"><code>Warning = 1</code><span class="api-kind">member</span></div>
+		<p>Aviso.</p>
+	</li><li class="api-member" id="synapse-diagnosticseverity-information-2">
+		<div class="api-member-head"><code>Information = 2</code><span class="api-kind">member</span></div>
+		<p>Informação.</p>
+	</li><li class="api-member" id="synapse-diagnosticseverity-hint-3">
+		<div class="api-member-head"><code>Hint = 3</code><span class="api-kind">member</span></div>
+		<p>Dica.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-diagnostictag">
+		<h3><code>enum</code> DiagnosticTag</h3>
+		<pre class="api-signature"><code>enum DiagnosticTag</code></pre>
+		<p>Marcações extras de diagnóstico.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-diagnostictag-unnecessary-1">
+		<div class="api-member-head"><code>Unnecessary = 1</code><span class="api-kind">member</span></div>
+		<p>Código não usado (esmaecido).</p>
+	</li><li class="api-member" id="synapse-diagnostictag-deprecated-2">
+		<div class="api-member-head"><code>Deprecated = 2</code><span class="api-kind">member</span></div>
+		<p>Obsoleto (riscado).</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-diagnostic">
+		<h3><code>class</code> Diagnostic</h3>
+		<pre class="api-signature"><code>class Diagnostic</code></pre>
+		<p>Problema reportado no editor.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-diagnostic-range">
+		<div class="api-member-head"><code>range: Range</code><span class="api-kind">propriedade</span></div>
+		<p>Intervalo.</p>
+	</li><li class="api-member" id="synapse-diagnostic-message">
+		<div class="api-member-head"><code>message: string</code><span class="api-kind">propriedade</span></div>
+		<p>Mensagem.</p>
+	</li><li class="api-member" id="synapse-diagnostic-severity">
+		<div class="api-member-head"><code>severity: DiagnosticSeverity</code><span class="api-kind">propriedade</span></div>
+		<p>Severidade.</p>
+	</li><li class="api-member" id="synapse-diagnostic-source">
+		<div class="api-member-head"><code>source?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Origem exibida (<code>eslint</code>).</p>
+	</li><li class="api-member" id="synapse-diagnostic-code">
+		<div class="api-member-head"><code>code?: string | number</code><span class="api-kind">propriedade</span></div>
+		<p>Código do problema.</p>
+	</li><li class="api-member" id="synapse-diagnostic-tags">
+		<div class="api-member-head"><code>tags?: DiagnosticTag[]</code><span class="api-kind">propriedade</span></div>
+		<p>Marcações.</p>
+	</li><li class="api-member" id="synapse-diagnostic-constructor">
+		<div class="api-member-head"><code>constructor(range: Range, message: string, severity?: DiagnosticSeverity)</code><span class="api-kind">construtor</span></div>
+		<p>Cria o diagnóstico.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-diagnosticcollection">
+		<h3><code>interface</code> DiagnosticCollection</h3>
+		<pre class="api-signature"><code>interface DiagnosticCollection extends Disposable</code></pre>
+		<p>Coleção de diagnósticos por arquivo, mesclada com os internos por <code>source</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-diagnosticcollection-name">
+		<div class="api-member-head"><code>readonly name: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome usado como <code>source</code> padrão.</p>
+	</li><li class="api-member" id="synapse-diagnosticcollection-set">
+		<div class="api-member-head"><code>set(uri: Uri | string, diagnostics: readonly Diagnostic[] | undefined): void</code><span class="api-kind">método</span></div>
+		<p>Define os diagnósticos de um arquivo.</p>
+	</li><li class="api-member" id="synapse-diagnosticcollection-set">
+		<div class="api-member-head"><code>set(entries: readonly [Uri | string, readonly Diagnostic[] | undefined][]): void</code><span class="api-kind">método</span></div>
+		<p>Define vários arquivos de uma vez.</p>
+	</li><li class="api-member" id="synapse-diagnosticcollection-delete">
+		<div class="api-member-head"><code>delete(uri: Uri | string): void</code><span class="api-kind">método</span></div>
+		<p>Remove os diagnósticos de um arquivo.</p>
+	</li><li class="api-member" id="synapse-diagnosticcollection-clear">
+		<div class="api-member-head"><code>clear(): void</code><span class="api-kind">método</span></div>
+		<p>Limpa tudo.</p>
+	</li><li class="api-member" id="synapse-diagnosticcollection-get">
+		<div class="api-member-head"><code>get(uri: Uri | string): readonly Diagnostic[] | undefined</code><span class="api-kind">método</span></div>
+		<p>Lê os diagnósticos de um arquivo.</p>
+	</li><li class="api-member" id="synapse-diagnosticcollection-has">
+		<div class="api-member-head"><code>has(uri: Uri | string): boolean</code><span class="api-kind">método</span></div>
+		<p><code>true</code> se há diagnósticos para o arquivo.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-languageconfiguration">
+		<h3><code>interface</code> LanguageConfiguration</h3>
+		<pre class="api-signature"><code>interface LanguageConfiguration</code></pre>
+		<p>Configuração de linguagem consumida por indentação, dobra e auto-fechamento.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-languageconfiguration-comments">
+		<div class="api-member-head"><code>comments?: { lineComment?: string; blockComment?: [string, string] }</code><span class="api-kind">propriedade</span></div>
+		<p>Comentários de linha/bloco.</p>
+	</li><li class="api-member" id="synapse-languageconfiguration-brackets">
+		<div class="api-member-head"><code>brackets?: [string, string][]</code><span class="api-kind">propriedade</span></div>
+		<p>Pares de colchetes.</p>
+	</li><li class="api-member" id="synapse-languageconfiguration-autoclosingpairs">
+		<div class="api-member-head"><code>autoClosingPairs?: { open: string; close: string; notIn?: string[] }[]</code><span class="api-kind">propriedade</span></div>
+		<p>Pares auto-fechados.</p>
+	</li><li class="api-member" id="synapse-languageconfiguration-surroundingpairs">
+		<div class="api-member-head"><code>surroundingPairs?: { open: string; close: string }[]</code><span class="api-kind">propriedade</span></div>
+		<p>Pares que envolvem a seleção.</p>
+	</li><li class="api-member" id="synapse-languageconfiguration-wordpattern">
+		<div class="api-member-head"><code>wordPattern?: RegExp | string</code><span class="api-kind">propriedade</span></div>
+		<p>Regex de palavra.</p>
+	</li><li class="api-member" id="synapse-languageconfiguration-folding">
+		<div class="api-member-head"><code>folding?: { markers?: { start: RegExp | string; end: RegExp | string }; offSide?: boolean }</code><span class="api-kind">propriedade</span></div>
+		<p>Marcadores de região dobrável.</p>
+	</li><li class="api-member" id="synapse-languageconfiguration-indentationrules">
+		<div class="api-member-head"><code>indentationRules?: { increaseIndentPattern: RegExp | string; decreaseIndentPattern: RegExp | string }</code><span class="api-kind">propriedade</span></div>
+		<p>Regras de indentação.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-uikind">
+		<h3><code>enum</code> UIKind</h3>
+		<pre class="api-signature"><code>enum UIKind</code></pre>
+		<p>Tipo de interface em uso.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-uikind-desktop-1">
+		<div class="api-member-head"><code>Desktop = 1</code><span class="api-kind">member</span></div>
+		<p>Janela de desktop.</p>
+	</li><li class="api-member" id="synapse-uikind-mobile-2">
+		<div class="api-member-head"><code>Mobile = 2</code><span class="api-kind">member</span></div>
+		<p>Layout de celular.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-clipboard">
+		<h3><code>interface</code> Clipboard</h3>
+		<pre class="api-signature"><code>interface Clipboard</code></pre>
+		<p>Área de transferência (permissão <code>clipboard</code>).</p>
+		<ul class="api-members"><li class="api-member" id="synapse-clipboard-readtext">
+		<div class="api-member-head"><code>readText(): Promise&lt;string&gt;</code><span class="api-kind">método</span></div>
+		<p>Lê texto.</p>
+	</li><li class="api-member" id="synapse-clipboard-writetext">
+		<div class="api-member-head"><code>writeText(value: string): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Grava texto.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-previewstate">
+		<h3><code>interface</code> PreviewState</h3>
+		<pre class="api-signature"><code>interface PreviewState</code></pre>
+		<p>Estado atual do preview.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-previewstate-projectid">
+		<div class="api-member-head"><code>readonly projectId: string | null</code><span class="api-kind">propriedade</span></div>
+		<p>Id do projeto.</p>
+	</li><li class="api-member" id="synapse-previewstate-projectname">
+		<div class="api-member-head"><code>readonly projectName: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome do projeto.</p>
+	</li><li class="api-member" id="synapse-previewstate-mode">
+		<div class="api-member-head"><code>readonly mode: string</code><span class="api-kind">propriedade</span></div>
+		<p>Modo (<code>static</code>, <code>build</code>, <code>server</code>).</p>
+	</li><li class="api-member" id="synapse-previewstate-url">
+		<div class="api-member-head"><code>readonly url: string</code><span class="api-kind">propriedade</span></div>
+		<p>URL interna do iframe.</p>
+	</li><li class="api-member" id="synapse-previewstate-building">
+		<div class="api-member-head"><code>readonly building: boolean</code><span class="api-kind">propriedade</span></div>
+		<p><code>true</code> enquanto compila.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-previewviewport">
+		<h3><code>interface</code> PreviewViewport</h3>
+		<pre class="api-signature"><code>interface PreviewViewport</code></pre>
+		<p>Viewport do preview.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-previewviewport-preset">
+		<div class="api-member-head"><code>preset?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Preset (<code>padrao</code>, <code>celular</code>, <code>tablet</code>, <code>notebook</code>, <code>desktop</code>).</p>
+	</li><li class="api-member" id="synapse-previewviewport-width">
+		<div class="api-member-head"><code>width?: number</code><span class="api-kind">propriedade</span></div>
+		<p>Largura em px.</p>
+	</li><li class="api-member" id="synapse-previewviewport-height">
+		<div class="api-member-head"><code>height?: number</code><span class="api-kind">propriedade</span></div>
+		<p>Altura em px.</p>
+	</li><li class="api-member" id="synapse-previewviewport-dpr">
+		<div class="api-member-head"><code>dpr?: number</code><span class="api-kind">propriedade</span></div>
+		<p>Densidade de pixels emulada.</p>
+	</li><li class="api-member" id="synapse-previewviewport-orientation">
+		<div class="api-member-head"><code>orientation?: 'portrait' | 'landscape'</code><span class="api-kind">propriedade</span></div>
+		<p>Orientação.</p>
+	</li><li class="api-member" id="synapse-previewviewport-touch">
+		<div class="api-member-head"><code>touch?: boolean</code><span class="api-kind">propriedade</span></div>
+		<p>Emula toque.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-testcaseresult">
+		<h3><code>interface</code> TestCaseResult</h3>
+		<pre class="api-signature"><code>interface TestCaseResult</code></pre>
+		<p>Resultado de um caso de teste.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-testcaseresult-name">
+		<div class="api-member-head"><code>readonly name: string</code><span class="api-kind">propriedade</span></div>
+		<p>Nome completo (<code>suite &gt; caso</code>).</p>
+	</li><li class="api-member" id="synapse-testcaseresult-status">
+		<div class="api-member-head"><code>readonly status: 'passed' | 'failed' | 'skipped'</code><span class="api-kind">propriedade</span></div>
+		<p><code>passed</code>, <code>failed</code> ou <code>skipped</code>.</p>
+	</li><li class="api-member" id="synapse-testcaseresult-durationms">
+		<div class="api-member-head"><code>readonly durationMs: number</code><span class="api-kind">propriedade</span></div>
+		<p>Duração em ms.</p>
+	</li><li class="api-member" id="synapse-testcaseresult-error">
+		<div class="api-member-head"><code>readonly error?: string</code><span class="api-kind">propriedade</span></div>
+		<p>Mensagem do erro quando falhou.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-testreport">
+		<h3><code>interface</code> TestReport</h3>
+		<pre class="api-signature"><code>interface TestReport</code></pre>
+		<p>Relatório de uma execução de testes.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-testreport-total">
+		<div class="api-member-head"><code>readonly total: number</code><span class="api-kind">propriedade</span></div>
+		<p>Total de casos.</p>
+	</li><li class="api-member" id="synapse-testreport-passed">
+		<div class="api-member-head"><code>readonly passed: number</code><span class="api-kind">propriedade</span></div>
+		<p>Aprovados.</p>
+	</li><li class="api-member" id="synapse-testreport-failed">
+		<div class="api-member-head"><code>readonly failed: number</code><span class="api-kind">propriedade</span></div>
+		<p>Reprovados.</p>
+	</li><li class="api-member" id="synapse-testreport-skipped">
+		<div class="api-member-head"><code>readonly skipped: number</code><span class="api-kind">propriedade</span></div>
+		<p>Pulados.</p>
+	</li><li class="api-member" id="synapse-testreport-durationms">
+		<div class="api-member-head"><code>readonly durationMs: number</code><span class="api-kind">propriedade</span></div>
+		<p>Duração total em ms.</p>
+	</li><li class="api-member" id="synapse-testreport-cases">
+		<div class="api-member-head"><code>readonly cases: readonly TestCaseResult[]</code><span class="api-kind">propriedade</span></div>
+		<p>Casos individuais.</p>
+	</li></ul>
+	</section><section class="api-type" id="synapse-expectation">
+		<h3><code>interface</code> Expectation</h3>
+		<pre class="api-signature"><code>interface Expectation&lt;T&gt;</code></pre>
+		<p>Asserções encadeáveis devolvidas por <code>test.expect</code>.</p>
+		<ul class="api-members"><li class="api-member" id="synapse-expectation-not">
+		<div class="api-member-head"><code>readonly not: Expectation&lt;T&gt;</code><span class="api-kind">propriedade</span></div>
+		<p>Inverte a próxima asserção.</p>
+	</li><li class="api-member" id="synapse-expectation-tobe">
+		<div class="api-member-head"><code>toBe(expected: T): void</code><span class="api-kind">método</span></div>
+		<p>Igualdade estrita (<code>Object.is</code>).</p>
+	</li><li class="api-member" id="synapse-expectation-toequal">
+		<div class="api-member-head"><code>toEqual(expected: any): void</code><span class="api-kind">método</span></div>
+		<p>Igualdade estrutural profunda.</p>
+	</li><li class="api-member" id="synapse-expectation-tobetruthy">
+		<div class="api-member-head"><code>toBeTruthy(): void</code><span class="api-kind">método</span></div>
+		<p>Valor truthy.</p>
+	</li><li class="api-member" id="synapse-expectation-tobefalsy">
+		<div class="api-member-head"><code>toBeFalsy(): void</code><span class="api-kind">método</span></div>
+		<p>Valor falsy.</p>
+	</li><li class="api-member" id="synapse-expectation-tobedefined">
+		<div class="api-member-head"><code>toBeDefined(): void</code><span class="api-kind">método</span></div>
+		<p>Diferente de <code>undefined</code>.</p>
+	</li><li class="api-member" id="synapse-expectation-tobeundefined">
+		<div class="api-member-head"><code>toBeUndefined(): void</code><span class="api-kind">método</span></div>
+		<p>Igual a <code>undefined</code>.</p>
+	</li><li class="api-member" id="synapse-expectation-tobenull">
+		<div class="api-member-head"><code>toBeNull(): void</code><span class="api-kind">método</span></div>
+		<p>Igual a <code>null</code>.</p>
+	</li><li class="api-member" id="synapse-expectation-tocontain">
+		<div class="api-member-head"><code>toContain(item: any): void</code><span class="api-kind">método</span></div>
+		<p>String/array contém o item.</p>
+	</li><li class="api-member" id="synapse-expectation-tohavelength">
+		<div class="api-member-head"><code>toHaveLength(length: number): void</code><span class="api-kind">método</span></div>
+		<p><code>length</code> igual.</p>
+	</li><li class="api-member" id="synapse-expectation-tobegreaterthan">
+		<div class="api-member-head"><code>toBeGreaterThan(value: number): void</code><span class="api-kind">método</span></div>
+		<p>Maior que.</p>
+	</li><li class="api-member" id="synapse-expectation-tobelessthan">
+		<div class="api-member-head"><code>toBeLessThan(value: number): void</code><span class="api-kind">método</span></div>
+		<p>Menor que.</p>
+	</li><li class="api-member" id="synapse-expectation-tomatch">
+		<div class="api-member-head"><code>toMatch(pattern: RegExp | string): void</code><span class="api-kind">método</span></div>
+		<p>Casa com regex ou substring.</p>
+	</li><li class="api-member" id="synapse-expectation-tothrow">
+		<div class="api-member-head"><code>toThrow(expected?: RegExp | string): void</code><span class="api-kind">método</span></div>
+		<p>Função lança (opcionalmente com mensagem que casa).</p>
+	</li><li class="api-member" id="synapse-expectation-rejects">
+		<div class="api-member-head"><code>rejects(expected?: RegExp | string): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Promise rejeita (opcionalmente com mensagem que casa).</p>
+	</li><li class="api-member" id="synapse-expectation-resolves">
+		<div class="api-member-head"><code>resolves(): Promise&lt;void&gt;</code><span class="api-kind">método</span></div>
+		<p>Promise resolve.</p>
+	</li></ul>
+	</section></section>
+				</article>
+				<footer class="docs-pager"></footer>
+				<p class="docs-page-footer">Encontrou um símbolo sem descrição? Complete o TSDoc em synapse.d.ts e regenere.</p>
+			</main>
+			<aside class="docs-outline" aria-label="Nesta página"></aside>
+		</div>
+		<script src="./assets/docs-catalog.js"></script>
+		<script src="./assets/docs-current-category.js"></script>
+		<script src="./assets/docs-sidebar.js"></script>
+		<script src="./assets/docs-filter.js"></script>
+		<script src="./assets/docs-outline.js"></script>
+		<script src="./assets/docs-pager.js"></script>
+		<script src="./assets/docs-boot.js"></script>
+		<script src="../assets/js/i18n/phrase-registration.js"></script>
+		<script src="./assets/docs-phrases.js"></script>
+		<script src="./assets/docs-error-silencer.js"></script>
+		<script src="../assets/js/i18n/idiomas.js"></script>
+	</body>
+</html>

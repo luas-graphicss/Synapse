@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function () {
+				if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+				var caminho = location.pathname || '';
+				if (!caminho || /\/$/.test(caminho) || /\.[a-z0-9]+$/i.test(caminho)) return;
+				var base = document.createElement('base');
+				base.setAttribute('href', caminho + '/');
+				if (document.head) document.head.appendChild(base);
+			})();
+		</script>
+		<link rel="icon" href="../favicon.ico?v=1001" sizes="any" />
+		<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png?v=1001" />
+		<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16.png?v=1001" />
+		<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png?v=1001" />
+		<link rel="manifest" href="../site.webmanifest" />
+		<meta name="theme-color" content="#0b0d12" />
+		<link rel="canonical" href="https://sypnase-live-preview.vercel.app/docs/extensoes-linguagens.html" />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:type" content="article" />
+		<meta property="og:site_name" content="Synapse Live Preview" />
+		<meta property="og:title" content="Suporte a linguagens | Documentação da Synapse IDE" />
+		<meta property="og:description" content="Como criar extensões de linguagem para a Synapse IDE: gramáticas JSON, configuração de linguagem, snippets, providers de completion/hover/definition, formatação e diagnósticos." />
+		<meta property="og:url" content="https://sypnase-live-preview.vercel.app/docs/extensoes-linguagens.html" />
+		<meta property="og:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Suporte a linguagens | Documentação da Synapse IDE" />
+		<meta name="twitter:description" content="Como criar extensões de linguagem para a Synapse IDE: gramáticas JSON, configuração de linguagem, snippets, providers de completion/hover/definition, formatação e diagnósticos." />
+		<meta name="twitter:image" content="https://sypnase-live-preview.vercel.app/social-card.png" />
+		<title>Suporte a linguagens | Documentação da Synapse IDE</title>
+		<meta name="description" content="Como criar extensões de linguagem para a Synapse IDE: gramáticas JSON, configuração de linguagem, snippets, providers de completion/hover/definition, formatação e diagnósticos." />
+		<link rel="stylesheet" href="../assets/css/tema.css" />
+		<link rel="stylesheet" href="./assets/docs-shell.css" />
+		<link rel="stylesheet" href="./assets/docs-navigation.css" />
+		<link rel="stylesheet" href="./assets/docs-prose.css" />
+		<link rel="stylesheet" href="./assets/docs-theme.css" />
+		<link rel="stylesheet" href="./assets/docs-typography.css" />
+		<script src="./assets/docs-ide-preference.js"></script>
+		<script src="./assets/docs-theme-sync.js"></script>
+	</head>
+	<body data-docs-category="extensoes-linguagens">
+		<header class="docs-topbar">
+			<a class="docs-brand" href="./index.html">
+				<span class="docs-brand-mark">SYNAPSE</span>
+				<span class="docs-brand-text">Documentação oficial</span>
+			</a>
+			<nav class="docs-topbar-links">
+				<span class="docs-topbar-version">build 2026.09</span>
+				<a class="docs-topbar-link" href="./atualizacoes.html">Atualizações</a>
+				<a class="docs-topbar-link" href="../index.html">Abrir a IDE</a>
+			</nav>
+		</header>
+		<div class="docs-frame">
+			<nav class="docs-sidebar" aria-label="Categorias da documentação"></nav>
+			<main class="docs-main">
+				<article class="docs-article">
+					<p class="docs-kicker">Extensões / Suporte a linguagens</p>
+					<h1 class="docs-title">Adicionando uma linguagem à IDE</h1>
+					<p class="docs-lede">Do realce de sintaxe declarativo até completions, hover, símbolos e diagnósticos programáticos. Tudo que uma extensão de linguagem faz, na ordem em que você vai precisar.</p>
+					<div class="docs-meta">
+						<span>revisado em 15/09/2026</span>
+						<span>leitura 11 min</span>
+						<span>público: dev</span>
+					</div>
+					<section>
+						<h2>Camadas de suporte</h2>
+						<p>
+							Você não precisa entregar tudo de uma vez. Cada camada funciona sozinha e a próxima
+							só adiciona por cima:
+						</p>
+						<ol class="docs-steps">
+							<li><strong>Registro da linguagem</strong> (manifesto): extensões de arquivo, aliases, comentários e pares. Já libera detecção e comentar/descomentar.</li>
+							<li><strong>Gramática</strong> (JSON): realce de sintaxe. Sem código.</li>
+							<li><strong>Snippets</strong> (JSON): trechos por prefixo. Sem código.</li>
+							<li><strong>Providers</strong> (código): completion, hover, definição, símbolos, formatação, ações de código.</li>
+							<li><strong>Diagnósticos</strong> (código): sublinhados e painel de problemas.</li>
+						</ol>
+					</section>
+
+					<section>
+						<h2>1. Registrar a linguagem</h2>
+						<pre><code>"contributes": {
+	"languages": [{
+		"id": "zig",
+		"extensions": [".zig", ".zon"],
+		"aliases": ["Zig"],
+		"filenames": ["build.zig"],
+		"configuration": "language-configuration.json"
+	}]
+},
+"activationEvents": ["onLanguage:zig"]</code></pre>
+						<p><code>language-configuration.json</code> descreve o comportamento do editor:</p>
+						<pre><code>{
+	"comments": { "lineComment": "//", "blockComment": ["/*", "*/"] },
+	"brackets": [["{", "}"], ["[", "]"], ["(", ")"]],
+	"autoClosingPairs": [
+		{ "open": "{", "close": "}" },
+		{ "open": "\"", "close": "\"", "notIn": ["string"] }
+	],
+	"wordPattern": "[A-Za-z_][A-Za-z0-9_]*",
+	"indentationRules": { "increaseIndentPattern": "\\{\\s*$", "decreaseIndentPattern": "^\\s*\\}" }
+}</code></pre>
+					</section>
+
+					<section>
+						<h2>2. Gramática</h2>
+						<p>
+							A IDE usa um formato de gramática próprio, mais simples que TextMate: uma lista
+							linear de padrões com regex JavaScript e nomes de escopo. Cada linha é analisada da
+							esquerda para a direita; o primeiro padrão que casar em uma posição vence.
+						</p>
+						<pre><code>{
+	"lineComments": ["//"],
+	"blockComments": [["/*", "*/"]],
+	"quotes": ["\""],
+	"keywords": "fn const var if else while return",
+	"patterns": [
+		{ "match": "@[A-Za-z_]\\w*", "name": "support.function.builtin" },
+		{ "match": "\\b(?:i|u)(?:8|16|32|64)\\b", "name": "storage.type" },
+		{ "match": "\\b(fn)\\s+([A-Za-z_]\\w*)", "captures": { "1": "keyword", "2": "entity.name.function" } },
+		{ "match": "\\b\\d[\\d_]*\\b", "name": "constant.numeric" },
+		{ "match": "[{}()\\[\\];,.]", "name": "punctuation" }
+	]
+}</code></pre>
+						<dl class="docs-definition">
+							<dt><code>lineComments</code>, <code>blockComments</code>, <code>quotes</code></dt>
+							<dd>Tratados pelo tokenizador antes dos padrões, com suporte a escape e strings multilinha (<code>multilineStrings: true</code>).</dd>
+							<dt><code>keywords</code></dt>
+							<dd>Atalho: lista separada por espaço que vira o escopo <code>keyword</code> sem você escrever a regex.</dd>
+							<dt><code>patterns[].name</code></dt>
+							<dd>Escopo aplicado ao match inteiro. Os temas mapeiam os escopos padrão: <code>keyword</code>, <code>storage.type</code>, <code>entity.name.function</code>, <code>constant.numeric</code>, <code>string.*</code>, <code>comment</code>, <code>variable</code>, <code>support.function.builtin</code>, <code>punctuation</code>.</dd>
+							<dt><code>patterns[].captures</code></dt>
+							<dd>Escopo por grupo de captura quando um único padrão cobre várias partes.</dd>
+						</dl>
+						<div class="docs-note">
+							<span class="docs-note-label">Desempenho</span>
+							Regex com <em>lookbehind</em> e quantificadores aninhados deixam a digitação lenta em
+							arquivos grandes. A IDE aborta um padrão que passa de 50 ms por linha e avisa no
+							console do Extension Development Host.
+						</div>
+					</section>
+
+					<section>
+						<h2>3. Snippets</h2>
+						<pre><code>"snippets": [{ "language": "zig", "path": "snippets/zig.json" }]
+
+// snippets/zig.json
+{
+	"Função pública": {
+		"prefix": "pubfn",
+		"body": ["pub fn ${1:nome}(${2}) ${3:void} {", "\t$0", "}"],
+		"description": "Declara uma função pública."
+	}
+}</code></pre>
+						<p>
+							Tabstops (<code>$1</code>, <code>$2</code>, <code>$0</code>), placeholders
+							(<code>${1:nome}</code>) e escolhas (<code>${1|a,b,c|}</code>) seguem a sintaxe
+							padrão. Para inserir por código use <code>new synapse.SnippetString(...)</code> em
+							<code>editor.insertSnippet</code> ou em <code>CompletionItem.insertText</code>.
+						</p>
+					</section>
+
+					<section>
+						<h2>4. Providers</h2>
+						<p>
+							Registre em <code>activate</code> e adicione cada retorno a
+							<code>context.subscriptions</code>. O seletor pode ser o id da linguagem ou um
+							<code>DocumentFilter</code> com <code>pattern</code>.
+						</p>
+						<pre><code>const { languages, CompletionItem, CompletionItemKind, Hover, MarkdownString, Location, Range, Position } = synapse;
+
+languages.registerCompletionItemProvider('zig', {
+	provideCompletionItems(document, position) {
+		const linha = document.lineAt(position.line).text.slice(0, position.character);
+		if (!/@\w*$/.test(linha)) return [];
+		return BUILTINS.map((nome) =&gt; {
+			const item = new CompletionItem('@' + nome, CompletionItemKind.Function);
+			item.detail = 'builtin';
+			return item;
+		});
+	},
+}, '@');
+
+languages.registerHoverProvider('zig', {
+	provideHover(document, position) {
+		const palavra = document.getText(document.getWordRangeAtPosition(position));
+		const doc = DOCS[palavra];
+		return doc ? new Hover(new MarkdownString(doc)) : null;
+	},
+});
+
+languages.registerDocumentSymbolProvider('zig', {
+	provideDocumentSymbols(document) { return extrairSimbolos(document); },
+});
+
+languages.registerDocumentFormattingEditProvider('zig', {
+	provideDocumentFormattingEdits(document) {
+		const todo = new Range(new Position(0, 0), document.lineAt(document.lineCount - 1).range.end);
+		return [synapse.TextEdit.replace(todo, formatar(document.getText()))];
+	},
+});</code></pre>
+						<table class="docs-table">
+							<thead><tr><th>Provider</th><th>Quando roda</th><th>Retorna</th></tr></thead>
+							<tbody>
+								<tr><td>Completion</td><td>Digitação, caracteres gatilho, <kbd>Ctrl</kbd>+<kbd>Espaço</kbd></td><td><code>CompletionItem[]</code> ou <code>CompletionList</code></td></tr>
+								<tr><td>Hover</td><td>Mouse parado sobre uma palavra</td><td><code>Hover</code></td></tr>
+								<tr><td>Definition</td><td><kbd>F12</kbd>, <kbd>Ctrl</kbd>+clique</td><td><code>Location | Location[]</code></td></tr>
+								<tr><td>DocumentSymbol</td><td>Painel de estrutura, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd></td><td><code>DocumentSymbol[]</code></td></tr>
+								<tr><td>DocumentFormatting</td><td>Formatar documento, formatar ao salvar</td><td><code>TextEdit[]</code></td></tr>
+								<tr><td>CodeActions</td><td>Lâmpada, <kbd>Ctrl</kbd>+<kbd>.</kbd></td><td><code>CodeAction[]</code></td></tr>
+							</tbody>
+						</table>
+						<p>
+							Todos recebem um <code>CancellationToken</code>; verifique
+							<code>token.isCancellationRequested</code> em loops longos. Providers que demoram mais
+							de 2 s são cancelados e o tempo aparece no Inspetor.
+						</p>
+					</section>
+
+					<section>
+						<h2>5. Diagnósticos</h2>
+						<pre><code>const colecao = synapse.languages.createDiagnosticCollection('zig');
+context.subscriptions.push(colecao);
+
+function analisar(document) {
+	if (document.languageId !== 'zig') return;
+	const problemas = [];
+	for (let i = 0; i &lt; document.lineCount; i++) {
+		const linha = document.lineAt(i);
+		const idx = linha.text.indexOf('var ');
+		if (idx !== -1 &amp;&amp; !linha.text.includes('=')) {
+			const range = new synapse.Range(i, idx, i, idx + 3);
+			const d = new synapse.Diagnostic(range, 'Variável declarada sem valor inicial.', synapse.DiagnosticSeverity.Warning);
+			d.code = 'zig/var-sem-valor';
+			d.source = 'zig';
+			problemas.push(d);
+		}
+	}
+	colecao.set(document.uri, problemas);
+}
+
+synapse.workspace.textDocuments.forEach(analisar);
+synapse.workspace.onDidOpenTextDocument(analisar);
+synapse.workspace.onDidChangeTextDocument((e) =&gt; analisar(e.document));
+synapse.workspace.onDidCloseTextDocument((doc) =&gt; colecao.delete(doc.uri));</code></pre>
+						<p>
+							Diagnósticos aparecem sublinhados no editor, no painel de problemas e no contador da
+							barra de status, agrupados pelo <code>source</code>. Combine com um
+							<code>CodeActionsProvider</code> que leia <code>context.diagnostics</code> para
+							oferecer correções.
+						</p>
+					</section>
+
+					<section>
+						<h2>Testando uma linguagem</h2>
+						<p>
+							Testes rodam no worker com acesso ao workspace, então dá para abrir um documento
+							fictício e exercitar os providers de verdade:
+						</p>
+						<pre><code>const { describe, it, expect } = synapse.test;
+
+describe('zig completions', () =&gt; {
+	it('sugere builtins após @', async () =&gt; {
+		const doc = await synapse.workspace.openTextDocument({ language: 'zig', content: 'const x = @' });
+		const lista = await synapse.commands.executeCommand('synapse.executeCompletionItemProvider', doc.uri, new synapse.Position(0, 11));
+		expect(lista.items.map((i) =&gt; i.label)).toContain('@import');
+	});
+});</code></pre>
+					</section>
+
+				</article>
+				<footer class="docs-pager"></footer>
+				<p class="docs-page-footer">O exemplo exemplos/extensoes/zig-language implementa cada seção desta página; use-o como gabarito.</p>
+			</main>
+			<aside class="docs-outline" aria-label="Nesta página"></aside>
+		</div>
+		<script src="./assets/docs-catalog.js"></script>
+		<script src="./assets/docs-current-category.js"></script>
+		<script src="./assets/docs-sidebar.js"></script>
+		<script src="./assets/docs-filter.js"></script>
+		<script src="./assets/docs-outline.js"></script>
+		<script src="./assets/docs-pager.js"></script>
+		<script src="./assets/docs-boot.js"></script>
+		<script src="../assets/js/i18n/phrase-registration.js"></script>
+		<script src="./assets/docs-phrases.js"></script>
+		<script src="./assets/docs-error-silencer.js"></script>
+		<script src="../assets/js/i18n/idiomas.js"></script>
+	</body>
+</html>

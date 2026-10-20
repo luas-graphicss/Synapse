@@ -1,0 +1,30 @@
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+node_modules/
+.wrangler/
+.vercel/
+.next/
+.v0/
+coverage/
+playwright-report/
+test-results/
+**/__tests__/
+**/test/
+**/tests/
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+*.log
+.DS_Store
+Thumbs.db
+IDE Sypnase/ROADMAP-*
+IDE Sypnase/distribuicao/
+IDE Sypnase/exemplos/
+IDE Sypnase/assets/extensoes/governanca/
