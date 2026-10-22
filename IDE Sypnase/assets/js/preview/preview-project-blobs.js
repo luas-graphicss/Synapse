@@ -8,6 +8,7 @@
 
 	function revokeEveryUrl(project) {
 		for (const url of [...project.blobs]) {
+			if (typeof url !== 'string' || !url.startsWith('blob:')) continue;
 			try {
 				root.URL.revokeObjectURL(url);
 			} catch (error) {
@@ -22,6 +23,12 @@
 		root.SynapsePreviewResources.reset(project);
 		root.SynapsePreviewBlobUsage.clear(project);
 		revokeEveryUrl(project);
+
+		try {
+			root.SynapsePreviewIsolado?.limpar(project);
+		} catch (error) {
+			ignorarErro(error, 'previewProjectBlobs');
+		}
 		clearCache(project, 'blobCache');
 		clearCache(project, 'cssBlobCache');
 		project.lastHtml = null;

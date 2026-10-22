@@ -1,7 +1,6 @@
 (function () {
 	'use strict';
 
-	const MENOR = String.fromCharCode(8249);
 	const ANG = String.fromCharCode(10216);
 	const RATIO = String.fromCharCode(8758);
 	const FWEQ = String.fromCharCode(65309);
@@ -9,32 +8,8 @@
 	const RATIO_ENT = '&#8758;';
 	const FWEQ_ENT = '&#65309;';
 
-	const RE_TAG_FIM = /<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:._-]{0,40})\s*\/?\s*>/g;
-	const RE_TAG_ABR = /<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:._-]{0,40})/g;
-	const RE_MENOR = /</g;
-	const RE_JS_URI = /javascript\s*:/gi;
-	const RE_DATA_HTML = /data(\s*):(\s*)text\s*\/\s*html/gi;
-	const RE_HANDLER = /\bon([a-z]{3,15})\s*=/gi;
-	const RE_TEMPLATE = /\$\{/g;
-
-	function _tagFim(_m, barra, nome) {
-		return `[${barra || ''}${nome}]`;
-	}
-	function _tagAbr(_m, barra, nome) {
-		return `[${barra || ''}${nome}`;
-	}
-
 	function wafTextoSeguro(txt) {
-		if (typeof txt !== 'string' || !txt) return txt;
-		let t = txt;
-		if (t.includes('<')) {
-			t = t.replace(RE_TAG_FIM, _tagFim).replace(RE_TAG_ABR, _tagAbr).replace(RE_MENOR, MENOR);
-		}
-		if (t.includes(':'))
-			t = t.replace(RE_JS_URI, 'javascript :').replace(RE_DATA_HTML, 'data$1 :$2text/html');
-		if (t.includes('=')) t = t.replace(RE_HANDLER, 'on$1 =');
-		if (t.includes('${')) t = t.replace(RE_TEMPLATE, '$ {');
-		return t;
+		return wafCodificarSaida(txt);
 	}
 
 	function _mapaFundo(valor, fn) {
@@ -54,7 +29,23 @@
 	}
 
 	function wafSanearObj(valor) {
-		return _mapaFundo(valor, wafTextoSeguro);
+		if (valor == null || typeof valor !== 'object') return valor;
+		let serial = '';
+		try {
+			serial = JSON.stringify(valor);
+		} catch (e) {
+			return valor;
+		}
+		let precisa = serial.includes('<') || serial.includes(ANG);
+		if (NIVEL >= 2 && !precisa)
+			precisa =
+				RE_URI_COD.test(serial) ||
+				RE_HAND_COD.test(serial) ||
+				serial.includes(RATIO) ||
+				serial.includes(FWEQ);
+		RE_URI_COD.lastIndex = 0;
+		RE_HAND_COD.lastIndex = 0;
+		return precisa ? _mapaFundo(valor, wafCodificarSaida) : valor;
 	}
 
 	let MODO = 'auto';

@@ -73,8 +73,8 @@
 })();
 
 function mcpNewSession() {
-	MCP.sid = mcpRand(10);
-	MCP.token = mcpRand(24);
+	MCP.sid = mcpRand(MCP_TAMANHO_SID);
+	MCP.token = mcpRand(MCP_TAMANHO_TOKEN);
 	mcpSaveCfg();
 }
 function MCP_HDRS() {

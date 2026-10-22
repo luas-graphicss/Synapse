@@ -12,6 +12,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const net = require('net');
+const dns = require('dns');
 const spawn = require('child_process').spawn;
 const SDec = require('string_decoder').StringDecoder;
 const OEM_HIGH_RANGE =
@@ -80,6 +82,7 @@ function createProcessTextDecoder() {
 	};
 }
 const NL = String.fromCharCode(10);
+const CRLF = String.fromCharCode(13, 10);
 const PORT = process.env.PORT || 8787;
 const MAX_BODY = 64 * 1024 * 1024;
 const TIMEOUT_MS = Number(process.env.AURORA_TIMEOUT_MS || 35000);
@@ -89,41 +92,328 @@ const IGNORE = ['node_modules', '.git', '.cache', '.next', '.vercel', '.DS_Store
 const SCAN_MAX = Math.max(50, Number(process.env.AURORA_SCAN_MAX || 0) || 20000);
 const MAX_PROCS = Math.max(4, Number(process.env.AURORA_MAX_PROCS || 0) || 24);
 const sessions = new Map();
-const ALLOW_ORIGIN = String(process.env.AURORA_ALLOW_ORIGIN || '').trim();
+
+const SITE_ORIGEM = 'https://sypnase-live-preview.vercel.app';
+const ORIGEM_LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?$/i;
+const ORIGENS_CONFIGURADAS = String(process.env.AURORA_ALLOW_ORIGIN || '')
+	.split(',')
+	.map(normalizarOrigem)
+	.filter(Boolean);
+const SID_FORMATO = /^[A-Za-z0-9_-]{4,80}$/;
+const TOKEN_FORMATO = /^[A-Za-z0-9_-]{16,160}$/;
+const LIMITE_HTTP = limiteConfigurado('AURORA_RATE_HTTP', 1200);
+const LIMITE_AUTH = limiteConfigurado('AURORA_RATE_AUTH', 20);
+const LIMITE_TERMINAL = limiteConfigurado('AURORA_RATE_TERMINAL', 90);
+const LIMITE_REDE = limiteConfigurado('AURORA_RATE_FETCH', 40);
+const LIMITE_WS_MENSAGENS = limiteConfigurado('AURORA_RATE_WS', 600);
+const LIMITE_WS_CONEXOES = limiteConfigurado('AURORA_WS_CONEXOES', 32);
+const MAX_SESSOES = limiteConfigurado('AURORA_MAX_SESSOES', 200);
+const SESSAO_OCIOSA_MS = limiteConfigurado('AURORA_SESSAO_OCIOSA_MS', 6 * 3600000);
+const MAX_REDIRECIONAMENTOS = 5;
+const HOSTS_CONFIAVEIS = Object.freeze([
+	'api.notion.com',
+	'github.com',
+	'api.github.com',
+	'codeload.github.com',
+	'raw.githubusercontent.com',
+	'gist.githubusercontent.com',
+	'objects.githubusercontent.com',
+	'release-assets.githubusercontent.com',
+	'api.polyhaven.com',
+	'dl.polyhaven.org',
+	'ambientcg.com',
+	'api.poly.pizza',
+	'poly.pizza',
+	'api.sketchfab.com',
+	'sketchfab.com',
+	'media.sketchfab.com',
+	'cdn.jsdelivr.net',
+	'unpkg.com',
+	'esm.sh',
+	'cdnjs.cloudflare.com',
+	'registry.npmjs.org',
+	'fonts.googleapis.com',
+	'fonts.gstatic.com',
+	'huggingface.co',
+	'openrouter.ai',
+	'api.openai.com',
+	'api.anthropic.com',
+	'generativelanguage.googleapis.com',
+]);
+const HOSTS_EXTRAS = String(process.env.AURORA_FETCH_HOSTS || '')
+	.split(',')
+	.map((h) => h.trim().toLowerCase().replace(/\.$/, ''))
+	.filter(Boolean);
+const HOST_INTERNO = /^(localhost|.+\.localhost|.+\.local|.+\.internal|.+\.home\.arpa)$/i;
+
+function limiteConfigurado(nome, padrao) {
+	const n = Number(process.env[nome]);
+	return Number.isFinite(n) && n > 0 ? Math.floor(n) : padrao;
+}
+function normalizarOrigem(valor) {
+	return String(valor || '')
+		.trim()
+		.replace(/\/+$/, '')
+		.toLowerCase();
+}
+function origemDoPedido(req) {
+	return normalizarOrigem(req && req.headers && req.headers.origin);
+}
 function origemPermitida(req) {
-	if (!ALLOW_ORIGIN) return true;
-	const o = String((req && req.headers && req.headers.origin) || '').replace(/\/+$/, '');
-	if (!o) return true;
-	const lista = ALLOW_ORIGIN.split(',');
-	for (let i = 0; i < lista.length; i++) {
-		const x = String(lista[i] || '')
-			.trim()
-			.replace(/\/+$/, '');
-		if (x && (x === '*' || x === o)) return true;
-	}
-	return false;
+	const origem = origemDoPedido(req);
+	if (!origem) return true;
+	if (ORIGENS_CONFIGURADAS.includes('*') || ORIGENS_CONFIGURADAS.includes(origem)) return true;
+	if (ORIGENS_CONFIGURADAS.length) return false;
+	return origem === SITE_ORIGEM || ORIGEM_LOCAL.test(origem);
+}
+function prepararCors(req, res) {
+	const origem = origemDoPedido(req);
+	res.origemCors = !origem ? '*' : origemPermitida(req) ? origem : '';
 }
 function cors(res) {
-	res.setHeader('Access-Control-Allow-Origin', '*');
+	if (res.origemCors) res.setHeader('Access-Control-Allow-Origin', res.origemCors);
+	if (res.origemCors !== '*') res.setHeader('Vary', 'Origin');
 	res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+	res.setHeader('X-Content-Type-Options', 'nosniff');
 	res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
 	res.setHeader(
 		'Access-Control-Allow-Headers',
 		'Content-Type, Authorization, Accept, Notion-Version, Mcp-Session-Id, MCP-Protocol-Version, Last-Event-ID, ngrok-skip-browser-warning, X-Requested-With, Cache-Control, Pragma',
 	);
-	res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id');
+	res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id, Retry-After');
 	res.setHeader('Access-Control-Allow-Private-Network', 'true');
 	res.setHeader('Access-Control-Max-Age', '86400');
 }
-function sendJson(res, code, obj) {
+function jsonSeguro(obj) {
+	const texto = JSON.stringify(obj);
+	if (texto === undefined) return 'null';
+	return texto.replace(
+		/[<>&\u2028\u2029]/g,
+		(c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'),
+	);
+}
+function enderecoDe(req) {
+	return String((req && req.socket && req.socket.remoteAddress) || 'desconhecido');
+}
+function criarLimitador(maximo, janelaMs) {
+	const baldes = new Map();
+	const varredura = setInterval(() => {
+		const agora = Date.now();
+		for (const [chave, balde] of baldes)
+			if (agora - balde.inicio >= janelaMs) baldes.delete(chave);
+	}, janelaMs);
+	varredura.unref();
+	const balde = (chave) => {
+		const agora = Date.now();
+		let b = baldes.get(chave);
+		if (!b || agora - b.inicio >= janelaMs) {
+			b = { inicio: agora, usados: 0 };
+			baldes.set(chave, b);
+		}
+		return b;
+	};
+	const retryEm = (b) => Math.max(1, Math.ceil((b.inicio + janelaMs - Date.now()) / 1000));
+	return {
+		consumir(chave) {
+			const b = balde(chave);
+			b.usados++;
+			return { ok: b.usados <= maximo, usados: b.usados, retryEm: retryEm(b) };
+		},
+		bloqueado(chave) {
+			const b = baldes.get(chave);
+			if (!b || Date.now() - b.inicio >= janelaMs) return null;
+			return b.usados >= maximo ? { retryEm: retryEm(b) } : null;
+		},
+		liberar(chave) {
+			baldes.delete(chave);
+		},
+		zerar() {
+			baldes.clear();
+		},
+	};
+}
+const limitadorHttp = criarLimitador(LIMITE_HTTP, 60000);
+const limitadorAuth = criarLimitador(LIMITE_AUTH, 600000);
+const limitadorTerminal = criarLimitador(LIMITE_TERMINAL, 60000);
+const limitadorRede = criarLimitador(LIMITE_REDE, 60000);
+const limitadorWs = criarLimitador(LIMITE_WS_MENSAGENS, 10000);
+const conexoesWs = new Map();
+
+function resumo(valor) {
+	return crypto.createHash('sha256').update(String(valor)).digest();
+}
+function mesmoToken(a, b) {
+	return crypto.timingSafeEqual(resumo(a), resumo(b));
+}
+function sessaoOciosa(s, agora) {
+	if (workersVivos(s).length || s.pending.size || s.polls.length) return false;
+	for (const p of s.procs.values()) if (!p.done && !p.exited) return false;
+	return agora - Math.max(s.lastSeen || 0, s.criadaEm || 0) > 60000;
+}
+function liberarSessaoOciosa() {
+	const agora = Date.now();
+	let alvo = null;
+	for (const [sid, s] of sessions) {
+		if (!sessaoOciosa(s, agora)) continue;
+		if (!alvo || (s.lastSeen || 0) < (alvo.s.lastSeen || 0)) alvo = { sid, s };
+	}
+	if (alvo) sessions.delete(alvo.sid);
+	return !!alvo;
+}
+function varrerSessoes() {
+	const agora = Date.now();
+	for (const [sid, s] of sessions)
+		if (sessaoOciosa(s, agora) && agora - (s.lastSeen || s.criadaEm || 0) > SESSAO_OCIOSA_MS)
+			sessions.delete(sid);
+}
+const varreduraSessoes = setInterval(varrerSessoes, 600000);
+varreduraSessoes.unref();
+function autenticar(req, sid, token, opcoes) {
+	const exigirSessao = !!(opcoes && opcoes.exigirSessao);
+	const endereco = enderecoDe(req);
+	const bloqueio = limitadorAuth.bloqueado(endereco);
+	if (bloqueio)
+		return {
+			erro: 429,
+			mensagem: 'muitas tentativas de autenticacao; aguarde antes de repetir',
+			retryEm: bloqueio.retryEm,
+		};
+	if (!SID_FORMATO.test(String(sid || ''))) return { erro: 400, mensagem: 'sessao invalida' };
+	if (!TOKEN_FORMATO.test(String(token || '')))
+		return {
+			erro: 400,
+			mensagem: 'token fraco ou invalido: use de 16 a 160 caracteres [A-Za-z0-9_-]',
+		};
+	const existente = sessions.get(sid);
+	if (!existente && exigirSessao) {
+		limitadorAuth.consumir(endereco);
+		return { erro: 403, mensagem: 'sessao desconhecida' };
+	}
+	if (!existente && sessions.size >= MAX_SESSOES && !liberarSessaoOciosa())
+		return { erro: 503, mensagem: 'limite de sessoes do relay atingido; tente mais tarde' };
+	const sessao = existente || getSession(sid);
+	if (sessao.token && !mesmoToken(sessao.token, token)) {
+		limitadorAuth.consumir(endereco);
+		return { erro: 403, mensagem: 'token invalido' };
+	}
+	sessao.token = token;
+	return { sessao };
+}
+function recusar(res, auth) {
+	if (auth.erro === 429) sendRetry(res, 429, auth.mensagem, auth.retryEm);
+	else sendJson(res, auth.erro, { error: auth.mensagem });
+}
+function recusarUpgrade(sock, codigo, texto) {
 	try {
-		cors(res);
-		res.writeHead(code, { 'Content-Type': 'application/json' });
-		res.end(JSON.stringify(obj));
+		sock.end(
+			`HTTP/1.1 ${codigo} ${texto}${CRLF}Connection: close${CRLF}Content-Length: 0${CRLF}${CRLF}`,
+		);
 	} catch (e) {
-		ignorarErro(e, 'sendJson');
+		ignorarErro(e, 'recusarUpgrade');
 	}
 }
+
+function ipPrivado(ip) {
+	const valor = String(ip || '').toLowerCase();
+	if (net.isIPv4(valor)) {
+		const [a, b] = valor.split('.').map(Number);
+		return (
+			a === 0 ||
+			a === 10 ||
+			a === 127 ||
+			(a === 100 && b >= 64 && b <= 127) ||
+			(a === 169 && b === 254) ||
+			(a === 172 && b >= 16 && b <= 31) ||
+			(a === 192 && b === 168) ||
+			a >= 224
+		);
+	}
+	if (net.isIPv6(valor)) {
+		if (valor === '::' || valor === '::1') return true;
+		if (/^(fe[89ab]|f[cd]|ff)/.test(valor)) return true;
+		const mapeado = valor.match(/^(?:0:0:0:0:0:ffff|::ffff):(\d+\.\d+\.\d+\.\d+)$/);
+		if (mapeado) return ipPrivado(mapeado[1]);
+		if (/^::ffff:[0-9a-f]{1,4}:[0-9a-f]{1,4}$/.test(valor)) return true;
+	}
+	return false;
+}
+function hostCasa(host, regra) {
+	if (regra === '*') return true;
+	if (regra.startsWith('*.')) return host.endsWith(regra.slice(1));
+	return host === regra || host.endsWith('.' + regra);
+}
+function hostConfiavel(host) {
+	const h = String(host || '')
+		.toLowerCase()
+		.replace(/^\[|\]$/g, '')
+		.replace(/\.$/, '');
+	if (!h || HOST_INTERNO.test(h)) return false;
+	if (net.isIP(h)) return !ipPrivado(h) && HOSTS_EXTRAS.includes('*');
+	return HOSTS_CONFIAVEIS.some((r) => hostCasa(h, r)) || HOSTS_EXTRAS.some((r) => hostCasa(h, r));
+}
+function avaliarUrl(valor) {
+	let url;
+	try {
+		url = new URL(String(valor || ''));
+	} catch (e) {
+		return { ok: false, motivo: 'url invalida' };
+	}
+	if (url.protocol !== 'http:' && url.protocol !== 'https:')
+		return { ok: false, motivo: 'url invalida: use http(s)' };
+	if (url.username || url.password)
+		return { ok: false, motivo: 'url com credenciais embutidas nao e permitida' };
+	const host = url.hostname.replace(/^\[|\]$/g, '').toLowerCase();
+	if (!hostConfiavel(host))
+		return {
+			ok: false,
+			motivo: `host fora da lista confiavel: ${host} (acrescente em AURORA_FETCH_HOSTS para liberar)`,
+		};
+	return { ok: true, url, host };
+}
+async function hostResolveSeguro(host) {
+	if (net.isIP(host)) return !ipPrivado(host);
+	let enderecos;
+	try {
+		enderecos = await dns.promises.lookup(host, { all: true, verbatim: true });
+	} catch (e) {
+		return false;
+	}
+	return enderecos.length > 0 && enderecos.every((e) => !ipPrivado(e.address));
+}
+async function buscarConfiavel(valor, opcoes) {
+	let atual = String(valor || '');
+	let metodo = String((opcoes && opcoes.method) || 'GET').toUpperCase();
+	let corpo = opcoes && opcoes.body;
+	for (let salto = 0; salto <= MAX_REDIRECIONAMENTOS; salto++) {
+		const avaliacao = avaliarUrl(atual);
+		if (!avaliacao.ok) throw new Error(avaliacao.motivo);
+		if (!(await hostResolveSeguro(avaliacao.host)))
+			throw new Error(`host resolve para endereco privado ou nao resolve: ${avaliacao.host}`);
+		const resposta = await fetch(avaliacao.url, {
+			...opcoes,
+			method: metodo,
+			body: metodo === 'GET' || metodo === 'HEAD' ? undefined : corpo,
+			redirect: 'manual',
+		});
+		const destino = resposta.headers.get('location');
+		if (resposta.status >= 300 && resposta.status < 400 && destino) {
+			try {
+				if (resposta.body) await resposta.body.cancel();
+			} catch (e) {
+				ignorarErro(e, 'buscarConfiavel');
+			}
+			atual = new URL(destino, avaliacao.url).href;
+			if (resposta.status !== 307 && resposta.status !== 308) {
+				metodo = 'GET';
+				corpo = undefined;
+			}
+			continue;
+		}
+		return resposta;
+	}
+	throw new Error(`redirecionamentos demais (limite ${MAX_REDIRECIONAMENTOS})`);
+}
+
 function sseWrite(res, ev, data) {
 	if (!res || res.destroyed || res.writableEnded) return false;
 	try {
@@ -205,31 +495,47 @@ function avisarTransporteLocal(rota) {
 		'          O index.html v9.8 corrige isso sozinho ao ativar o MCP (recarregue o site com Ctrl+F5).',
 	);
 }
-const WAF_MENOR = String.fromCharCode(8249);
+const WAF_ANGULO = String.fromCharCode(10216);
+const WAF_RAZAO = String.fromCharCode(8758);
+const WAF_IGUAL = String.fromCharCode(65309);
+const WAF_RE_URI = /((?:java|vb|live)script)(\s*):/gi;
+const WAF_RE_DATA = /(data)(\s*):(\s*text\s*\/\s*html)/gi;
+const WAF_RE_HANDLER = /\bon([A-Za-z]{2,20})(\s*)=/g;
 function wafSanearTexto(s) {
 	if (typeof s !== 'string' || !s) return s;
 	let t = s;
-	if (t.includes('<')) {
-		t = t
-			.replace(/<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:._-]{0,40})\s*\/?\s*>/g, function (m, b, n) {
-				return `[${b || ''}${n}]`;
-			})
-			.replace(/<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:._-]{0,40})/g, function (m, b, n) {
-				return `[${b || ''}${n}`;
-			})
-			.replace(/</g, WAF_MENOR);
-	}
-	if (t.includes(':')) t = t.replace(/javascript\s*:/gi, 'javascript :');
-	if (t.includes('=')) t = t.replace(/\bon([a-z]{3,15})\s*=/gi, 'on$1 =');
-	t = t.replace(/\x24\{/g, '\x24 {');
+	if (t.includes(WAF_ANGULO)) t = t.split(WAF_ANGULO).join('&#10216;');
+	if (t.includes(WAF_RAZAO)) t = t.split(WAF_RAZAO).join('&#8758;');
+	if (t.includes(WAF_IGUAL)) t = t.split(WAF_IGUAL).join('&#65309;');
+	if (t.includes('<')) t = t.split('<').join(WAF_ANGULO);
+	if (t.includes(':'))
+		t = t.replace(WAF_RE_URI, '$1$2' + WAF_RAZAO).replace(WAF_RE_DATA, `$1$2${WAF_RAZAO}$3`);
+	if (t.includes('=')) t = t.replace(WAF_RE_HANDLER, 'on$1$2' + WAF_IGUAL);
 	return t;
+}
+function wafPrecisaSanear(texto) {
+	if (texto.includes('<') || texto.includes(WAF_ANGULO)) return true;
+	if (texto.includes(WAF_RAZAO) || texto.includes(WAF_IGUAL)) return true;
+	WAF_RE_URI.lastIndex = 0;
+	WAF_RE_HANDLER.lastIndex = 0;
+	const precisa = WAF_RE_URI.test(texto) || WAF_RE_HANDLER.test(texto);
+	WAF_RE_URI.lastIndex = 0;
+	WAF_RE_HANDLER.lastIndex = 0;
+	return precisa;
+}
+function wafSanearFundo(valor) {
+	if (typeof valor === 'string') return wafSanearTexto(valor);
+	if (!valor || typeof valor !== 'object') return valor;
+	if (Array.isArray(valor)) return valor.map(wafSanearFundo);
+	const out = {};
+	for (const k of Object.keys(valor)) out[k] = wafSanearFundo(valor[k]);
+	return out;
 }
 function wafSanearJson(obj) {
 	try {
 		if (obj == null || typeof obj !== 'object') return obj;
-		const s = JSON.stringify(obj);
-		if (!s.includes('<') && !s.includes('javascript')) return obj;
-		return JSON.parse(wafSanearTexto(s));
+		if (!wafPrecisaSanear(JSON.stringify(obj))) return obj;
+		return wafSanearFundo(obj);
 	} catch (e) {
 		return obj;
 	}
@@ -295,10 +601,10 @@ function respostaFallback(metodo, body) {
 function sendJson(res, code, obj, hdrs) {
 	try {
 		cors(res);
-		const h = { 'Content-Type': 'application/json' };
+		const h = { 'Content-Type': 'application/json; charset=utf-8' };
 		if (hdrs) for (let k in hdrs) h[k] = hdrs[k];
 		res.writeHead(code, h);
-		res.end(JSON.stringify(obj));
+		res.end(jsonSeguro(obj));
 	} catch (e) {
 		ignorarErro(e, 'sendJson');
 	}
@@ -306,10 +612,13 @@ function sendJson(res, code, obj, hdrs) {
 function sendRetry(res, code, msg, seg, hdrs) {
 	try {
 		cors(res);
-		const h = { 'Content-Type': 'application/json', 'Retry-After': String(seg || 1) };
+		const h = {
+			'Content-Type': 'application/json; charset=utf-8',
+			'Retry-After': String(seg || 1),
+		};
 		if (hdrs) for (let k in hdrs) h[k] = hdrs[k];
 		res.writeHead(code, h);
-		res.end(JSON.stringify({ error: msg, retryable: true }));
+		res.end(jsonSeguro({ error: msg, retryable: true }));
 	} catch (e) {
 		ignorarErro(e, 'sendRetry');
 	}
@@ -319,6 +628,7 @@ function getSession(sid) {
 	if (!s) {
 		s = {
 			token: null,
+			criadaEm: Date.now(),
 			workers: [],
 			polls: [],
 			clients: new Map(),
@@ -1113,30 +1423,31 @@ async function termAction(s, act, b, res) {
 			rec.exited = true;
 			rec.code = -1;
 		});
-		child.on('exit', function (code) {
-			rec.exited = true;
-			if (code != null) rec.code = code;
-			setTimeout(function () {
-				if (!rec.done) {
-					rec.done = true;
-					if (rec.code == null) rec.code = -1;
-					setTimeout(function () {
-						s.procs.delete(id);
-					}, 600000);
-				}
-			}, 2000);
-		});
-		child.on('close', function (code) {
-			flushDec();
-			rec.exited = true;
-			if (rec.code == null) rec.code = code == null ? -1 : code;
-			if (!rec.done) {
-				rec.done = true;
+			const expirarRegistro = function () {
 				setTimeout(function () {
 					s.procs.delete(id);
-				}, 600000);
-			}
-		});
+				}, 600000).unref();
+			};
+			child.on('exit', function (code) {
+				rec.exited = true;
+				if (code != null) rec.code = code;
+				setTimeout(function () {
+					if (!rec.done) {
+						rec.done = true;
+						if (rec.code == null) rec.code = -1;
+						expirarRegistro();
+					}
+				}, 2000).unref();
+			});
+			child.on('close', function (code) {
+				flushDec();
+				rec.exited = true;
+				if (rec.code == null) rec.code = code == null ? -1 : code;
+				if (!rec.done) {
+					rec.done = true;
+					expirarRegistro();
+				}
+			});
 		s.procs.set(id, rec);
 		sendJson(res, 200, { procId: id, dir: dir3 });
 		return;
@@ -1253,8 +1564,9 @@ async function termAction(s, act, b, res) {
 	}
 	if (act === 'fetchjson') {
 		const u4 = String(b.url || '');
-		if (!/^https?:\/\//i.test(u4)) {
-			sendJson(res, 400, { error: 'url invalida: use http(s)' });
+		const politica4 = avaliarUrl(u4);
+		if (!politica4.ok) {
+			sendJson(res, politica4.motivo.startsWith('host') ? 403 : 400, { error: politica4.motivo });
 			return;
 		}
 		if (typeof fetch !== 'function') {
@@ -1263,7 +1575,7 @@ async function termAction(s, act, b, res) {
 		}
 		let met = String(b.method || 'GET').toUpperCase();
 		if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'].includes(met)) met = 'GET';
-		const o4 = { method: met, redirect: 'follow', headers: relayHeaders(b.headers) };
+		const o4 = { method: met, headers: relayHeaders(b.headers) };
 		if (b.body != null && met !== 'GET' && met !== 'HEAD') {
 			o4.body = typeof b.body === 'string' ? b.body : JSON.stringify(b.body);
 			if (!o4.headers['Content-Type']) o4.headers['Content-Type'] = 'application/json';
@@ -1277,7 +1589,7 @@ async function termAction(s, act, b, res) {
 				ignorarErro(e, 'termAction');
 			}
 		}, 30000);
-		fetch(u4, o4)
+		buscarConfiavel(u4, o4)
 			.then(function (r4) {
 				return r4.text().then(function (tx) {
 					sendJson(res, 200, {
@@ -1301,8 +1613,9 @@ async function termAction(s, act, b, res) {
 	}
 	if (act === 'fetchurl') {
 		const u2 = String(b.url || '');
-		if (!/^https?:\/\//i.test(u2)) {
-			sendJson(res, 400, { error: 'url invalida: use http(s)' });
+		const politica2 = avaliarUrl(u2);
+		if (!politica2.ok) {
+			sendJson(res, politica2.motivo.startsWith('host') ? 403 : 400, { error: politica2.motivo });
 			return;
 		}
 		if (typeof fetch !== 'function') {
@@ -1318,7 +1631,7 @@ async function termAction(s, act, b, res) {
 				ignorarErro(e, 'termAction');
 			}
 		}, 30000);
-		fetch(u2, { redirect: 'follow', signal: ctl.signal, headers: relayHeaders(b.headers) })
+		buscarConfiavel(u2, { signal: ctl.signal, headers: relayHeaders(b.headers) })
 			.then(function (r2) {
 				if (!r2.ok) {
 					sendJson(res, 502, { error: 'download falhou: HTTP ' + r2.status });
@@ -1527,17 +1840,12 @@ function caminhoRelSeguro(p) {
 	return j.length > 512 ? null : j;
 }
 function devProxyHttp(req, res, u, parts) {
-	if (typeof origemPermitida === 'function' && !origemPermitida(req)) {
-		sendJson(res, 403, {
-			error: 'origem nao autorizada para terminal/disco - ajuste AURORA_ALLOW_ORIGIN',
-		});
+	const authDev = autenticar(req, parts[1], parts[2], { exigirSessao: true });
+	if (authDev.erro) {
+		recusar(res, authDev);
 		return;
 	}
-	const sDev = getSession(parts[1]);
-	if (sDev.token && sDev.token !== parts[2]) {
-		sendJson(res, 403, { error: 'token invalido' });
-		return;
-	}
+	const sDev = authDev.sessao;
 	const regDev = (sDev.dev || {})[parts[3]];
 	if (!regDev) {
 		sendJson(res, 404, { error: 'dev server nao registrado (use start_dev_server)' });
@@ -1729,11 +2037,23 @@ function proxyNotion(req, res, u, parts) {
 }
 
 const server = http.createServer(function (req, res) {
+	prepararCors(req, res);
 	let u;
 	try {
 		u = new URL(req.url, 'http://x');
 	} catch (e) {
 		sendJson(res, 400, { error: 'url invalida' });
+		return;
+	}
+	if (!origemPermitida(req)) {
+		sendJson(res, 403, {
+			error: `origem nao autorizada: ${origemDoPedido(req)} - acrescente em AURORA_ALLOW_ORIGIN`,
+		});
+		return;
+	}
+	const taxa = limitadorHttp.consumir(enderecoDe(req));
+	if (!taxa.ok) {
+		sendRetry(res, 429, 'limite de requisicoes por minuto atingido', taxa.retryEm);
 		return;
 	}
 	const parts = u.pathname.split('/').filter(Boolean);
@@ -1803,12 +2123,12 @@ const server = http.createServer(function (req, res) {
 		parts[3] === 'events' &&
 		req.method === 'GET'
 	) {
-		const s1 = getSession(parts[1]);
-		if (s1.token && s1.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const auth1 = autenticar(req, parts[1], parts[2]);
+		if (auth1.erro) {
+			recusar(res, auth1);
 			return;
 		}
-		s1.token = parts[2];
+		const s1 = auth1.sessao;
 		avisarTransporteLocal(`bridge/${parts[1]}/.../events`);
 		cors(res);
 		res.writeHead(200, {
@@ -1841,12 +2161,12 @@ const server = http.createServer(function (req, res) {
 	}
 
 	if (parts[0] === 'bridge' && parts.length === 4 && parts[3] === 'poll' && req.method === 'POST') {
-		const s5 = getSession(parts[1]);
-		if (s5.token && s5.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const auth5 = autenticar(req, parts[1], parts[2]);
+		if (auth5.erro) {
+			recusar(res, auth5);
 			return;
 		}
-		s5.token = parts[2];
+		const s5 = auth5.sessao;
 		readBody(req)
 			.then(function (raw) {
 				let wait = 20000;
@@ -1904,11 +2224,12 @@ const server = http.createServer(function (req, res) {
 		parts[3] === 'reply' &&
 		req.method === 'POST'
 	) {
-		const s2 = sessions.get(parts[1]);
-		if (!s2 || s2.token !== parts[2]) {
-			sendJson(res, 403, { error: 'sessao/token invalido' });
+		const auth2 = autenticar(req, parts[1], parts[2], { exigirSessao: true });
+		if (auth2.erro) {
+			recusar(res, auth2);
 			return;
 		}
+		const s2 = auth2.sessao;
 		readBody(req)
 			.then(function (raw) {
 				let msg;
@@ -1934,12 +2255,12 @@ const server = http.createServer(function (req, res) {
 	}
 
 	if (parts[0] === 'bridge' && parts.length === 4 && parts[3] === 'meta' && req.method === 'POST') {
-		const sMe = getSession(parts[1]);
-		if (sMe.token && sMe.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const authMe = autenticar(req, parts[1], parts[2]);
+		if (authMe.erro) {
+			recusar(res, authMe);
 			return;
 		}
-		sMe.token = parts[2];
+		const sMe = authMe.sessao;
 		avisarTransporteLocal(`bridge/${parts[1]}/.../meta`);
 		readBody(req)
 			.then(function (raw) {
@@ -1978,22 +2299,36 @@ const server = http.createServer(function (req, res) {
 		req.method === 'POST'
 	) {
 		const act = parts[3];
-		if (!origemPermitida(req)) {
-			sendJson(res, 403, {
-				error: 'origem nao autorizada para terminal/disco - ajuste AURORA_ALLOW_ORIGIN',
-			});
+		const authT = autenticar(req, parts[1], parts[2], { exigirSessao: true });
+		if (authT.erro) {
+			recusar(res, authT);
 			return;
 		}
-		if (!sessions.has(parts[1])) {
-			sendJson(res, 403, { error: 'sessao desconhecida para terminal/disco' });
-			return;
+		const sT = authT.sessao;
+		if (act === 'run') {
+			const cota = limitadorTerminal.consumir(parts[1]);
+			if (!cota.ok) {
+				sendRetry(
+					res,
+					429,
+					`limite de ${LIMITE_TERMINAL} comandos por minuto nesta sessao. NADA foi executado: repita em ${cota.retryEm}s.`,
+					cota.retryEm,
+				);
+				return;
+			}
 		}
-		const sT = getSession(parts[1]);
-		if (sT.token && sT.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
-			return;
+		if (act === 'fetchurl' || act === 'fetchjson') {
+			const cota = limitadorRede.consumir(parts[1]);
+			if (!cota.ok) {
+				sendRetry(
+					res,
+					429,
+					`limite de ${LIMITE_REDE} chamadas de rede por minuto nesta sessao. Repita em ${cota.retryEm}s.`,
+					cota.retryEm,
+				);
+				return;
+			}
 		}
-		sT.token = parts[2];
 		readBody(req)
 			.then(function (raw) {
 				let b;
@@ -2014,14 +2349,12 @@ const server = http.createServer(function (req, res) {
 	}
 
 	if (parts[0] === 'mcp' && parts.length === 3) {
-		const sid3 = parts[1],
-			tok3 = parts[2];
-		const sM = getSession(sid3);
-		if (sM.token && sM.token !== tok3) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const authM = autenticar(req, parts[1], parts[2]);
+		if (authM.erro) {
+			recusar(res, authM);
 			return;
 		}
-		sM.token = tok3;
+		const sM = authM.sessao;
 		limparClients(sM);
 
 		const cidHdr = String(req.headers['mcp-session-id'] || u.searchParams.get('cid') || '').slice(
@@ -2415,25 +2748,24 @@ server.on('upgrade', function (req, sock, head) {
 	}
 	const pp = u2.pathname.split('/').filter(Boolean);
 	const key = req.headers['sec-websocket-key'];
+	if (!origemPermitida(req)) {
+		recusarUpgrade(sock, 403, 'Forbidden');
+		return;
+	}
+	const enderecoWs = enderecoDe(req);
+	if ((conexoesWs.get(enderecoWs) || 0) >= LIMITE_WS_CONEXOES) {
+		recusarUpgrade(sock, 429, 'Too Many Requests');
+		return;
+	}
 	if (pp[0] === 'dev' && pp.length >= 4 && key) {
-		const sU = getSession(pp[1]);
-		if (sU.token && sU.token !== pp[2]) {
-			try {
-				sock.write(`HTTP/1.1 403 Forbidden${NL}Connection: close${NL}${NL}`);
-				sock.destroy();
-			} catch (eU1) {
-				ignorarErro(eU1, 'relay');
-			}
+		const authU = autenticar(req, pp[1], pp[2], { exigirSessao: true });
+		if (authU.erro) {
+			recusarUpgrade(sock, authU.erro, authU.erro === 429 ? 'Too Many Requests' : 'Forbidden');
 			return;
 		}
-		const regU = (sU.dev || {})[pp[3]];
+		const regU = (authU.sessao.dev || {})[pp[3]];
 		if (!regU) {
-			try {
-				sock.write(`HTTP/1.1 404 Not Found${NL}Connection: close${NL}${NL}`);
-				sock.destroy();
-			} catch (eU2) {
-				ignorarErro(eU2, 'relay');
-			}
+			recusarUpgrade(sock, 404, 'Not Found');
 			return;
 		}
 		const subU = `/${pp.slice(4).join('/')}${u2.search || ''}`;
@@ -2471,25 +2803,23 @@ server.on('upgrade', function (req, sock, head) {
 		return;
 	}
 	if (!(pp.length === 4 && pp[0] === 'bridge' && pp[3] === 'ws') || !key) {
-		try {
-			sock.write(`HTTP/1.1 400 Bad Request${NL}Connection: close${NL}${NL}`);
-			sock.destroy();
-		} catch (e) {
-			ignorarErro(e, 'relay');
-		}
+		recusarUpgrade(sock, 400, 'Bad Request');
 		return;
 	}
-	const sw = getSession(pp[1]);
-	if (sw.token && sw.token !== pp[2]) {
-		try {
-			sock.write(`HTTP/1.1 403 Forbidden${NL}Connection: close${NL}${NL}`);
-			sock.destroy();
-		} catch (e) {
-			ignorarErro(e, 'relay');
-		}
+	const authW = autenticar(req, pp[1], pp[2]);
+	if (authW.erro) {
+		recusarUpgrade(sock, authW.erro, authW.erro === 429 ? 'Too Many Requests' : 'Forbidden');
 		return;
 	}
-	sw.token = pp[2];
+	const sw = authW.sessao;
+	conexoesWs.set(enderecoWs, (conexoesWs.get(enderecoWs) || 0) + 1);
+	const chaveMensagens = `${enderecoWs}#${sw.wseq++}`;
+	sock.once('close', function () {
+		const restantes = (conexoesWs.get(enderecoWs) || 1) - 1;
+		if (restantes > 0) conexoesWs.set(enderecoWs, restantes);
+		else conexoesWs.delete(enderecoWs);
+		limitadorWs.liberar(chaveMensagens);
+	});
 	const accept = crypto
 		.createHash('sha1')
 		.update(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
@@ -2502,7 +2832,6 @@ server.on('upgrade', function (req, sock, head) {
 		ignorarErro(e, 'relay');
 	}
 	try {
-		const CRLF = String.fromCharCode(13, 10);
 		sock.write(
 			`HTTP/1.1 101 Switching Protocols${CRLF}Upgrade: websocket${CRLF}Connection: Upgrade${CRLF}Sec-WebSocket-Accept: ${accept}${CRLF}${CRLF}`,
 		);
@@ -2522,17 +2851,20 @@ server.on('upgrade', function (req, sock, head) {
 		}
 	}
 
-	const w = addWorker(sw, { kind: 'ws', sock: sock });
+
+
+	const w = { kind: 'ws', sock: sock };
 	wsSend(
 		sock,
 		JSON.stringify({
 			t: 'hello',
 			v: VERSION,
-			workerId: w.id,
+			workerId: sw.wseq,
 			perWorker: PER_WORKER,
-			pool: workersVivos(sw).length,
+			pool: workersVivos(sw).length + 1,
 		}),
 	);
+	addWorker(sw, w);
 
 	const hbw = setInterval(function () {
 		if (w.morto) {
@@ -2561,6 +2893,11 @@ server.on('upgrade', function (req, sock, head) {
 	wsAttach(
 		sock,
 		function (txt) {
+			if (!limitadorWs.consumir(chaveMensagens).ok) {
+				console.log(`[ponte] aba excedeu ${LIMITE_WS_MENSAGENS} mensagens em 10s - desconectando`);
+				wsClose(sock);
+				return;
+			}
 			let msg;
 			try {
 				msg = JSON.parse(txt);
@@ -2600,32 +2937,77 @@ server.on('error', function (e) {
 	}
 	console.error('[relay] erro no servidor: ' + ((e && e.message) || e));
 });
-server.listen(PORT, function () {
-	console.log(`Synapse MCP Relay ${VERSION} ouvindo na porta ${PORT}`);
-	console.log('Pasta dos projetos (terminal): ' + WORK);
-	console.log(
-		'Catalogo em cache: ' +
-			(nTools()
-				? nTools() + ' ferramentas (o Notion valida a conexao mesmo com a aba fechada)'
-				: 'vazio - abra o site e ative o MCP uma vez'),
-	);
-	console.log('Diagnostico: http://localhost:' + PORT + '/stats');
-	console.log('');
-	console.log('v8.7 - este processo agora e um COMPLEMENTO, nao o servidor MCP.');
-	console.log(
-		'  O site fala direto com http://localhost:' + PORT + ' (terminal, disco e dev server)',
-	);
-	console.log(
-		'  enquanto o MCP do Notion continua pela nuvem, com a mesma capacidade do modo nuvem.',
-	);
-	console.log(
-		'  NAO precisa de tunel. No site: menu MCP > modo local > Testar > permitir terminal.',
-	);
-	console.log('  Tunel so e preciso se o site estiver aberto em OUTRO aparelho:');
-	console.log(
-		'    cloudflared tunnel --url http://localhost:' + PORT + '   ou   ngrok http ' + PORT,
-	);
-	console.log(
-		'  Para restringir quem usa o terminal: AURORA_ALLOW_ORIGIN=https://seusite,http://localhost:5500',
-	);
-});
+function iniciar() {
+	server.listen(PORT, function () {
+		console.log(`Synapse MCP Relay ${VERSION} ouvindo na porta ${PORT}`);
+		console.log('Pasta dos projetos (terminal): ' + WORK);
+		console.log(
+			'Catalogo em cache: ' +
+				(nTools()
+					? nTools() + ' ferramentas (o Notion valida a conexao mesmo com a aba fechada)'
+					: 'vazio - abra o site e ative o MCP uma vez'),
+		);
+		console.log('Diagnostico: http://localhost:' + PORT + '/stats');
+		console.log('');
+		console.log('v8.7 - este processo agora e um COMPLEMENTO, nao o servidor MCP.');
+		console.log(
+			'  O site fala direto com http://localhost:' + PORT + ' (terminal, disco e dev server)',
+		);
+		console.log(
+			'  enquanto o MCP do Notion continua pela nuvem, com a mesma capacidade do modo nuvem.',
+		);
+		console.log(
+			'  NAO precisa de tunel. No site: menu MCP > modo local > Testar > permitir terminal.',
+		);
+		console.log('  Tunel so e preciso se o site estiver aberto em OUTRO aparelho:');
+		console.log(
+			'    cloudflared tunnel --url http://localhost:' + PORT + '   ou   ngrok http ' + PORT,
+		);
+		console.log(
+			`  Origens aceitas: ${SITE_ORIGEM}, localhost e as de AURORA_ALLOW_ORIGIN (ex.: https://seusite,http://localhost:5500)`,
+		);
+		console.log(
+			'  Downloads/API pelo relay so para hosts confiaveis; libere outros com AURORA_FETCH_HOSTS=dominio.com,*.cdn.com',
+		);
+	});
+}
+
+if (require.main === module) iniciar();
+
+module.exports = {
+	server,
+	iniciar,
+	sessions,
+	VERSION,
+	limites: {
+		http: LIMITE_HTTP,
+		auth: LIMITE_AUTH,
+		terminal: LIMITE_TERMINAL,
+		rede: LIMITE_REDE,
+		wsMensagens: LIMITE_WS_MENSAGENS,
+		wsConexoes: LIMITE_WS_CONEXOES,
+		sessoes: MAX_SESSOES,
+	},
+	origemPermitida,
+	mesmoToken,
+	criarLimitador,
+	limitadores: {
+		http: limitadorHttp,
+		auth: limitadorAuth,
+		terminal: limitadorTerminal,
+		rede: limitadorRede,
+		ws: limitadorWs,
+		zerar() {
+			limitadorHttp.zerar();
+			limitadorAuth.zerar();
+			limitadorTerminal.zerar();
+			limitadorRede.zerar();
+			limitadorWs.zerar();
+			conexoesWs.clear();
+		},
+	},
+	jsonSeguro,
+	wafSanearTexto,
+	wafSanearJson,
+	politicaDeRede: { avaliarUrl, hostConfiavel, ipPrivado, buscarConfiavel },
+};

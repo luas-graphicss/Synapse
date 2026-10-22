@@ -11,11 +11,26 @@
 	                                                                                                
 	                                                                              
 
+
+
+
+
+
+
+
+
+
+
+
 	const META_KEY = 'session';
 	const FILE_PREFIX = 'pf:';
 	const SNAP_PREFIX = 'ps:';
+	const MANIFEST_PREFIX = 'pm:';
+	const COFRE_PREFIX = 'cofre.';
 	const LOST_PREFIX = 'session.lost.';
 	const FORMAT = 2;
+	const STRICT = { durability: 'strict' };
+	const KEYS_PAGE = 1000;
 	const HIGH = '\uffff';
 	const BATCH_BYTES = 2 * 1024 * 1024;
 	const BATCH_RECORDS = 150;
@@ -65,14 +80,18 @@
 			r.onsuccess = function () {
 				const d = r.result;
 				d.onclose = dropDb;
-				d.onversionchange = function () {
-					try {
-						d.close();
-					} catch (e) {
-						ignorar(e, 'sessaoIncremental:onversionchange');
-					}
-					dropDb();
-				};
+				if (root.SynapseCofreGuarda) root.SynapseCofreGuarda.protegerConexao(d, dropDb);
+				else
+					d.onversionchange = function (ev) {
+
+						if (!ev || ev.newVersion == null) return;
+						try {
+							d.close();
+						} catch (e) {
+							ignorar(e, 'sessaoIncremental:onversionchange');
+						}
+						dropDb();
+					};
 				res(d);
 			};
 			r.onerror = function () {
@@ -100,9 +119,14 @@
 
 	                                                                                            
 	                                                                                
-	async function tx(mode, fn) {
+	async function tx(mode, fn, txOpts) {
 		const d = await dbOpen();
-		const t = d.transaction('kv', mode);
+		let t;
+		try {
+			t = txOpts ? d.transaction('kv', mode, txOpts) : d.transaction('kv', mode);
+		} catch (e) {
+			t = d.transaction('kv', mode);
+		}
 		const st = t.objectStore('kv');
 		const done = txDone(t);
 		let reqErr = null;
@@ -130,10 +154,70 @@
 		});
 	}
 
+	function kvPut(key, value, strict) {
+		return tx(
+			'readwrite',
+			function (st, track) {
+				track(st.put(value, key));
+			},
+			strict ? STRICT : null,
+		);
+	}
+
+	function kvDel(key) {
+		return tx('readwrite', function (st, track) {
+			track(st.delete(key));
+		});
+	}
+
 	function deleteRange(prefix) {
 		return tx('readwrite', function (st, track) {
 			track(st.delete(IDBKeyRange.bound(prefix, prefix + HIGH, false, false)));
 		});
+	}
+
+
+	async function keysByPrefix(prefix, onKey) {
+		const upper = prefix + HIGH;
+		let range = IDBKeyRange.bound(prefix, upper, false, false);
+		let n = 0;
+		for (;;) {
+			const keys = await tx('readonly', function (st, track) {
+				const rq = track(st.getAllKeys(range, KEYS_PAGE));
+				return function () {
+					return rq.result || [];
+				};
+			});
+			if (!keys.length) break;
+			for (let i = 0; i < keys.length; i++) {
+				onKey(String(keys[i]));
+				n++;
+			}
+			if (keys.length < KEYS_PAGE) break;
+			range = IDBKeyRange.bound(keys[keys.length - 1], upper, true, false);
+			await yieldToBrowser();
+		}
+		return n;
+	}
+
+
+	async function countFilesByProject() {
+		const M = root.SynapseCofreManifesto;
+		const counts = new Map();
+		await keysByPrefix(FILE_PREFIX, function (key) {
+			const pid = M ? M.pidFromFileKey(key) : null;
+			if (pid == null) return;
+			counts.set(pid, (counts.get(pid) || 0) + 1);
+		});
+		return counts;
+	}
+
+	async function listManifestPids() {
+		const out = [];
+		await keysByPrefix(MANIFEST_PREFIX, function (key) {
+			out.push(key.slice(MANIFEST_PREFIX.length));
+		});
+		return out;
 	}
 
 	function yieldToBrowser() {
@@ -212,7 +296,7 @@
 	function shadowFor(pid) {
 		let s = shadow.get(pid);
 		if (!s) {
-			s = { files: new Map(), snaps: new Map() };
+			s = { files: new Map(), snaps: new Map(), manifest: null };
 			shadow.set(pid, s);
 		}
 		return s;
@@ -258,7 +342,12 @@
 
 	async function putMeta(rec, expectRev, writer, revFloor) {
 		const d = await dbOpen();
-		const t = d.transaction('kv', 'readwrite');
+		let t;
+		try {
+			t = d.transaction('kv', 'readwrite', STRICT);
+		} catch (e) {
+			t = d.transaction('kv', 'readwrite');
+		}
 		const st = t.objectStore('kv');
 		const done = txDone(t);
 		let conflict = null;
@@ -394,6 +483,25 @@
 				legacy: false,
 			};
 		}
+		if (cur && cur.enc && !encrypt && !force) {
+
+
+
+
+			return {
+				ok: true,
+				skipped: true,
+				code: 'bloqueado',
+				msg: 'a sessao gravada esta protegida por senha: desbloqueie (cadeado) para voltar a gravar',
+				rev: (cur && cur.__rev) || expectRev,
+				bytes: 0,
+				delta: 0,
+				written: 0,
+				deleted: 0,
+				files: 0,
+				legacy: false,
+			};
+		}
 
 		const plan = { dels: [], puts: [], snapWrites: [], snapDels: [] };
 		let total = 0;
@@ -421,6 +529,7 @@
 				total += bytes;
 				plan.puts.push({
 					key: prefix + path,
+					pid: pid,
 					bytes: bytes,
 					prepare: function () {
 						                                                                           
@@ -438,6 +547,7 @@
 					if (seen.has(path)) return;
 					plan.dels.push({
 						key: prefix + path,
+						pid: pid,
 						after: function () {
 							sh.files.delete(path);
 						},
@@ -468,6 +578,7 @@
 		let written = 0;
 		let deleted = 0;
 		let delta = 0;
+		const touched = new Set();
 		function progress() {
 			if (onProgress)
 				try {
@@ -500,6 +611,7 @@
 			for (let i = 0; i < items.length; i++) {
 				const it = items[i];
 				it.after(it.prepared);
+				if (it.pid) touched.add(it.pid);
 				if (it.prepare) {
 					written++;
 					delta += it.bytes || 0;
@@ -546,6 +658,7 @@
 				await yieldToBrowser();
 			}
 			sw.sh.snaps.set(sw.sid, { ref: sw.snap, parts: parts.length });
+			touched.add(sw.pid);
 			written++;
 			done++;
 			progress();
@@ -553,6 +666,10 @@
 
 		const metaObj =
 			typeof opts.serializeMeta === 'function' ? opts.serializeMeta() : { v: 1, projects: [] };
+		if (!Array.isArray(metaObj.projects)) metaObj.projects = [];
+		const guarded = await protectIndex(metaObj, cur, opts, writer);
+		const carried = guarded.carried;
+		await writeManifests(metaObj.projects, encrypt, writer, force);
 		metaObj.inc = 1;
 		metaObj.fmt = FORMAT;
 		let rec = encrypt ? await encrypt(metaObj) : metaObj;
@@ -574,6 +691,7 @@
 		stats.lastMs = Date.now() - t0;
 		stats.lastReason = opts.reason || '';
 		if (legacy) stats.migrated = true;
+		if (carried.length) stats.carried = (stats.carried || 0) + carried.length;
 		return {
 			ok: true,
 			rev: rev,
@@ -583,8 +701,161 @@
 			deleted: deleted,
 			files: nFiles,
 			legacy: legacy,
+			carried: carried,
+			touched: Array.from(touched),
 			ms: stats.lastMs,
 		};
+	}
+
+
+
+
+	async function protectIndex(metaObj, cur, opts, writer) {
+		const M = root.SynapseCofreManifesto;
+		if (!M || opts.allowShrink) return { carried: [] };
+		const decrypt = typeof opts.decrypt === 'function' ? opts.decrypt : null;
+		const forgotten = new Set();
+		if (opts.forgotten)
+			try {
+				Array.from(opts.forgotten).forEach(function (pid) {
+					forgotten.add(String(pid));
+				});
+			} catch (e) {
+				ignorar(e, 'sessaoIncremental:forgotten');
+			}
+		const nextIds = new Set();
+		metaObj.projects.forEach(function (p) {
+			if (p && p.id != null) nextIds.add(String(p.id));
+		});
+
+		let atual = [];
+		if (cur && Array.isArray(cur.projects)) atual = cur.projects;
+		else if (cur && cur.enc && decrypt) {
+			try {
+				const dec = await decrypt(cur);
+				if (dec && Array.isArray(dec.projects)) atual = dec.projects;
+			} catch (e) {
+				ignorar(e, 'sessaoIncremental:decryptMeta');
+			}
+		}
+
+		let conhecidos = [];
+		try {
+			conhecidos = await listManifestPids();
+		} catch (e) {
+			ignorar(e, 'sessaoIncremental:listManifestPids');
+		}
+
+
+		const candidatos = new Set();
+		conhecidos.forEach(function (pid) {
+			if (!nextIds.has(pid) && !forgotten.has(pid)) candidatos.add(pid);
+		});
+		atual.forEach(function (p) {
+			if (!p || p.id == null) return;
+			const pid = String(p.id);
+			if (!nextIds.has(pid) && !forgotten.has(pid)) candidatos.add(pid);
+		});
+		if (!candidatos.size) return { carried: [] };
+
+
+		const vazios = new Set();
+		for (const pid of candidatos) {
+			try {
+				const n = await countProjectFiles(pid);
+				if (n === 0) vazios.add(pid);
+			} catch (e) {
+				ignorar(e, 'sessaoIncremental:countProjectFiles');
+			}
+		}
+		for (const pid of vazios) {
+			candidatos.delete(pid);
+			try {
+				await kvDel(MANIFEST_PREFIX + pid);
+			} catch (e) {
+				ignorar(e, 'sessaoIncremental:limparManifesto');
+			}
+		}
+		if (!candidatos.size) return { carried: [] };
+
+		const manifestos = new Map();
+		for (const pid of candidatos) {
+			try {
+				let v = await kvGet(MANIFEST_PREFIX + pid);
+				if (v && v.enc) v = decrypt ? await decrypt(v) : null;
+				if (v && typeof v === 'object') manifestos.set(pid, v);
+			} catch (e) {
+				ignorar(e, 'sessaoIncremental:lerManifesto');
+			}
+		}
+		const atualVivos = atual.filter(function (p) {
+			return p && p.id != null && !vazios.has(String(p.id));
+		});
+		const merged = M.mergeProjects(
+			atualVivos,
+			metaObj.projects,
+			Array.from(candidatos),
+			forgotten,
+			manifestos,
+			{ allowShrink: false },
+		);
+		metaObj.projects = merged.projects;
+		if (merged.carried.length) {
+			try {
+				if (root.registro)
+					root.registro.aviso(
+						'[Synapse/cofre] ' +
+							merged.carried.length +
+							' projeto(s) voltaram ao indice por protecao: ' +
+							merged.carried.map((c) => c.name + ' (' + c.id + ')').join(', '),
+					);
+			} catch (e) {
+				ignorar(e, 'sessaoIncremental:avisoCarried');
+			}
+		}
+		return { carried: merged.carried, writer: writer };
+	}
+
+
+	async function writeManifests(list, encrypt, writer, force) {
+		const M = root.SynapseCofreManifesto;
+		if (!M) return 0;
+		const pendentes = [];
+		for (let i = 0; i < list.length; i++) {
+			const pm = list[i];
+			if (!pm || pm.id == null) continue;
+			const pid = String(pm.id);
+			const sh = shadowFor(pid);
+			const man = M.manifestFromMeta(pm, { t: Date.now(), w: writer });
+			if (!man) continue;
+			if (!force && sh.manifest && !M.manifestChanged(sh.manifest, man)) continue;
+			pendentes.push({ key: MANIFEST_PREFIX + pid, value: encrypt ? await encrypt(man) : man, sh: sh, man: man });
+		}
+		if (!pendentes.length) return 0;
+
+		await tx(
+			'readwrite',
+			function (st, track) {
+				for (let i = 0; i < pendentes.length; i++) track(st.put(pendentes[i].value, pendentes[i].key));
+			},
+			STRICT,
+		);
+		for (let i = 0; i < pendentes.length; i++) pendentes[i].sh.manifest = pendentes[i].man;
+		return pendentes.length;
+	}
+
+
+
+	async function scanProjects(decrypt) {
+		const M = root.SynapseCofreManifesto;
+		if (!M) return [];
+		const manifestos = new Map();
+		await loadRange(MANIFEST_PREFIX, decrypt || null, function (pid, v, why, raw) {
+			if (v && typeof v === 'object') manifestos.set(pid, v);
+			else if (why) manifestos.set(pid, { bloqueado: true, bruto: raw || null });
+		});
+		const contagens = await countFilesByProject();
+		return M.rebuildIndex(manifestos, contagens);
 	}
 
 	                                                                                              
@@ -627,13 +898,13 @@
 				let v = page.vals[i];
 				if (v && v.enc) {
 					if (!decrypt) {
-						onItem(rest, null, 'bloqueado');
+						onItem(rest, null, 'bloqueado', v);
 						continue;
 					}
 					try {
 						v = await decrypt(v);
 					} catch (e) {
-						onItem(rest, null, 'senha');
+						onItem(rest, null, 'senha', page.vals[i]);
 						continue;
 					}
 				}
@@ -738,7 +1009,9 @@
 		shadow.delete(pid);
 		await deleteRange(FILE_PREFIX + pid + ':');
 		await deleteRange(SNAP_PREFIX + pid + ':');
+		await kvDel(MANIFEST_PREFIX + pid);
 	}
+
 
 	async function clearAll() {
 		shadow.clear();
@@ -747,6 +1020,7 @@
 		});
 		await deleteRange(FILE_PREFIX);
 		await deleteRange(SNAP_PREFIX);
+		await deleteRange(MANIFEST_PREFIX);
 		await deleteRange(LOST_PREFIX);
 	}
 
@@ -776,6 +1050,8 @@
 		META_KEY: META_KEY,
 		FILE_PREFIX: FILE_PREFIX,
 		SNAP_PREFIX: SNAP_PREFIX,
+		MANIFEST_PREFIX: MANIFEST_PREFIX,
+		COFRE_PREFIX: COFRE_PREFIX,
 		LOST_PREFIX: LOST_PREFIX,
 		FORMAT: FORMAT,
 		stats: stats,
@@ -786,6 +1062,14 @@
 		loadSession: loadSession,
 		loadProject: loadProject,
 		countProjectFiles: countProjectFiles,
+		countFilesByProject: countFilesByProject,
+		listManifestPids: listManifestPids,
+		scanProjects: scanProjects,
+		getRecord: kvGet,
+		putRecord: function (key, value) {
+			return kvPut(key, value, true);
+		},
+		deleteRecord: kvDel,
 		forgetProject: forgetProject,
 		clearAll: clearAll,
 		resetShadow: resetShadow,

@@ -36,6 +36,14 @@
 		quota: 0,
 		usage: 0,
 		softLimit: 180 * 1024 * 1024,
+
+
+
+		forgotten: new Set(),
+		bootUnverified: false,
+		wipeAttempt: null,
+		carried: [],
+		marker: null,
 	});
 
 	function now() {
@@ -98,14 +106,17 @@
 				d.onclose = function () {
 					dropDb();
 				};
-				d.onversionchange = function () {
-					try {
-						d.close();
-					} catch (e) {
-						ignorarErro(e, 'onversionchange');
-					}
-					dropDb();
-				};
+				if (window.SynapseCofreGuarda) window.SynapseCofreGuarda.protegerConexao(d, dropDb);
+				else
+					d.onversionchange = function (ev) {
+						if (!ev || ev.newVersion == null) return;
+						try {
+							d.close();
+						} catch (e) {
+							ignorarErro(e, 'onversionchange');
+						}
+						dropDb();
+					};
 				res(d);
 			};
 			r.onerror = function () {
@@ -199,6 +210,11 @@
 				}
 				return null;
 			}
+		};
+
+
+		window.sdbGetStrict = async function (k) {
+			return withTimeout(kvGet(k), 45000, `IndexedDB get(${k})`);
 		};
 		sdbDel = async function (k) {
 			try {
@@ -324,6 +340,14 @@
 			FX.lastErr = 'esta aba esta em modo somente-leitura (outra aba do Synapse esta no comando)';
 			return { ok: false, code: 'nao-dono', msg: FX.lastErr };
 		}
+		if (FX.bootUnverified) {
+
+
+			FX.lastErr =
+				'o indice da sessao nao pode ser lido quando a aba abriu; recarregue a pagina para voltar a gravar com seguranca';
+			renderBanner();
+			return { ok: false, code: 'boot-nao-verificado', msg: FX.lastErr };
+		}
 		if (typeof State !== 'undefined' && State.suppressSave)
 			return { ok: true, code: 'suprimido', bytes: 0, level: 0 };
 		if (STORE.stats.loading) return { ok: true, code: 'carregando', bytes: 0, level: 0 };
@@ -344,6 +368,7 @@
 						writerId: FX.id,
 						expectRev: FX.rev,
 						revFloor: FX.rev,
+						forgotten: FX.forgotten,
 						projects: function () {
 							return State.projects;
 						},
@@ -354,12 +379,25 @@
 										return _encSession(obj);
 									}
 								: null,
+						decrypt:
+							typeof LOCK !== 'undefined' && LOCK && LOCK.key
+								? function (rec) {
+										return _decSession(rec, LOCK.key);
+									}
+								: null,
 						onProgress: avisarMigracao,
 					}),
 					10 * 60 * 1000,
 					'gravacao incremental no IndexedDB',
 				);
 				if (!r || !r.ok) throw new Error('gravacao incremental devolveu um resultado invalido');
+				if (r.skipped && r.code === 'bloqueado') {
+
+
+					FX.lastErr = r.msg;
+					renderBanner();
+					return { ok: false, code: r.code, msg: r.msg };
+				}
 				if (r.skipped) {
 					FX.savedSeq = seq;
 					renderBanner();
@@ -401,6 +439,7 @@
 						ignorarErro(e, 'doFlush');
 					}
 				}
+				aposGravar(r, reason, level);
 				renderBanner();
 				return { ok: true, bytes: r.bytes, level: level, rev: r.rev, written: r.written };
 			} catch (e) {
@@ -478,8 +517,61 @@
 	};
 
 	                                                                                                
+
+	function aposGravar(r, reason, level) {
+		try {
+			const carried = (r && Array.isArray(r.carried) && r.carried) || [];
+
+
+			const antes = new Set((FX.carried || []).map((c) => String(c.id)));
+			const novos = carried.filter((c) => !antes.has(String(c.id)));
+			FX.carried = carried;
+			if (novos.length) {
+				registro.aviso(
+					'[Synapse/persist] o indice ia perder ' +
+						novos.length +
+						' projeto(s); eles foram mantidos: ' +
+						novos.map((c) => c.name).join(', '),
+				);
+				toast(
+					'Projetos protegidos',
+					novos.length +
+						' projeto(s) que nao estao abertos continuam guardados. Veja em Recentes (relogio).',
+					'warn',
+				);
+				if (typeof recFlagBtn === 'function') recFlagBtn();
+			}
+		} catch (e) {
+			ignorarErro(e, 'aposGravar:carried');
+		}
+		try {
+			const M = window.SynapseCofreManifesto;
+			if (M) {
+			const disco = window.SynapseCofreDisco;
+			FX.marker = M.writeMarker(window.localStorage, {
+					t: Date.now(),
+					rev: FX.rev,
+					persisted: FX.persisted,
+					disco: !!(disco && disco.estado().vinculada),
+					projects: (typeof State !== 'undefined' && State.projects) || [],
+				});
+			}
+		} catch (e) {
+			ignorarErro(e, 'aposGravar:marcador');
+		}
+		try {
+			const disco = window.SynapseCofreDisco;
+			if (disco) disco.aoGravar(r, reason, level);
+		} catch (e) {
+			ignorarErro(e, 'aposGravar:disco');
+		}
+	}
+
+
+
 	FX.forgetProject = async function (pid) {
 		FX.seq++;
+		FX.forgotten.add(String(pid));
 		if (!FX.owner) return flushNow('fechar');
 		try {
 			await STORE.forgetProject(pid);
@@ -524,6 +616,14 @@
 		FX.savedSeq = FX.seq;
 		FX.lastBytes = 0;
 		FX.lastErr = null;
+		FX.carried = [];
+		try {
+
+			const M = window.SynapseCofreManifesto;
+			if (M) FX.marker = M.writeMarker(window.localStorage, { t: Date.now(), rev: 0, projects: [] });
+		} catch (e) {
+			ignorarErro(e, 'clearAll:marcador');
+		}
 		renderBanner();
 		return true;
 	};
@@ -811,7 +911,12 @@
 	function renderBanner() {
 		try {
 			if (!document.body) return;
-			const bad = !FX.owner || !!FX.lastErr;
+			try {
+				if (window.SynapseCofrePainel) window.SynapseCofrePainel.atualizarIndicador();
+			} catch (e) {
+				ignorarErro(e, 'renderBanner:indicador');
+			}
+			const bad = !FX.owner || !!FX.lastErr || !!FX.wipeAttempt;
 			if (!bad) {
 				if (bar) bar.style.display = 'none';
 				return;
@@ -827,32 +932,55 @@
 				);
 				document.body.appendChild(bar);
 			}
-			let msg, label;
-			if (!FX.owner) {
+			let msg, label, acao, extra;
+			const BTN =
+				'cursor:pointer;border:0;border-radius:3px;padding:5px 10px;font:600 12px system-ui,sans-serif;background:#fff;color:#111';
+			if (FX.wipeAttempt) {
+				bar.style.background = '#7f1d1d';
+				bar.style.color = '#fff';
+
+				msg = [
+					'ALERTA: algo tentou APAGAR o armazenamento da IDE as',
+					{ raw: ' ' + hhmm(FX.wipeAttempt.t) + ' ' },
+					'(origem:',
+					{ raw: ' ' + FX.wipeAttempt.origem + '). ' },
+					'A exclusao esta bloqueada enquanto esta aba estiver aberta, mas pode se concluir quando ela fechar. Garanta um backup agora: pasta de backup no disco ou exportar .zip.',
+				];
+				label = 'Abrir backups';
+				acao = function () {
+					if (typeof openRecentPanel === 'function') openRecentPanel();
+				};
+				extra = {
+					label: 'Entendi',
+					run: function () {
+						FX.wipeAttempt = null;
+						renderBanner();
+					},
+				};
+			} else if (!FX.owner) {
 				bar.style.background = '#7a5b00';
 				bar.style.color = '#fff';
 				msg =
 					'Esta aba esta em MODO LEITURA: outra aba do Synapse esta no comando da sessao. Nada aqui e salvo e os agentes nao falam com esta aba.';
 				label = 'Assumir o controle';
+				acao = function () {
+					FX.takeover();
+				};
+			} else if (FX.bootUnverified) {
+				bar.style.background = '#7a5b00';
+				bar.style.color = '#fff';
+				msg =
+					'O indice da sessao NAO pode ser lido quando esta aba abriu, entao nada esta sendo gravado aqui (gravar por cima poderia descartar projetos que nao chegamos a ver). Seus dados continuam no navegador. Recarregue a pagina para voltar ao normal.';
+				label = 'Recarregar a pagina';
+				acao = function () {
+					location.reload();
+				};
 			} else {
 				bar.style.background = '#7f1d1d';
 				bar.style.color = '#fff';
 				msg = `A SESSAO NAO ESTA SENDO SALVA: ${FX.lastErr}. Ultima gravacao com sucesso: ${hhmm(FX.lastOk)}. Exporte o projeto em ZIP antes de fechar a aba.`;
 				label = 'Tentar gravar agora';
-			}
-			bar.textContent = '';
-			const sp = document.createElement('span');
-			sp.textContent = msg;
-			bar.appendChild(sp);
-			const b = document.createElement('button');
-			b.textContent = label;
-			b.setAttribute(
-				'style',
-				'cursor:pointer;border:0;border-radius:3px;padding:5px 10px;font:600 12px system-ui,sans-serif;background:#fff;color:#111',
-			);
-			b.onclick = function () {
-				if (!FX.owner) FX.takeover();
-				else
+				acao = function () {
 					flushNow('botao').then(
 						function (r) {
 							try {
@@ -869,13 +997,41 @@
 							ignorarErro(erro, 'persistencia:botao');
 						},
 					);
-			};
+				};
+			}
+			bar.textContent = '';
+			const sp = document.createElement('span');
+			if (Array.isArray(msg)) {
+				msg.forEach(function (parte) {
+					if (parte && typeof parte === 'object') {
+						sp.appendChild(document.createTextNode(String(parte.raw || '')));
+						return;
+					}
+					const s = document.createElement('span');
+					s.textContent = String(parte);
+					sp.appendChild(s);
+				});
+			} else sp.textContent = msg;
+			bar.appendChild(sp);
+			const b = document.createElement('button');
+			b.textContent = label;
+			b.setAttribute('style', BTN);
+			b.onclick = acao;
 			bar.appendChild(b);
+			if (extra) {
+				const b2 = document.createElement('button');
+				b2.textContent = extra.label;
+				b2.setAttribute('style', BTN + ';background:transparent;color:#fff;border:1px solid #fff');
+				b2.onclick = extra.run;
+				bar.appendChild(b2);
+			}
 			bar.style.display = 'flex';
 		} catch (e) {
 			ignorarErro(e, 'renderBanner');
 		}
 	}
+
+	FX.render = renderBanner;
 
 	function addNote(res, extra) {
 		try {
@@ -895,6 +1051,17 @@
 			return (
 				'\n\n[AVISO DO SYNAPSE] Esta aba do editor esta em MODO LEITURA porque outra aba assumiu a sessao. ' +
 				'Nada gravado aqui sobrevive a um reload. Peca ao usuario para deixar UMA unica aba do Synapse aberta.'
+			);
+		if (FX.bootUnverified)
+			return (
+				'\n\n[AVISO DO SYNAPSE] O indice da sessao nao pode ser lido quando a aba abriu; nada esta sendo gravado. ' +
+				'Peca ao usuario para recarregar a pagina antes de continuar.'
+			);
+		if (FX.wipeAttempt)
+			return (
+				'\n\n[AVISO DO SYNAPSE] Algo tentou APAGAR o armazenamento da IDE (origem: ' +
+				FX.wipeAttempt.origem +
+				'). A exclusao esta bloqueada por enquanto. Peca ao usuario para garantir um backup (pasta de backup ou .zip) agora.'
 			);
 		if (FX.lastErr)
 			return `\n\n[AVISO DO SYNAPSE] A ultima gravacao da sessao FALHOU (${FX.lastErr}). Ultimo salvamento \
@@ -1006,6 +1173,36 @@ NAO foi gravada no navegador, entao ela some se a pagina recarregar. Motivo: ${r
 						L.push(
 							`ATENCAO: a ultima gravacao precisou podar historico/snapshots (nivel ${FX.lastLevel}).`,
 						);
+					try {
+						const pids = await STORE.listManifestPids();
+						L.push(
+							`Cofre: ${pids.length} manifesto(s) de projeto gravado(s) | projetos devolvidos ao indice por protecao: ${STORE.stats.carried || 0}`,
+						);
+					} catch (e) {
+						ignorarErro(e, 'storage_health:manifestos');
+					}
+					try {
+						const disco = window.SynapseCofreDisco;
+						if (disco) {
+							const d = disco.estado();
+							if (!d.suportado)
+								L.push('Pasta de backup no disco: nao suportada neste navegador (use exportar .zip).');
+							else if (!d.vinculada)
+								L.push('Pasta de backup no disco: NAO vinculada (recomende vincular pelo painel Recentes).');
+							else
+								L.push(
+									`Pasta de backup no disco: "${d.nome}" | permissao: ${d.permissao} | ultimo espelho: ${hhmm(d.ultimoEspelho)} | pendentes: ${d.pendentes}${d.ultimoErro ? ' | erro: ' + d.ultimoErro : ''}`,
+								);
+						}
+					} catch (e) {
+						ignorarErro(e, 'storage_health:disco');
+					}
+					if (FX.wipeAttempt)
+						L.push(
+							`ALERTA: tentativa de apagar o banco da IDE detectada as ${hhmm(FX.wipeAttempt.t)} (${FX.wipeAttempt.origem}).`,
+						);
+					if (FX.bootUnverified)
+						L.push('ALERTA: indice nao lido no boot; esta aba nao grava ate ser recarregada.');
 					if (FX.lastErr) L.push('ERRO ATUAL: ' + FX.lastErr);
 					else L.push('Sem erros de gravacao no momento.');
 					return L.join('\n');
@@ -1064,6 +1261,54 @@ NAO foi gravada no navegador, entao ela some se a pagina recarregar. Motivo: ${r
 		}
 	}
 
+
+	function aoTentarApagar(detalhe) {
+		FX.wipeAttempt = detalhe || { t: now(), origem: 'desconhecida' };
+		renderBanner();
+		try {
+			toast(
+				'Tentativa de apagar o armazenamento',
+				'A exclusao foi bloqueada. Garanta um backup agora (Recentes > pasta de backup ou exportar .zip).',
+				'err',
+			);
+		} catch (e) {
+			ignorarErro(e, 'aoTentarApagar');
+		}
+		try {
+			if (typeof recFlagBtn === 'function') recFlagBtn();
+		} catch (e) {
+			ignorarErro(e, 'aoTentarApagar');
+		}
+		try {
+			const disco = window.SynapseCofreDisco;
+			if (disco) disco.espelharAgora('tentativa-de-exclusao');
+		} catch (e) {
+			ignorarErro(e, 'aoTentarApagar:disco');
+		}
+	}
+	try {
+		if (window.SynapseCofreGuarda)
+			window.addEventListener(window.SynapseCofreGuarda.EVENTO, function (ev) {
+				aoTentarApagar(ev && ev.detail);
+			});
+	} catch (e) {
+		ignorarErro(e, 'auroraFixPersistencia');
+	}
+
+
+
+	FX.pedirPersistencia = async function () {
+		try {
+			if (!(navigator.storage && navigator.storage.persist)) return null;
+			FX.persisted = await navigator.storage.persist();
+			renderBanner();
+			return FX.persisted;
+		} catch (e) {
+			ignorarErro(e, 'pedirPersistencia');
+			return null;
+		}
+	};
+
 	async function boot() {
 		try {
 			if (navigator.storage && navigator.storage.persist) {
@@ -1071,7 +1316,7 @@ NAO foi gravada no navegador, entao ela some se a pagina recarregar. Motivo: ${r
 				FX.persisted = already ? true : await navigator.storage.persist();
 				if (!FX.persisted)
 					registro.aviso(
-						'[Synapse/persist] o navegador nao concedeu armazenamento persistente: sob pressao de disco os dados podem ser despejados. Exporte ZIPs com frequencia.',
+						'[Synapse/persist] o navegador nao concedeu armazenamento persistente: sob pressao de disco os dados podem ser despejados. Vincule uma pasta de backup no disco.',
 					);
 			}
 		} catch (e) {
@@ -1079,6 +1324,12 @@ NAO foi gravada no navegador, entao ela some se a pagina recarregar. Motivo: ${r
 		}
 		await refreshQuota();
 		renderBanner();
+		try {
+			const M = window.SynapseCofreManifesto;
+			if (M) FX.marker = M.readMarker(window.localStorage);
+		} catch (e) {
+			ignorarErro(e, 'boot:marcador');
+		}
 	}
 
 	requestLock(false);

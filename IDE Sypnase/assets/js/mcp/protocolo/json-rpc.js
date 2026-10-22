@@ -246,6 +246,7 @@ MCP_INSTRUCTIONS +=
 	'65309).';
 function mcpWafSeguro(o) {
 	try {
+		if (typeof wafAtivo === 'function' && !wafAtivo()) return o;
 		return typeof wafSanearObj === 'function' ? wafSanearObj(o) : o;
 	} catch (e) {
 		return o;
@@ -360,7 +361,10 @@ async function mcpDispatch(method, params) {
 			}),
 		};
 	}
-	if (method === 'tools/call') return { ok: await mcpToolCall(params) };
+	if (method === 'tools/call') {
+		if (window.SynapseDesempenho) window.SynapseDesempenho.marcarChamadaMcp();
+		return { ok: await mcpToolCall(params) };
+	}
 	if (method === 'resources/list') return { ok: { resources: [] } };
 	if (method === 'resources/templates/list') return { ok: { resourceTemplates: [] } };
 	if (method === 'prompts/list') return { ok: { prompts: [] } };
@@ -445,7 +449,16 @@ async function mcpToolCall(params) {
 }
 
 const VIS = { seq: 1, pending: new Map() };
+
+
+
+
+
 const HEADLESS = { map: new Map(), MAX: 3, W: 1280, H: 720 };
+function visaoIsolada(proj) {
+	const iso = window.SynapsePreviewIsolado;
+	return iso && iso.ativoPara(proj) ? iso : null;
+}
 function headlessProjBySource(src) {
 	for (const [pid, h] of HEADLESS.map) {
 		if (h.ifr && h.ifr.contentWindow === src)
@@ -478,22 +491,18 @@ function headlessWaitReady(h, ms) {
 		}, ms || 8000);
 	});
 }
-function headlessRefresh(proj, html) {
-	const h = HEADLESS.map.get(proj.id);
-	if (!h || h.dev) return;
-	if (proj.id === State.active) {
-		headlessDestroy(proj.id);
-		return;
-	}
-	h.ready = headlessWaitReady(h, 8000);
-	h.ifr.srcdoc = html;
-}
 async function headlessEnsure(proj) {
 	let h = HEADLESS.map.get(proj.id);
 	const dv = typeof DEV !== 'undefined' && DEV.map ? DEV.map[proj.id] : null;
 	if (h && ((h.dev && (!dv || !dv.url || h.src !== dv.url)) || (!h.dev && dv && dv.url))) {
 		headlessDestroy(proj.id);
 		h = null;
+	}
+
+	if (h && !h.dev && proj.lastHtml && h.html !== proj.lastHtml) {
+		h.html = proj.lastHtml;
+		h.ready = headlessWaitReady(h, 8000);
+		h.ifr.srcdoc = proj.lastHtml;
 	}
 	if (!h) {
 		if (HEADLESS.map.size >= HEADLESS.MAX) {
@@ -540,6 +549,7 @@ async function headlessEnsure(proj) {
 				);
 			}
 			h.ready = headlessWaitReady(h, 10000);
+			h.html = proj.lastHtml;
 			ifr.srcdoc = proj.lastHtml;
 		}
 		logCmd(proj, `👁 Preview headless ativo (${vpw}x${vph}) para as ferramentas de visão.`);
@@ -556,7 +566,8 @@ window.addEventListener('message', (e) => {
 	const d = e.data;
 	if (!d) return;
 	const isMain = el.frame && e.source === el.frame.contentWindow;
-	const hproj = isMain ? null : headlessProjBySource(e.source);
+	const iso = window.SynapsePreviewIsolado;
+	const hproj = isMain ? null : headlessProjBySource(e.source) || (iso && iso.projetoDaFonte(e.source));
 	if (!isMain && !hproj) return;
 	if (d.__lp_vision_ready) {
 		if (hproj && d.loaded) {
@@ -577,20 +588,35 @@ async function visionCall(proj, action, args, timeoutMs) {
 	let win,
 		vw,
 		vh,
-		headless = false;
+		headless = false,
+		targetOrigin = '*',
+		liberar = null;
+	const iso = visaoIsolada(proj);
 	if (proj.id === State.active) {
-		win = el.frame && el.frame.contentWindow;
+		const frameAtivo = iso && iso.temPreview(proj.id) ? iso.elementoDe(proj) : el.frame;
+		win = frameAtivo && frameAtivo.contentWindow;
 		if (!win)
 			throw new Error(
 				'Preview indisponível (iframe não montado). Use refresh_preview e tente de novo.',
 			);
-		const rect = el.frame.getBoundingClientRect();
+		const rect = frameAtivo.getBoundingClientRect();
 		if (rect.width < 40 || rect.height < 40)
 			throw new Error(
 				`O preview está oculto ou recolhido na tela (${Math.round(rect.width)}x${Math.round(rect.height)}). Abra o painel de preview e tente de novo.`,
 			);
-		vw = Math.round(el.frame.offsetWidth || rect.width);
-		vh = Math.round(el.frame.offsetHeight || rect.height);
+		vw = Math.round(frameAtivo.offsetWidth || rect.width);
+		vh = Math.round(frameAtivo.offsetHeight || rect.height);
+		if (frameAtivo !== el.frame) targetOrigin = iso.origem() || '*';
+	} else if (iso) {
+
+
+		const cap = await iso.prepararParaCaptura(proj, proj.viewport || null);
+		win = cap.janela;
+		vw = cap.w || (proj.viewport && proj.viewport.w) || HEADLESS.W;
+		vh = cap.h || (proj.viewport && proj.viewport.h) || HEADLESS.H;
+		targetOrigin = iso.origem() || '*';
+		headless = true;
+		liberar = () => iso.liberarCaptura(proj);
 	} else {
 		const h = await headlessEnsure(proj);
 		win = h.ifr.contentWindow;
@@ -612,12 +638,13 @@ async function visionCall(proj, action, args, timeoutMs) {
 			}
 		}, timeoutMs || 12000);
 		VIS.pending.set(id, { res, rej, timer });
-		let targetOrigin = '*';
-		try {
-			const frameOrigin = win.location.origin;
-			if (frameOrigin && frameOrigin !== 'null') targetOrigin = frameOrigin;
-		} catch (e) {
-			ignorarErro(e, 'visionCall');
+		if (targetOrigin === '*') {
+			try {
+				const frameOrigin = win.location.origin;
+				if (frameOrigin && frameOrigin !== 'null') targetOrigin = frameOrigin;
+			} catch (e) {
+				ignorarErro(e, 'visionCall');
+			}
 		}
 		try {
 			win.postMessage({ __lp_vision: true, id: id, action: action, args: a }, targetOrigin);
@@ -626,6 +653,8 @@ async function visionCall(proj, action, args, timeoutMs) {
 			VIS.pending.delete(id);
 			rej(e);
 		}
+	}).finally(() => {
+		if (liberar) liberar();
 	});
 	try {
 		Object.defineProperty(r, '__headless', { value: headless, enumerable: false });
