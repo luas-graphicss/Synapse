@@ -806,15 +806,6 @@ async function buscarConfiavel(valor, opcoes) {
 	throw new Error(\`redirecionamentos demais (limite \${MAX_REDIRECIONAMENTOS})\`);
 }
 
-function sendJson(res, code, obj) {
-	try {
-		cors(res);
-		res.writeHead(code, { 'Content-Type': 'application/json' });
-		res.end(JSON.stringify(obj));
-	} catch (e) {
-		ignorarErro(e, 'sendJson');
-	}
-}
 function sseWrite(res, ev, data) {
 	if (!res || res.destroyed || res.writableEnded) return false;
 	try {
@@ -896,31 +887,47 @@ function avisarTransporteLocal(rota) {
 		'          O index.html v9.8 corrige isso sozinho ao ativar o MCP (recarregue o site com Ctrl+F5).',
 	);
 }
-const WAF_MENOR = String.fromCharCode(8249);
+const WAF_ANGULO = String.fromCharCode(10216);
+const WAF_RAZAO = String.fromCharCode(8758);
+const WAF_IGUAL = String.fromCharCode(65309);
+const WAF_RE_URI = /((?:java|vb|live)script)(\\s*):/gi;
+const WAF_RE_DATA = /(data)(\\s*):(\\s*text\\s*\\/\\s*html)/gi;
+const WAF_RE_HANDLER = /\\bon([A-Za-z]{2,20})(\\s*)=/g;
 function wafSanearTexto(s) {
 	if (typeof s !== 'string' || !s) return s;
 	let t = s;
-	if (t.includes('<')) {
-		t = t
-			.replace(/<\\s*(\\/?)\\s*([A-Za-z][A-Za-z0-9:._-]{0,40})\\s*\\/?\\s*>/g, function (m, b, n) {
-				return \`[\${b || ''}\${n}]\`;
-			})
-			.replace(/<\\s*(\\/?)\\s*([A-Za-z][A-Za-z0-9:._-]{0,40})/g, function (m, b, n) {
-				return \`[\${b || ''}\${n}\`;
-			})
-			.replace(/</g, WAF_MENOR);
-	}
-	if (t.includes(':')) t = t.replace(/javascript\\s*:/gi, 'javascript :');
-	if (t.includes('=')) t = t.replace(/\\bon([a-z]{3,15})\\s*=/gi, 'on$1 =');
-	t = t.replace(/\\x24\\{/g, '\\x24 {');
+	if (t.includes(WAF_ANGULO)) t = t.split(WAF_ANGULO).join('&#10216;');
+	if (t.includes(WAF_RAZAO)) t = t.split(WAF_RAZAO).join('&#8758;');
+	if (t.includes(WAF_IGUAL)) t = t.split(WAF_IGUAL).join('&#65309;');
+	if (t.includes('<')) t = t.split('<').join(WAF_ANGULO);
+	if (t.includes(':'))
+		t = t.replace(WAF_RE_URI, '$1$2' + WAF_RAZAO).replace(WAF_RE_DATA, \`$1$2\${WAF_RAZAO}$3\`);
+	if (t.includes('=')) t = t.replace(WAF_RE_HANDLER, 'on$1$2' + WAF_IGUAL);
 	return t;
+}
+function wafPrecisaSanear(texto) {
+	if (texto.includes('<') || texto.includes(WAF_ANGULO)) return true;
+	if (texto.includes(WAF_RAZAO) || texto.includes(WAF_IGUAL)) return true;
+	WAF_RE_URI.lastIndex = 0;
+	WAF_RE_HANDLER.lastIndex = 0;
+	const precisa = WAF_RE_URI.test(texto) || WAF_RE_HANDLER.test(texto);
+	WAF_RE_URI.lastIndex = 0;
+	WAF_RE_HANDLER.lastIndex = 0;
+	return precisa;
+}
+function wafSanearFundo(valor) {
+	if (typeof valor === 'string') return wafSanearTexto(valor);
+	if (!valor || typeof valor !== 'object') return valor;
+	if (Array.isArray(valor)) return valor.map(wafSanearFundo);
+	const out = {};
+	for (const k of Object.keys(valor)) out[k] = wafSanearFundo(valor[k]);
+	return out;
 }
 function wafSanearJson(obj) {
 	try {
 		if (obj == null || typeof obj !== 'object') return obj;
-		const s = JSON.stringify(obj);
-		if (!s.includes('<') && !s.includes('javascript')) return obj;
-		return JSON.parse(wafSanearTexto(s));
+		if (!wafPrecisaSanear(JSON.stringify(obj))) return obj;
+		return wafSanearFundo(obj);
 	} catch (e) {
 		return obj;
 	}
@@ -986,10 +993,10 @@ function respostaFallback(metodo, body) {
 function sendJson(res, code, obj, hdrs) {
 	try {
 		cors(res);
-		const h = { 'Content-Type': 'application/json' };
+		const h = { 'Content-Type': 'application/json; charset=utf-8' };
 		if (hdrs) for (let k in hdrs) h[k] = hdrs[k];
 		res.writeHead(code, h);
-		res.end(JSON.stringify(obj));
+		res.end(jsonSeguro(obj));
 	} catch (e) {
 		ignorarErro(e, 'sendJson');
 	}
@@ -997,10 +1004,13 @@ function sendJson(res, code, obj, hdrs) {
 function sendRetry(res, code, msg, seg, hdrs) {
 	try {
 		cors(res);
-		const h = { 'Content-Type': 'application/json', 'Retry-After': String(seg || 1) };
+		const h = {
+			'Content-Type': 'application/json; charset=utf-8',
+			'Retry-After': String(seg || 1),
+		};
 		if (hdrs) for (let k in hdrs) h[k] = hdrs[k];
 		res.writeHead(code, h);
-		res.end(JSON.stringify({ error: msg, retryable: true }));
+		res.end(jsonSeguro({ error: msg, retryable: true }));
 	} catch (e) {
 		ignorarErro(e, 'sendRetry');
 	}
