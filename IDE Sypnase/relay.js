@@ -80,6 +80,7 @@ function createProcessTextDecoder() {
 	};
 }
 const NL = String.fromCharCode(10);
+const CRLF = String.fromCharCode(13, 10);
 const PORT = process.env.PORT || 8787;
 const MAX_BODY = 64 * 1024 * 1024;
 const TIMEOUT_MS = Number(process.env.AURORA_TIMEOUT_MS || 35000);
@@ -89,6 +90,19 @@ const IGNORE = ['node_modules', '.git', '.cache', '.next', '.vercel', '.DS_Store
 const SCAN_MAX = Math.max(50, Number(process.env.AURORA_SCAN_MAX || 0) || 20000);
 const MAX_PROCS = Math.max(4, Number(process.env.AURORA_MAX_PROCS || 0) || 24);
 const sessions = new Map();
+
+const LIMITE_HTTP = limiteConfigurado('AURORA_RATE_HTTP', 1200);
+const LIMITE_AUTH = limiteConfigurado('AURORA_RATE_AUTH', 20);
+const LIMITE_TERMINAL = limiteConfigurado('AURORA_RATE_TERMINAL', 90);
+const LIMITE_REDE = limiteConfigurado('AURORA_RATE_FETCH', 40);
+const LIMITE_WS_MENSAGENS = limiteConfigurado('AURORA_RATE_WS', 600);
+const LIMITE_WS_CONEXOES = limiteConfigurado('AURORA_WS_CONEXOES', 32);
+const MAX_SESSOES = limiteConfigurado('AURORA_MAX_SESSOES', 200);
+const SESSAO_OCIOSA_MS = limiteConfigurado('AURORA_SESSAO_OCIOSA_MS', 6 * 3600000);
+function limiteConfigurado(nome, padrao) {
+	const n = Number(process.env[nome]);
+	return Number.isFinite(n) && n > 0 ? Math.floor(n) : padrao;
+}
 const ALLOW_ORIGIN = String(process.env.AURORA_ALLOW_ORIGIN || '').trim();
 function origemPermitida(req) {
 	if (!ALLOW_ORIGIN) return true;
@@ -115,6 +129,53 @@ function cors(res) {
 	res.setHeader('Access-Control-Allow-Private-Network', 'true');
 	res.setHeader('Access-Control-Max-Age', '86400');
 }
+function enderecoDe(req) {
+	return String((req && req.socket && req.socket.remoteAddress) || 'desconhecido');
+}
+function criarLimitador(maximo, janelaMs) {
+	const baldes = new Map();
+	const varredura = setInterval(() => {
+		const agora = Date.now();
+		for (const [chave, balde] of baldes)
+			if (agora - balde.inicio >= janelaMs) baldes.delete(chave);
+	}, janelaMs);
+	varredura.unref();
+	const balde = (chave) => {
+		const agora = Date.now();
+		let b = baldes.get(chave);
+		if (!b || agora - b.inicio >= janelaMs) {
+			b = { inicio: agora, usados: 0 };
+			baldes.set(chave, b);
+		}
+		return b;
+	};
+	const retryEm = (b) => Math.max(1, Math.ceil((b.inicio + janelaMs - Date.now()) / 1000));
+	return {
+		consumir(chave) {
+			const b = balde(chave);
+			b.usados++;
+			return { ok: b.usados <= maximo, usados: b.usados, retryEm: retryEm(b) };
+		},
+		bloqueado(chave) {
+			const b = baldes.get(chave);
+			if (!b || Date.now() - b.inicio >= janelaMs) return null;
+			return b.usados >= maximo ? { retryEm: retryEm(b) } : null;
+		},
+		liberar(chave) {
+			baldes.delete(chave);
+		},
+		zerar() {
+			baldes.clear();
+		},
+	};
+}
+const limitadorHttp = criarLimitador(LIMITE_HTTP, 60000);
+const limitadorAuth = criarLimitador(LIMITE_AUTH, 600000);
+const limitadorTerminal = criarLimitador(LIMITE_TERMINAL, 60000);
+const limitadorRede = criarLimitador(LIMITE_REDE, 60000);
+const limitadorWs = criarLimitador(LIMITE_WS_MENSAGENS, 10000);
+const conexoesWs = new Map();
+
 function sendJson(res, code, obj) {
 	try {
 		cors(res);
@@ -2600,6 +2661,7 @@ server.on('error', function (e) {
 	}
 	console.error('[relay] erro no servidor: ' + ((e && e.message) || e));
 });
+
 server.listen(PORT, function () {
 	console.log(`Synapse MCP Relay ${VERSION} ouvindo na porta ${PORT}`);
 	console.log('Pasta dos projetos (terminal): ' + WORK);

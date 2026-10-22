@@ -408,7 +408,73 @@ const path = require('path');
 const crypto = require('crypto');
 const spawn = require('child_process').spawn;
 const SDec = require('string_decoder').StringDecoder;
+const OEM_HIGH_RANGE =
+	'ÇüéâäàåçêëèïîìÄÅ' +
+	'ÉæÆôöòûùÿÖÜø£Ø×ƒ' +
+	'áíóúñÑªº¿®¬½¼¡«»' +
+	'░▒▓│┤ÁÂÀ©╣║╗╝¢¥┐' +
+	'└┴┬├─┼ãÃ╚╔╩╦╠═╬¤' +
+	'ðÐÊËÈıÍÎÏ┘┌█▄¦Ì▀' +
+	'ÓßÔÒõÕµþÞÚÛÙýÝ¯´' +
+	'­±‗¾¶§÷¸°¨·¹³²■ ';
+
+function decodeOemBytes(buffer) {
+	let texto = '';
+	for (let indice = 0; indice < buffer.length; indice++) {
+		const byte = buffer[indice];
+		texto += byte < 128 ? String.fromCharCode(byte) : OEM_HIGH_RANGE[byte - 128];
+	}
+	return texto;
+}
+
+function completeUtf8Length(buffer) {
+	const maximoDaSequencia = 4;
+	let cursor = buffer.length;
+	while (cursor > 0 && buffer.length - cursor < maximoDaSequencia) {
+		const byte = buffer[cursor - 1];
+		if (byte < 0x80) return buffer.length;
+		if (byte >= 0xc0) {
+			const necessarios = byte >= 0xf0 ? 4 : byte >= 0xe0 ? 3 : 2;
+			const disponiveis = buffer.length - (cursor - 1);
+			return disponiveis >= necessarios ? buffer.length : cursor - 1;
+		}
+		cursor--;
+	}
+	return buffer.length;
+}
+
+function createProcessTextDecoder() {
+	const utf8Estrito = new TextDecoder('utf-8', { fatal: true });
+	let pendente = Buffer.alloc(0);
+	function decodificar(bytes) {
+		if (!bytes.length) return '';
+		try {
+			return utf8Estrito.decode(bytes);
+		} catch (erro) {
+			return decodeOemBytes(bytes);
+		}
+	}
+	return {
+		write(pedaco) {
+			pendente = pendente.length ? Buffer.concat([pendente, pedaco]) : Buffer.from(pedaco);
+			const prontos = completeUtf8Length(pendente);
+			if (!prontos) return '';
+			const bytes = pendente.subarray(0, prontos);
+			const resto = Buffer.from(pendente.subarray(prontos));
+			const texto = decodificar(bytes);
+			pendente = resto;
+			return texto;
+		},
+		end() {
+			if (!pendente.length) return '';
+			const bytes = pendente;
+			pendente = Buffer.alloc(0);
+			return decodificar(bytes);
+		},
+	};
+}
 const NL = String.fromCharCode(10);
+const CRLF = String.fromCharCode(13, 10);
 const PORT = process.env.PORT || 8787;
 const MAX_BODY = 64 * 1024 * 1024;
 const TIMEOUT_MS = Number(process.env.AURORA_TIMEOUT_MS || 35000);
@@ -418,6 +484,19 @@ const IGNORE = ['node_modules', '.git', '.cache', '.next', '.vercel', '.DS_Store
 const SCAN_MAX = Math.max(50, Number(process.env.AURORA_SCAN_MAX || 0) || 20000);
 const MAX_PROCS = Math.max(4, Number(process.env.AURORA_MAX_PROCS || 0) || 24);
 const sessions = new Map();
+
+const LIMITE_HTTP = limiteConfigurado('AURORA_RATE_HTTP', 1200);
+const LIMITE_AUTH = limiteConfigurado('AURORA_RATE_AUTH', 20);
+const LIMITE_TERMINAL = limiteConfigurado('AURORA_RATE_TERMINAL', 90);
+const LIMITE_REDE = limiteConfigurado('AURORA_RATE_FETCH', 40);
+const LIMITE_WS_MENSAGENS = limiteConfigurado('AURORA_RATE_WS', 600);
+const LIMITE_WS_CONEXOES = limiteConfigurado('AURORA_WS_CONEXOES', 32);
+const MAX_SESSOES = limiteConfigurado('AURORA_MAX_SESSOES', 200);
+const SESSAO_OCIOSA_MS = limiteConfigurado('AURORA_SESSAO_OCIOSA_MS', 6 * 3600000);
+function limiteConfigurado(nome, padrao) {
+	const n = Number(process.env[nome]);
+	return Number.isFinite(n) && n > 0 ? Math.floor(n) : padrao;
+}
 const ALLOW_ORIGIN = String(process.env.AURORA_ALLOW_ORIGIN || '').trim();
 function origemPermitida(req) {
 	if (!ALLOW_ORIGIN) return true;
@@ -444,6 +523,53 @@ function cors(res) {
 	res.setHeader('Access-Control-Allow-Private-Network', 'true');
 	res.setHeader('Access-Control-Max-Age', '86400');
 }
+function enderecoDe(req) {
+	return String((req && req.socket && req.socket.remoteAddress) || 'desconhecido');
+}
+function criarLimitador(maximo, janelaMs) {
+	const baldes = new Map();
+	const varredura = setInterval(() => {
+		const agora = Date.now();
+		for (const [chave, balde] of baldes)
+			if (agora - balde.inicio >= janelaMs) baldes.delete(chave);
+	}, janelaMs);
+	varredura.unref();
+	const balde = (chave) => {
+		const agora = Date.now();
+		let b = baldes.get(chave);
+		if (!b || agora - b.inicio >= janelaMs) {
+			b = { inicio: agora, usados: 0 };
+			baldes.set(chave, b);
+		}
+		return b;
+	};
+	const retryEm = (b) => Math.max(1, Math.ceil((b.inicio + janelaMs - Date.now()) / 1000));
+	return {
+		consumir(chave) {
+			const b = balde(chave);
+			b.usados++;
+			return { ok: b.usados <= maximo, usados: b.usados, retryEm: retryEm(b) };
+		},
+		bloqueado(chave) {
+			const b = baldes.get(chave);
+			if (!b || Date.now() - b.inicio >= janelaMs) return null;
+			return b.usados >= maximo ? { retryEm: retryEm(b) } : null;
+		},
+		liberar(chave) {
+			baldes.delete(chave);
+		},
+		zerar() {
+			baldes.clear();
+		},
+	};
+}
+const limitadorHttp = criarLimitador(LIMITE_HTTP, 60000);
+const limitadorAuth = criarLimitador(LIMITE_AUTH, 600000);
+const limitadorTerminal = criarLimitador(LIMITE_TERMINAL, 60000);
+const limitadorRede = criarLimitador(LIMITE_REDE, 60000);
+const limitadorWs = criarLimitador(LIMITE_WS_MENSAGENS, 10000);
+const conexoesWs = new Map();
+
 function sendJson(res, code, obj) {
 	try {
 		cors(res);
@@ -1414,8 +1540,8 @@ async function termAction(s, act, b, res) {
 			if (rec.out.length > 2000000)
 				rec.out = \`[saida antiga truncada]\${NL}\${rec.out.slice(-1500000)}\`;
 		};
-		const decOut = new SDec('utf8'),
-			decErr = new SDec('utf8');
+		const decOut = createProcessTextDecoder(),
+			decErr = createProcessTextDecoder();
 		const append = function (d) {
 			addTxt(typeof d === 'string' ? d : decOut.write(d));
 		};
@@ -2929,6 +3055,7 @@ server.on('error', function (e) {
 	}
 	console.error('[relay] erro no servidor: ' + ((e && e.message) || e));
 });
+
 server.listen(PORT, function () {
 	console.log(\`Synapse MCP Relay \${VERSION} ouvindo na porta \${PORT}\`);
 	console.log('Pasta dos projetos (terminal): ' + WORK);
