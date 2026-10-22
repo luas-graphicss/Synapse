@@ -4827,11 +4827,18 @@ const MCP = {
 };
 window.MCP = MCP;
 
+const MCP_ALFABETO = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const MCP_TETO_SEM_VIES = 256 - (256 % MCP_ALFABETO.length);
+const MCP_TAMANHO_SID = 10;
+const MCP_TAMANHO_TOKEN = 32;
 function mcpRand(n) {
-	const a = new Uint8Array(n);
-	crypto.getRandomValues(a);
 	let s = '';
-	for (let i = 0; i < a.length; i++) s += 'abcdefghijklmnopqrstuvwxyz0123456789'[a[i] % 36];
+	const lote = new Uint8Array(n * 2);
+	while (s.length < n) {
+		crypto.getRandomValues(lote);
+		for (let i = 0; i < lote.length && s.length < n; i++)
+			if (lote[i] < MCP_TETO_SEM_VIES) s += MCP_ALFABETO[lote[i] % MCP_ALFABETO.length];
+	}
 	return s;
 }
 function mcpSaveCfg() {
@@ -4856,9 +4863,9 @@ function mcpLoadCfg() {
 	}
 	if (!MCP.relay && MCP_RELAY_PADRAO) MCP.relay = MCP_RELAY_PADRAO;
 	if (MCP_MOBILE && !appPonte()) MCP.pub = '';
-	if (!MCP.sid || !MCP.token) {
-		MCP.sid = mcpRand(10);
-		MCP.token = mcpRand(24);
+	if (!MCP.sid || !MCP.token || MCP.token.length < 16) {
+		MCP.sid = mcpRand(MCP_TAMANHO_SID);
+		MCP.token = mcpRand(MCP_TAMANHO_TOKEN);
 		mcpSaveCfg();
 	}
 	try {
