@@ -56,6 +56,8 @@
 			<script type="text/javascript" src="./assets/js/preview/preview-channel-name.js"></script>
 			<script type="text/javascript" src="./assets/js/arquivos/session-storage-names.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/diagnostico.js"></script>
+			<script type="text/javascript" src="./assets/js/arquivos/cofre-manifesto.js"></script>
+			<script type="text/javascript" src="./assets/js/arquivos/cofre-guarda.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/url-policy.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/zip-entry-guard.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/zip-stream-reader.js"></script>
@@ -63,6 +65,7 @@
 			<script type="text/javascript" src="./assets/js/mcp/configuracao/relay-default-endpoint.js"></script>
 			<script type="text/javascript" src="./assets/js/mcp/configuracao/relay-url-presentation.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/seguranca.js"></script>
+			<script type="text/javascript" src="./assets/js/nucleo/agendador.js"></script>
 			<script type="text/javascript" src="./assets/js/preview/iframe-permissions.js"></script>
 			<script type="text/javascript" src="./assets/js/preview/frame-presentation.js"></script>
 			<script type="text/javascript" src="./assets/js/preview/preview-resource-lifetime.js"></script>
@@ -71,6 +74,7 @@
 			<script type="text/javascript" src="./assets/js/preview/preview-project-blobs.js"></script>
 			<script type="text/javascript" src="./assets/js/preview/preview-mount-reset.js"></script>
 			<script type="text/javascript" src="./assets/js/preview/preview-pause.js"></script>
+			<script type="text/javascript" src="./assets/js/preview/preview-isolado.js"></script>
 
 			<script type="text/javascript" src="./assets/js/i18n/idiomas.js"></script>
 			<script type="text/javascript" src="./assets/js/i18n/phrase-registration.js"></script>
@@ -79,6 +83,7 @@
 			<script type="text/javascript" src="./assets/js/i18n/tour-phrases.js"></script>
 			<script type="text/javascript" src="./assets/js/i18n/mcp-menu-phrases.js"></script>
 			<script type="text/javascript" src="./assets/js/i18n/extension-phrases.js"></script>
+			<script type="text/javascript" src="./assets/js/i18n/cofre-phrases.js"></script>
 		</template>
 		<script>
 			SynapseClassicScripts.load(document.currentScript.previousElementSibling);
@@ -119,6 +124,7 @@
 		<link rel="stylesheet" href="./assets/css/celular-conforto.css" />
 		<link rel="stylesheet" href="./assets/css/marca-e-superficie-vazia.css" />
 		<link rel="stylesheet" href="./assets/css/shell.css" />
+		<link rel="stylesheet" href="./assets/css/desempenho.css" />
 		<link rel="stylesheet" href="./assets/css/desktop.css" />
 	</head>
 	<body>
@@ -989,6 +995,15 @@
 					><span>—</span>
 				</div>
 				<div class="sp"></div>
+				<button
+					type="button"
+					class="st st-perf"
+					id="stPerf"
+					aria-pressed="false"
+					title="Painel de desempenho (Alt+Shift+P)"
+				>
+					<span>– fps</span>
+				</button>
 				<div class="st" id="stContext">—</div>
 				<div class="st" id="stFiles">—</div>
 			</div>
@@ -1148,9 +1163,7 @@
 			<script type="text/javascript" src="./assets/js/explorer/selection-model.js"></script>
 			<script type="text/javascript" src="./assets/js/explorer/file-operations.js"></script>
 		<script type="text/javascript" src="./assets/js/explorer/virtual-tree.js"></script>
-			<script type="text/javascript" src="./assets/js/desempenho/frame-scheduler.js"></script>
 			<script type="text/javascript" src="./assets/js/preview/viewport-geometry.js"></script>
-			<script type="text/javascript" src="./assets/js/nucleo/chunked-work.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/guarded-steps.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/project-record.js"></script>
 			<script type="text/javascript" src="./assets/js/nucleo/project-open-report.js"></script>
@@ -1326,6 +1339,8 @@
 			<script type="text/javascript" src="./assets/js/arquivos/sessao-incremental.js"></script>
 			<script type="text/javascript" src="./assets/js/mcp/protocolo/tool-durability-policy.js"></script>
 			<script type="text/javascript" src="./assets/js/arquivos/persistencia.js"></script>
+			<script type="text/javascript" src="./assets/js/arquivos/cofre-disco.js"></script>
+			<script type="text/javascript" src="./assets/js/arquivos/cofre-painel.js"></script>
 
 			<script type="text/javascript" src="./assets/js/mcp/local/modo-local.js"></script>
 
@@ -1463,6 +1478,7 @@
 
 			<script type="text/javascript" src="./assets/js/desempenho/render-coalescido.js"></script>
 			<script type="text/javascript" src="./assets/js/desempenho/memoria.js"></script>
+			<script type="text/javascript" src="./assets/js/desempenho/painel-desempenho.js"></script>
 
 			<script type="text/javascript" src="./assets/js/mcp/resiliencia/diagnostico.js"></script>
 
