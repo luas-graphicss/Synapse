@@ -1,0 +1,236 @@
+(function (root) {
+	'use strict';
+
+	const COFRE_PHRASES = {
+		'Saude do armazenamento': ['Storage health', 'Salud del almacenamiento', '存储健康状况'],
+		'Armazenamento persistente': ['Persistent storage', 'Almacenamiento persistente', '持久化存储'],
+		'concedido pelo navegador': ['granted by the browser', 'concedido por el navegador', '浏览器已授予'],
+		'NAO concedido: o navegador pode despejar os dados': [
+			'NOT granted: the browser may evict the data',
+			'NO concedido: el navegador puede desalojar los datos',
+			'未授予：浏览器可能会清除数据',
+		],
+		desconhecido: ['unknown', 'desconocido', '未知'],
+		'Pedir ao navegador': ['Ask the browser', 'Pedir al navegador', '向浏览器申请'],
+		'Ultima gravacao confirmada': ['Last confirmed save', 'Último guardado confirmado', '最近一次确认保存'],
+		'alteracoes pendentes': ['pending changes', 'cambios pendientes', '有待保存的更改'],
+		'Pasta de backup no disco': ['Backup folder on disk', 'Carpeta de respaldo en disco', '磁盘备份文件夹'],
+		'nao suportada neste navegador (Chrome/Edge no computador)': [
+			'not supported in this browser (Chrome/Edge on desktop)',
+			'no compatible con este navegador (Chrome/Edge en el ordenador)',
+			'此浏览器不支持（请使用桌面版 Chrome/Edge）',
+		],
+		'Exportar .zip': ['Export .zip', 'Exportar .zip', '导出 .zip'],
+		'nenhuma pasta vinculada': ['no folder linked', 'ninguna carpeta vinculada', '未关联文件夹'],
+		'Escolher pasta...': ['Choose folder...', 'Elegir carpeta...', '选择文件夹...'],
+		'Com uma pasta vinculada, cada projeto vira uma subpasta real no seu computador, atualizada em segundo plano a cada gravacao. Se o navegador apagar os dados do site, nada se perde.':
+			[
+				'With a linked folder, each project becomes a real subfolder on your computer, updated in the background on every save. If the browser wipes the site data, nothing is lost.',
+				'Con una carpeta vinculada, cada proyecto se convierte en una subcarpeta real en tu ordenador, actualizada en segundo plano en cada guardado. Si el navegador borra los datos del sitio, no se pierde nada.',
+				'关联文件夹后，每个项目都会成为电脑上的真实子文件夹，并在每次保存时后台更新。即使浏览器清除了站点数据，也不会丢失任何内容。',
+			],
+		'espelhando...': ['mirroring...', 'reflejando...', '正在镜像...'],
+		'precisa de permissao': ['needs permission', 'necesita permiso', '需要权限'],
+		'Espelhar agora': ['Mirror now', 'Reflejar ahora', '立即镜像'],
+		Reconectar: ['Reconnect', 'Reconectar', '重新连接'],
+		Desvincular: ['Unlink', 'Desvincular', '取消关联'],
+		'permissao da pasta expirou: clique em Reconectar no painel Recentes': [
+			'folder permission expired: click Reconnect in the Recents panel',
+			'el permiso de la carpeta caducó: haz clic en Reconectar en el panel Recientes',
+			'文件夹权限已过期：请在“最近”面板中点击“重新连接”',
+		],
+		'Projetos encontrados no armazenamento (fora do indice)': [
+			'Projects found in storage (outside the index)',
+			'Proyectos encontrados en el almacenamiento (fuera del índice)',
+			'在存储中找到的项目（不在索引中）',
+		],
+		'Os arquivos destes projetos estao gravados no navegador, mas eles nao constam na lista da sessao. Isso acontece quando o indice foi sobrescrito ou nao pode ser lido. Reabrir devolve o projeto a sessao.':
+			[
+				'The files of these projects are saved in the browser, but they are missing from the session list. This happens when the index was overwritten or could not be read. Reopen puts the project back in the session.',
+				'Los archivos de estos proyectos están guardados en el navegador, pero no figuran en la lista de la sesión. Ocurre cuando el índice fue sobrescrito o no pudo leerse. Reabrir devuelve el proyecto a la sesión.',
+				'这些项目的文件已保存在浏览器中，但不在会话列表里。这通常是索引被覆盖或无法读取导致的。点击“重新打开”可将项目恢复到会话。',
+			],
+		'Projeto protegido por senha': ['Password-protected project', 'Proyecto protegido con contraseña', '受密码保护的项目'],
+		'Desbloquear e reabrir': ['Unlock and reopen', 'Desbloquear y reabrir', '解锁并重新打开'],
+		Reabrir: ['Reopen', 'Reabrir', '重新打开'],
+		Excluir: ['Delete', 'Eliminar', '删除'],
+		Aberto: ['Open', 'Abierto', '已打开'],
+		'Excluir da pasta': ['Delete from folder', 'Eliminar de la carpeta', '从文件夹删除'],
+		'A pasta precisa de permissao para ser lida. Clique em Reconectar acima.': [
+			'The folder needs permission to be read. Click Reconnect above.',
+			'La carpeta necesita permiso para leerse. Haz clic en Reconectar arriba.',
+			'需要权限才能读取该文件夹。请点击上方的“重新连接”。',
+		],
+		'Ainda nao ha projetos espelhados. O primeiro espelho acontece em segundos apos uma gravacao.': [
+			'No projects mirrored yet. The first mirror happens seconds after a save.',
+			'Aún no hay proyectos reflejados. El primer reflejo ocurre segundos después de un guardado.',
+			'尚无已镜像的项目。首次镜像会在保存后几秒内进行。',
+		],
+		'O indice da sessao nao pode ser lido quando a aba abriu; nada esta sendo gravado nesta aba. Recarregue a pagina.': [
+			'The session index could not be read when the tab opened; nothing is being saved in this tab. Reload the page.',
+			'El índice de la sesión no pudo leerse al abrir la pestaña; nada se está guardando en esta pestaña. Recarga la página.',
+			'标签页打开时无法读取会话索引；此标签页不会保存任何内容。请刷新页面。',
+		],
+		'Projetos na pasta de backup (': ['Projects in the backup folder (', 'Proyectos en la carpeta de respaldo (', '备份文件夹中的项目（'],
+		'Pasta de backup: ': ['Backup folder: ', 'Carpeta de respaldo: ', '备份文件夹：'],
+		'Proteja seus projetos': ['Protect your projects', 'Protege tus proyectos', '保护你的项目'],
+		'O navegador pode apagar os dados deste site. Vincule uma pasta de backup no disco: relogio (Recentes) > Escolher pasta.': [
+			'The browser may wipe this site data. Link a backup folder on disk: clock (Recents) > Choose folder.',
+			'El navegador puede borrar los datos de este sitio. Vincula una carpeta de respaldo en disco: reloj (Recientes) > Elegir carpeta.',
+			'浏览器可能会清除此站点的数据。请关联磁盘备份文件夹：时钟（最近）> 选择文件夹。',
+		],
+		'O navegador pode apagar os dados deste site. Exporte .zip com frequencia ou use Chrome/Edge para ter pasta de backup.': [
+			'The browser may wipe this site data. Export .zip often or use Chrome/Edge to get a backup folder.',
+			'El navegador puede borrar los datos de este sitio. Exporta .zip con frecuencia o usa Chrome/Edge para tener carpeta de respaldo.',
+			'浏览器可能会清除此站点的数据。请经常导出 .zip，或使用 Chrome/Edge 以启用备份文件夹。',
+		],
+		'Pasta vinculada': ['Folder linked', 'Carpeta vinculada', '文件夹已关联'],
+		'Pasta reconectada': ['Folder reconnected', 'Carpeta reconectada', '文件夹已重新连接'],
+		'O espelho em disco voltou a funcionar.': ['Disk mirroring is working again.', 'El reflejo en disco vuelve a funcionar.', '磁盘镜像已恢复正常。'],
+		'Permissao negada': ['Permission denied', 'Permiso denegado', '权限被拒绝'],
+		'Sem permissao a pasta nao pode ser atualizada.': [
+			'Without permission the folder cannot be updated.',
+			'Sin permiso la carpeta no puede actualizarse.',
+			'没有权限则无法更新该文件夹。',
+		],
+		'Espelho atualizado': ['Mirror updated', 'Reflejo actualizado', '镜像已更新'],
+		'Espelho nao executado': ['Mirror not run', 'Reflejo no ejecutado', '镜像未执行'],
+		'tente novamente em instantes': ['try again in a moment', 'inténtalo de nuevo en unos instantes', '请稍后重试'],
+		'Pedido recusado': ['Request refused', 'Solicitud rechazada', '请求被拒绝'],
+		'O navegador concedeu armazenamento persistente a este site.': [
+			'The browser granted persistent storage to this site.',
+			'El navegador concedió almacenamiento persistente a este sitio.',
+			'浏览器已为此站点授予持久化存储。',
+		],
+		'O navegador nao concedeu. Instalar a IDE como app, adicionar aos favoritos ou vincular uma pasta de backup resolve.': [
+			'The browser did not grant it. Installing the IDE as an app, bookmarking it or linking a backup folder solves this.',
+			'El navegador no lo concedió. Instalar el IDE como app, añadirlo a favoritos o vincular una carpeta de respaldo lo resuelve.',
+			'浏览器未授予。将 IDE 安装为应用、加入书签或关联备份文件夹即可解决。',
+		],
+		'Nao foi possivel vincular': ['Could not link', 'No se pudo vincular', '无法关联'],
+		'Nada para reabrir': ['Nothing to reopen', 'Nada que reabrir', '没有可重新打开的内容'],
+		'Os arquivos estao protegidos por senha.': ['The files are password-protected.', 'Los archivos están protegidos con contraseña.', '文件受密码保护。'],
+		'Nenhum arquivo legivel foi encontrado para este projeto.': [
+			'No readable file was found for this project.',
+			'No se encontró ningún archivo legible para este proyecto.',
+			'未找到此项目的可读文件。',
+		],
+		'Pasta vazia': ['Empty folder', 'Carpeta vacía', '文件夹为空'],
+		'Nenhum arquivo foi encontrado nesta subpasta.': ['No file was found in this subfolder.', 'No se encontró ningún archivo en esta subcarpeta.', '此子文件夹中未找到文件。'],
+		'Nao consegui ler a pasta': ['Could not read the folder', 'No pude leer la carpeta', '无法读取文件夹'],
+		'Lendo a pasta de backup...': ['Reading the backup folder...', 'Leyendo la carpeta de respaldo...', '正在读取备份文件夹...'],
+		'Desvincular pasta de backup': ['Unlink backup folder', 'Desvincular carpeta de respaldo', '取消关联备份文件夹'],
+		'Os arquivos ja espelhados continuam na pasta; a IDE so deixa de atualiza-los.': [
+			'Files already mirrored stay in the folder; the IDE just stops updating them.',
+			'Los archivos ya reflejados siguen en la carpeta; el IDE solo deja de actualizarlos.',
+			'已镜像的文件会保留在文件夹中；IDE 只是不再更新它们。',
+		],
+		'Excluir projeto do armazenamento': ['Delete project from storage', 'Eliminar proyecto del almacenamiento', '从存储中删除项目'],
+		'Isso apaga definitivamente os arquivos gravados deste projeto no navegador.': [
+			'This permanently deletes the files saved for this project in the browser.',
+			'Esto borra definitivamente los archivos guardados de este proyecto en el navegador.',
+			'这将永久删除浏览器中保存的此项目文件。',
+		],
+		'Excluir da pasta de backup': ['Delete from backup folder', 'Eliminar de la carpeta de respaldo', '从备份文件夹删除'],
+		'Remove a subpasta deste projeto do disco. O projeto aberto na IDE (se houver) nao e afetado.': [
+			'Removes this project subfolder from disk. The project open in the IDE (if any) is not affected.',
+			'Quita la subcarpeta de este proyecto del disco. El proyecto abierto en el IDE (si lo hay) no se ve afectado.',
+			'从磁盘移除此项目的子文件夹。IDE 中打开的项目（如有）不受影响。',
+		],
+		'Projetos protegidos': ['Projects protected', 'Proyectos protegidos', '项目已受保护'],
+		'Tentativa de apagar o armazenamento': ['Attempt to wipe storage', 'Intento de borrar el almacenamiento', '检测到清除存储的尝试'],
+		'A exclusao foi bloqueada. Garanta um backup agora (Recentes > pasta de backup ou exportar .zip).': [
+			'The deletion was blocked. Secure a backup now (Recents > backup folder or export .zip).',
+			'La eliminación fue bloqueada. Asegura una copia ahora (Recientes > carpeta de respaldo o exportar .zip).',
+			'删除已被阻止。请立即备份（最近 > 备份文件夹或导出 .zip）。',
+		],
+		'Abrir backups': ['Open backups', 'Abrir copias', '打开备份'],
+		'Dispensar este aviso': ['Dismiss this notice', 'Descartar este aviso', '忽略此提示'],
+		Entendi: ['Got it', 'Entendido', '知道了'],
+		'Seus projetos não estão mais no navegador': [
+			'Your projects are no longer in the browser',
+			'Tus proyectos ya no están en el navegador',
+			'你的项目已不在浏览器中',
+		],
+		'Abrir recuperação': ['Open recovery', 'Abrir recuperación', '打开恢复'],
+		'Não consegui ler o armazenamento': ['Could not read storage', 'No pude leer el almacenamiento', '无法读取存储'],
+		'Tentar de novo': ['Try again', 'Intentar de nuevo', '重试'],
+		'Continuar sem restaurar': ['Continue without restoring', 'Continuar sin restaurar', '不恢复并继续'],
+		'Modo de proteção': ['Protection mode', 'Modo de protección', '保护模式'],
+		'Nada será gravado nesta aba até você recarregar a página. Seus dados continuam no navegador.': [
+			'Nothing will be saved in this tab until you reload the page. Your data is still in the browser.',
+			'Nada se guardará en esta pestaña hasta que recargues la página. Tus datos siguen en el navegador.',
+			'刷新页面前，此标签页不会保存任何内容。你的数据仍在浏览器中。',
+		],
+		'Índice reconstruído': ['Index rebuilt', 'Índice reconstruido', '索引已重建'],
+		'Restauração parcial': ['Partial restore', 'Restauración parcial', '部分恢复'],
+		'Projetos protegidos encontrados': ['Protected projects found', 'Proyectos protegidos encontrados', '发现受保护的项目'],
+		'Há projetos cifrados fora do índice — abra Recentes (relógio) para desbloquear': [
+			'There are encrypted projects outside the index — open Recents (clock) to unlock',
+			'Hay proyectos cifrados fuera del índice — abre Recientes (reloj) para desbloquear',
+			'索引之外存在加密项目——请打开“最近”（时钟）以解锁',
+		],
+
+		'revisao 1': ['revision 1', 'revisión 1', '修订 1'],
+		'1 arquivo(s)': ['1 file(s)', '1 archivo(s)', '1 个文件'],
+		'1 projeto(s), 2 arquivo(s) gravado(s) em 3ms': [
+			'1 project(s), 2 file(s) written in 3ms',
+			'1 proyecto(s), 2 archivo(s) escritos en 3ms',
+			'1 个项目，2 个文件已在 3ms 内写入',
+		],
+		'1 projeto(s) que nao estao abertos continuam guardados. Veja em Recentes (relogio).': [
+			'1 project(s) that are not open remain stored. See Recents (clock).',
+			'1 proyecto(s) que no están abiertos siguen guardados. Míralos en Recientes (reloj).',
+			'1 个未打开的项目仍被保存。请查看“最近”（时钟）。',
+		],
+		'1 projeto(s) recuperado(s) do armazenamento': [
+			'1 project(s) recovered from storage',
+			'1 proyecto(s) recuperado(s) del almacenamiento',
+			'已从存储中恢复 1 个项目',
+		],
+		'1 projeto(s) recuperado(s) do armazenamento — o índice da sessão tinha sido perdido': [
+			'1 project(s) recovered from storage — the session index had been lost',
+			'1 proyecto(s) recuperado(s) del almacenamiento — el índice de la sesión se había perdido',
+			'已从存储中恢复 1 个项目——会话索引此前已丢失',
+		],
+		'1 projeto(s) não abriram — clique no relógio (Recentes) para recuperar': [
+			'1 project(s) did not open — click the clock (Recents) to recover',
+			'1 proyecto(s) no se abrieron — haz clic en el reloj (Recientes) para recuperar',
+			'1 个项目未能打开——点击时钟（最近）进行恢复',
+		],
+
+		'Algo tentou APAGAR o armazenamento da IDE as': [
+			'Something tried to WIPE the IDE storage at',
+			'Algo intentó BORRAR el almacenamiento del IDE a las',
+			'有程序试图清除 IDE 存储，时间：',
+		],
+		'ALERTA: algo tentou APAGAR o armazenamento da IDE as': [
+			'ALERT: something tried to WIPE the IDE storage at',
+			'ALERTA: algo intentó BORRAR el almacenamiento del IDE a las',
+			'警报：有程序试图清除 IDE 存储，时间：',
+		],
+		'(origem:': ['(source:', '(origen:', '（来源：'],
+		'A exclusao esta bloqueada enquanto esta aba estiver aberta. Garanta um backup agora.': [
+			'The deletion is blocked while this tab stays open. Secure a backup now.',
+			'La eliminación está bloqueada mientras esta pestaña siga abierta. Asegura una copia ahora.',
+			'只要此标签页保持打开，删除就会被阻止。请立即备份。',
+		],
+		'A exclusao esta bloqueada enquanto esta aba estiver aberta, mas pode se concluir quando ela fechar. Garanta um backup agora: pasta de backup no disco ou exportar .zip.':
+			[
+				'The deletion is blocked while this tab stays open, but it may complete once it closes. Secure a backup now: backup folder on disk or export .zip.',
+				'La eliminación está bloqueada mientras esta pestaña siga abierta, pero puede completarse al cerrarla. Asegura una copia ahora: carpeta de respaldo en disco o exportar .zip.',
+				'只要此标签页保持打开，删除就会被阻止，但关闭后可能会完成。请立即备份：磁盘备份文件夹或导出 .zip。',
+			],
+		cota: ['quota', 'cuota', '配额'],
+		nunca: ['never', 'nunca', '从未'],
+		'Fechados recentemente': ['Recently closed', 'Cerrados recientemente', '最近关闭'],
+		'Dica: a pasta de backup no disco e o Exportar .zip são as únicas cópias que vivem FORA do navegador. Tudo o mais acima mora no armazenamento do site — se ele for limpo, vai embora junto.':
+			[
+				'Tip: the backup folder on disk and Export .zip are the only copies that live OUTSIDE the browser. Everything else above lives in the site storage — if it is cleared, it goes away too.',
+				'Consejo: la carpeta de respaldo en disco y Exportar .zip son las únicas copias que viven FUERA del navegador. Todo lo demás de arriba vive en el almacenamiento del sitio — si se borra, también desaparece.',
+				'提示：磁盘备份文件夹和“导出 .zip”是仅有的位于浏览器之外的副本。上面的其他内容都保存在站点存储中——一旦清除，也会一并消失。',
+			],
+	};
+
+	root.SynapsePhraseRegistration.register(COFRE_PHRASES);
+})(typeof globalThis !== 'undefined' ? globalThis : window);
