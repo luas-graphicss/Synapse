@@ -537,4 +537,103 @@
 			__resumo: resumo,
 		};
 	}
+	async function listarProjetos() {
+		if (!pronto()) return [];
+		await indexarDiretorios();
+		const abertos = new Set(projetos().map((p) => String(p.id)));
+		const out = [];
+		estado.dirs.forEach(function (d, pid) {
+			const m = d.manifest || {};
+			out.push({
+				pid: pid,
+				nome: m.name || d.nome,
+				pasta: d.nome,
+				nFiles: m.nFiles != null ? m.nFiles : null,
+				t: m.t || 0,
+				aberto: abertos.has(pid),
+			});
+		});
+		out.sort((a, b) => (b.t || 0) - (a.t || 0));
+		return out;
+	}
+	async function excluirProjeto(pid) {
+		if (!pronto()) return false;
+		if (!estado.dirs.size) await indexarDiretorios();
+		const d = estado.dirs.get(String(pid));
+		if (!d) return false;
+		await estado.handle.removeEntry(d.nome, { recursive: true });
+		estado.dirs.delete(String(pid));
+		estado.sombra.delete(String(pid));
+		const pref = String(pid) + ':';
+		Array.from(estado.cacheHash.keys()).forEach(function (k) {
+			if (k.indexOf(pref) === 0) estado.cacheHash.delete(k);
+		});
+		return true;
+	}
+
+	function snapshot() {
+		return {
+			suportado: suportado(),
+			vinculada: !!estado.handle,
+			nome: estado.nome,
+			permissao: estado.permissao,
+			pronta: pronto(),
+			carregado: estado.carregado,
+			ocupado: estado.ocupado,
+			pendentes: estado.pendentes.size,
+			ultimoEspelho: estado.ultimoEspelho,
+			ultimoErro: estado.ultimoErro,
+			ultimoResumo: estado.ultimoResumo,
+			projetosNaPasta: estado.dirs.size,
+		};
+	}
+
+	function iniciar() {
+		if (!suportado()) {
+			estado.carregado = true;
+			return;
+		}
+		carregarHandle()
+			.then(function () {
+				try {
+					if (root.SynapseCofrePainel) root.SynapseCofrePainel.atualizarIndicador();
+				} catch (e) {
+					ignorar(e, 'cofreDisco:indicador');
+				}
+				if (pronto()) agendar(ATRASO_BOOT_MS);
+			})
+			.catch(function (e) {
+				ignorar(e, 'cofreDisco:iniciar');
+			});
+		try {
+			root.addEventListener('pagehide', function () {
+				if (pronto() && estado.pendentes.size)
+					executar('pagehide', new Set(estado.pendentes)).catch(function (e) {
+						ignorar(e, 'cofreDisco:pagehide');
+					});
+			});
+		} catch (e) {
+			ignorar(e, 'cofreDisco:iniciar');
+		}
+	}
+
+	root.SynapseCofreDisco = Object.freeze({
+		MANIFEST_FILE: MANIFEST_FILE,
+		suportado: suportado,
+		estado: snapshot,
+		pronta: pronto,
+		vincular: vincular,
+		reconectar: reconectar,
+		desvincular: desvincular,
+		espelharAgora: espelharAgora,
+		aoGravar: aoGravar,
+		listarProjetos: listarProjetos,
+		lerProjeto: lerProjeto,
+		excluirProjeto: excluirProjeto,
+		hashTexto: hashTexto,
+		hashBytes: hashBytes,
+		nomeSeguro: nomeSeguro,
+	});
+
+	iniciar();
 })(typeof window !== 'undefined' ? window : globalThis);
