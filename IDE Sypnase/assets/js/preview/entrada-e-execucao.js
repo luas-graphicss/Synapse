@@ -2662,6 +2662,8 @@ async function recRenderBody(body) {
 			return tb - ta;
 		});
 	let html = '';
+	const cofre = window.SynapseCofrePainel || null;
+	if (cofre) html += cofre.saude();
 	html += '<div class="rec-sec"><span class="rec-t">Sessão salva no navegador</span>';
 	if (sess && sess.enc) {
 		html +=
@@ -2685,14 +2687,18 @@ async function recRenderBody(body) {
 		if (sess.projects.some((pd) => !(pd && pd.id && State.projects.some((x) => x.id === pd.id))))
 			html +=
 				'<div class="rec-row"><span class="rec-n">Tudo que não está aberto</span><button class="rec-btn" data-op="sess-all">Reabrir todos</button></div>';
-	} else
-		html +=
-			'<div class="rec-note">Nenhuma sessão salva foi encontrada neste navegador. Se seus ' +
-			'projetos sumiram: 1) confira se você abriu o site pelo MESMO endereço de sempre (abrir ' +
-			'por file:// ou por localhost usa armazenamentos DIFERENTES); 2) o navegador pode ter ' +
-			'limpado os dados do site (modo anônimo, limpeza de espaço, antivírus); 3) se você usa o ' +
+		} else {
+
+
+			html +=
+				'<div class="rec-note">Nenhuma sessão salva foi encontrada neste navegador. Se seus ' +
+			'projetos sumiram: 1) veja as seções abaixo (projetos encontrados fora do índice e pasta ' +
+			'de backup no disco); 2) confira se você abriu o site pelo MESMO endereço de sempre (abrir ' +
+			'por file:// ou por localhost usa armazenamentos DIFERENTES); 3) o navegador pode ter ' +
+			'limpado os dados do site (modo anônimo, limpeza de espaço, antivírus); 4) se você usa o ' +
 			'relay, os projetos com terminal/dev server ficam espelhados na pasta aurora-projects do ' +
 			'computador — dá para reabrir de lá (ferramenta list_disk_projects do agente).</div>';
+	}
 	html += '</div>';
 	html += '<div class="rec-sec"><span class="rec-t">Fechados recentemente</span>';
 	if (!archK.length)
@@ -2741,12 +2747,14 @@ data-k="${esc(k)}">Excluir</button></div>`;
 		}
 		html += '</div>';
 	}
-	html += '<div class="rec-sec"><span class="rec-t">Backups automáticos da sessão</span>';
-	if (!bakK.length)
-		html +=
-			'<div class="rec-note">Cópias da sessão inteira passam a ser guardadas automaticamente: ' +
-			'a cada ~5 minutos de uso e sempre que algo tentar sobrescrever uma sessão que tinha ' +
-			'projetos.</div>';
+	if (cofre) {
+		try {
+			html += await cofre.recuperacao(sess);
+		} catch (e) {
+			ignorarErro(e, 'recRenderBody:cofre');
+		}
+	}
+	if (bakK.length) html += '<div class="rec-sec"><span class="rec-t">Backups antigos da sessão (formato anterior)</span>';
 	bakK.slice(0, 10).forEach((k) => {
 		const t = +k.split('.')[2] || 0;
 		const kind = k.indexOf('session.rescue.') === 0 ? 'Resgate automático' : 'Backup periódico';
@@ -2754,11 +2762,11 @@ data-k="${esc(k)}">Excluir</button></div>`;
 · ${relTime(t || Date.now())}</span><button class="rec-btn" data-op="bak" data-k="${esc(k)}">Restaurar \
 projetos</button></div>`;
 	});
-	html += '</div>';
+	if (bakK.length) html += '</div>';
 	html +=
-		'<div class="rec-note">Dica: para uma cópia fora do navegador use Exportar .zip. Os ' +
-		'backups acima moram no armazenamento do navegador — se ele for limpo, eles também vão ' +
-		'embora.</div>';
+		'<div class="rec-note">Dica: a pasta de backup no disco e o Exportar .zip são as únicas cópias ' +
+		'que vivem FORA do navegador. Tudo o mais acima mora no armazenamento do site — se ele for ' +
+		'limpo, vai embora junto.</div>';
 	body.innerHTML = html;
 }
 async function openRecentPanel() {
@@ -2791,6 +2799,22 @@ async function openRecentPanel() {
 			if (op === 'close') {
 				back.remove();
 				__recBack = null;
+				return;
+			}
+			if (op && op.indexOf('cofre:') === 0 && window.SynapseCofrePainel) {
+				b.disabled = true;
+				let r;
+				try {
+					r = await window.SynapseCofrePainel.acao(op, b, () =>
+						recRenderBody(back.querySelector('#recBody')),
+					);
+				} finally {
+					b.disabled = false;
+				}
+				if (r === 'fechar') {
+					back.remove();
+					__recBack = null;
+				}
 				return;
 			}
 			if (op === 'unlock') {
@@ -2884,6 +2908,7 @@ async function openRecentPanel() {
 }
 
 const LOCK = { key: null, salt: null };
+window.LOCK = LOCK;
 function _b64(buf) {
 	const b = new Uint8Array(buf);
 	const BLOCO = 32768;
@@ -3176,6 +3201,16 @@ async function promptUnlock(rec) {
 			let data = await _decSession(rec, key);
 			LOCK.key = key;
 			LOCK.salt = salt;
+			try {
+				const rr = await reconstruirIndiceSeVazio(data, (r) => _decSession(r, key));
+				if (rr.reconstruido) {
+					data = rr.data;
+					recFlagBtn();
+					toast('Índice reconstruído', `${rr.data.projects.length} projeto(s) recuperado(s) do armazenamento`, 'warn');
+				}
+			} catch (e) {
+				ignorarErro(e, 'promptUnlock:reconstruir');
+			}
 			data = await carregarSessaoIncremental(data, (r) => _decSession(r, key));
 			if (restoreSession(data)) {
 				setLayout(State.layout);
@@ -3494,17 +3529,152 @@ async function registrarProjetosPerdidos(data) {
 	await recPrune(store.LOST_PREFIX, 5);
 	return true;
 }
-async function restoreOnBoot() {
-	let data = null;
-	try {
-		data = await sdbGet('session');
-	} catch (e) {
-		ignorarErro(e, 'restoreOnBoot');
+
+
+
+async function lerIndiceNoBoot() {
+	const strict = typeof sdbGetStrict === 'function' ? sdbGetStrict : null;
+	for (let tentativa = 1; ; tentativa++) {
+		try {
+			const data = strict ? await strict('session') : await sdbGet('session');
+			return { ok: true, data: data || null };
+		} catch (e) {
+			ignorarErro(e, 'restoreOnBoot:leitura');
+			const r = await uiDialog({
+				title: 'Não consegui ler o armazenamento',
+				message:
+					`O navegador não respondeu ao abrir o banco de dados da sessão (${(e && e.message) || e}). ` +
+					'Seus projetos NÃO foram apagados por isso — a leitura é que falhou, e tentar de novo costuma resolver. ' +
+					'Se continuar sem restaurar, esta aba fica em modo de proteção: nada é gravado até você recarregar.',
+				buttons: [
+					{
+						id: 'retry',
+						label: tentativa > 1 ? `Tentar de novo (${tentativa})` : 'Tentar de novo',
+						primary: true,
+					},
+					{ id: 'skip', label: 'Continuar sem restaurar' },
+				],
+			});
+			if (!r || r.act !== 'retry') return { ok: false, data: null, erro: e };
+		}
 	}
+}
+
+
+async function reconstruirIndiceSeVazio(data, decrypt) {
+	const store = window.SynapseSessionStore;
+	const nada = { data: data, reconstruido: false, bloqueados: 0 };
+	if (!store || typeof store.scanProjects !== 'function') return nada;
+	if (data && data.enc) return nada;
+	if (data && Array.isArray(data.projects) && data.projects.length) return nada;
+	let achados = [];
+	try {
+		achados = await store.scanProjects(decrypt || null);
+	} catch (e) {
+		ignorarErro(e, 'reconstruirIndiceSeVazio');
+		return nada;
+	}
+	const abriveis = achados.filter((a) => a && !a.bloqueado && a.nFiles !== 0);
+	const bloqueados = achados.length - abriveis.length;
+	if (!abriveis.length) return { data: data, reconstruido: false, bloqueados: bloqueados };
+	const novo = Object.assign({ v: 1 }, data || {}, {
+		inc: 1,
+		fmt: store.FORMAT,
+		projects: abriveis,
+	});
+	if (!novo.active) novo.active = abriveis[0].id;
+	registro.aviso(
+		`[Synapse/cofre] índice da sessão reconstruído a partir de ${abriveis.length} projeto(s) gravado(s)`,
+	);
+	return { data: novo, reconstruido: true, bloqueados: bloqueados };
+}
+
+
+
+
+function lerMarcadorDoBoot() {
+	try {
+		const M = window.SynapseCofreManifesto;
+		return M ? M.readMarker(localStorage) : null;
+	} catch (e) {
+		ignorarErro(e, 'lerMarcadorDoBoot');
+		return null;
+	}
+}
+function explicarPerda(marcadorBoot) {
+	try {
+		const M = window.SynapseCofreManifesto;
+		if (!M) return false;
+		const marcador = marcadorBoot || M.readMarker(localStorage);
+		if (!marcador || !(marcador.n > 0)) return false;
+		const wipe = M.readWipe(localStorage);
+		const disco = window.SynapseCofreDisco ? window.SynapseCofreDisco.estado() : null;
+		const texto = M.describeLoss(marcador, wipe, { disco: !!(disco && disco.vinculada) });
+
+
+		M.writeLoss(localStorage, { t: Date.now(), marker: marcador, wipe: wipe, texto: texto });
+		recFlagBtn();
+		uiDialog({
+			title: 'Seus projetos não estão mais no navegador',
+			message: texto,
+			buttons: [
+				{ id: 'rec', label: 'Abrir recuperação', primary: true },
+				{ id: 'ok', label: 'Fechar' },
+			],
+		})
+			.then((r) => {
+				if (r && r.act === 'rec') openRecentPanel();
+			})
+			.catch((e) => ignorarErro(e, 'explicarPerda'));
+		return true;
+	} catch (e) {
+		ignorarErro(e, 'explicarPerda');
+		return false;
+	}
+}
+function sugerirProtecaoDepois() {
+	setTimeout(() => {
+		try {
+			window.SynapseCofrePainel?.sugerirProtecao();
+		} catch (e) {
+			ignorarErro(e, 'sugerirProtecao');
+		}
+	}, 4000);
+}
+async function restoreOnBoot() {
+	const FXP = window.AURORA_PERSIST || null;
+	const marcadorBoot = lerMarcadorDoBoot();
+	const leitura = await lerIndiceNoBoot();
+	if (!leitura.ok) {
+
+		if (FXP) {
+			FXP.bootUnverified = true;
+			if (typeof FXP.render === 'function') FXP.render();
+		}
+		resetFirstRunUI();
+		recFlagBtn();
+		toast(
+			'Modo de proteção',
+			'Nada será gravado nesta aba até você recarregar a página. Seus dados continuam no navegador.',
+			'warn',
+		);
+		return;
+	}
+	let data = leitura.data;
 	if (data && data.enc) {
 		updateLockBtn();
 		await promptUnlock(data);
 		return;
+	}
+	let reconstruido = false;
+	let bloqueados = 0;
+	try {
+		const r = await reconstruirIndiceSeVazio(data, null);
+		data = r.data;
+		reconstruido = r.reconstruido;
+		bloqueados = r.bloqueados;
+	} catch (e) {
+		ignorarErro(e, 'restoreOnBoot:reconstruir');
 	}
 	const want = data && Array.isArray(data.projects) ? data.projects.length : 0;
 	const incremental = !!window.SynapseSessionStore?.isIncremental(data);
@@ -3530,6 +3700,16 @@ async function restoreOnBoot() {
 				registro.aviso('[Synapse] restore preview', _e);
 			}
 		}
+		if (reconstruido) {
+			recFlagBtn();
+			toast(
+				'Índice reconstruído',
+				State.projects.length +
+					' projeto(s) recuperado(s) do armazenamento — o índice da sessão tinha sido perdido',
+				'warn',
+			);
+			saveSession();
+		}
 		if (State.projects.length < want) {
 			try {
 				if (incremental) await registrarProjetosPerdidos(data);
@@ -3548,7 +3728,13 @@ async function restoreOnBoot() {
 					' projeto(s) não abriram — clique no relógio (Recentes) para recuperar',
 				'warn',
 			);
-		} else toast('Sessão restaurada', State.projects.length + ' projeto(s) reaberto(s)', 'ok');
+		} else if (!reconstruido) {
+
+
+			if (!State.projects.length) explicarPerda(marcadorBoot);
+			else toast('Sessão restaurada', State.projects.length + ' projeto(s) reaberto(s)', 'ok');
+		}
+		sugerirProtecaoDepois();
 		return;
 	}
 	resetFirstRunUI();
@@ -3577,26 +3763,38 @@ async function restoreOnBoot() {
 	}
 	try {
 		const ks = await sdbKeys();
-		if (
-			ks.some(
-				(k) =>
-					typeof k === 'string' &&
-					(k.indexOf('recent.proj.') === 0 ||
-						k.indexOf('session.gen.') === 0 ||
-						k.indexOf('session.rescue.') === 0 ||
-						k.indexOf('session.lost.') === 0),
-			)
-		) {
+		const recuperaveis = ks.some(
+			(k) =>
+				typeof k === 'string' &&
+				(k.indexOf('recent.proj.') === 0 ||
+					k.indexOf('session.gen.') === 0 ||
+					k.indexOf('session.rescue.') === 0 ||
+					k.indexOf('session.lost.') === 0),
+		);
+
+
+		const explicado = explicarPerda(marcadorBoot);
+		if (recuperaveis) {
 			recFlagBtn();
-			toast(
-				'Sessão vazia',
-				'Há projetos recuperáveis no painel Recentes (ícone de relógio)',
-				'warn',
-			);
+			if (!explicado)
+				toast(
+					'Sessão vazia',
+					'Há projetos recuperáveis no painel Recentes (ícone de relógio)',
+					'warn',
+				);
+		} else if (bloqueados) {
+			recFlagBtn();
+			if (!explicado)
+				toast(
+					'Projetos protegidos encontrados',
+					'Há projetos cifrados fora do índice — abra Recentes (relógio) para desbloquear',
+					'warn',
+				);
 		}
 	} catch (e) {
 		ignorarErro(e, 'restoreOnBoot');
 	}
+	sugerirProtecaoDepois();
 }
 async function clearSession() {
 	const FXP = window.AURORA_PERSIST;
