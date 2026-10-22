@@ -310,4 +310,231 @@
 		}
 		return true;
 	}
+
+	async function espelharProjeto(p, motivo) {
+		const pid = String(p.id);
+		const d = await dirDoProjeto(p);
+		let sh = estado.sombra.get(pid);
+		if (!sh) {
+
+			sh = new Map();
+			const prev = d.manifest || (await lerManifesto(d.handle));
+			if (prev && prev.hashes && typeof prev.hashes === 'object')
+				Object.keys(prev.hashes).forEach(function (k) {
+					sh.set(k, prev.hashes[k]);
+				});
+			d.manifest = prev;
+			estado.sombra.set(pid, sh);
+		}
+		const cache = new Map();
+		const vistos = new Set();
+		const hashes = {};
+		let escritos = 0;
+		let removidos = 0;
+		let erros = 0;
+		let i = 0;
+		for (const [path, f] of p.files) {
+			i++;
+			if (!f || !caminhoValido(path)) continue;
+			vistos.add(path);
+			const h = hashArquivo(pid, path, f);
+			hashes[path] = h;
+			if (sh.get(path) === h) continue;
+			try {
+				await escreverArquivo(d.handle, path, f, cache);
+				sh.set(path, h);
+				escritos++;
+			} catch (e) {
+				erros++;
+				if (e && e.name === 'NotAllowedError') throw e;
+				ignorar(e, 'cofreDisco:escrever ' + path);
+			}
+			if (i % CEDER_A_CADA === 0) await ceder();
+		}
+		const antigos = Array.from(sh.keys());
+		for (let k = 0; k < antigos.length; k++) {
+			const path = antigos[k];
+			if (vistos.has(path)) continue;
+			if (await removerArquivo(d.handle, path)) removidos++;
+			sh.delete(path);
+			if (k % CEDER_A_CADA === 0) await ceder();
+		}
+		const emptyDirs = Array.from(p.emptyDirs || []);
+		for (let k = 0; k < emptyDirs.length; k++) {
+			const dirPath = emptyDirs[k];
+			if (!caminhoValido(dirPath)) continue;
+			try {
+				await dirPai(d.handle, dirPath + '/x', cache, true);
+			} catch (e) {
+				ignorar(e, 'cofreDisco:emptyDir');
+			}
+		}
+		const FX = root.AURORA_PERSIST || null;
+		const manifesto = {
+			versao: 1,
+			id: p.id,
+			name: p.name,
+			kind: p.kind || 'folder',
+			openFile: p.openFile || null,
+			openTabs: Array.isArray(p.openTabs) ? p.openTabs.slice(0, 64) : [],
+			emptyDirs: emptyDirs,
+			nFiles: p.files.size,
+			hashes: hashes,
+			rev: FX ? FX.rev : 0,
+			t: Date.now(),
+			motivo: motivo || '',
+		};
+		if (escritos || removidos || !d.manifest || d.manifest.nFiles !== p.files.size || d.manifest.name !== p.name)
+			await escreverTexto(d.handle, MANIFEST_FILE, JSON.stringify(manifesto));
+		d.manifest = manifesto;
+		return { escritos: escritos, removidos: removidos, erros: erros };
+	}
+
+	async function executar(motivo, alvo) {
+		if (!pronto()) return null;
+		if (estado.ocupado) {
+			estado.reexecutar = true;
+			estado.motivoPendente = motivo;
+			if (alvo) alvo.forEach((pid) => estado.pendentes.add(String(pid)));
+			return null;
+		}
+		estado.ocupado = true;
+		const t0 = Date.now();
+		const resumo = { motivo: motivo, projetos: 0, escritos: 0, removidos: 0, erros: 0, ms: 0 };
+		try {
+			const lista = projetos();
+			const quais = alvo ? new Set(Array.from(alvo).map(String)) : null;
+			for (let i = 0; i < lista.length; i++) {
+				const p = lista[i];
+				if (!p || p.id == null || !p.files) continue;
+				if (quais && !quais.has(String(p.id))) continue;
+				const r = await espelharProjeto(p, motivo);
+				resumo.projetos++;
+				resumo.escritos += r.escritos;
+				resumo.removidos += r.removidos;
+				resumo.erros += r.erros;
+				estado.pendentes.delete(String(p.id));
+				await ceder();
+			}
+			estado.ultimoEspelho = Date.now();
+			estado.ultimoErro = null;
+			estado.escritosTotal += resumo.escritos;
+			resumo.ms = Date.now() - t0;
+			estado.ultimoResumo = resumo;
+			if (resumo.escritos || resumo.removidos)
+				log(
+					'debug',
+					`[Synapse/cofre] espelho em disco (${motivo}): ${resumo.projetos} projeto(s), ${resumo.escritos} gravado(s), ${resumo.removidos} removido(s), ${resumo.ms}ms`,
+				);
+			return resumo;
+		} catch (e) {
+			estado.ultimoErro = (e && (e.message || e.name)) || String(e);
+			if (e && e.name === 'NotAllowedError') {
+				estado.permissao = 'prompt';
+				estado.ultimoErro = 'permissao da pasta expirou: clique em Reconectar no painel Recentes';
+			}
+			log('aviso', '[Synapse/cofre] falha no espelho em disco: ' + estado.ultimoErro);
+			return null;
+		} finally {
+			estado.ocupado = false;
+			try {
+				if (root.AURORA_PERSIST && root.SynapseCofrePainel)
+					root.SynapseCofrePainel.atualizarIndicador();
+			} catch (e) {
+				ignorar(e, 'cofreDisco:indicador');
+			}
+			if (estado.reexecutar) {
+				estado.reexecutar = false;
+				const m = estado.motivoPendente || 'pendente';
+				estado.motivoPendente = null;
+				const alvo2 = estado.pendentes.size ? new Set(estado.pendentes) : null;
+				setTimeout(function () {
+					executar(m, alvo2).catch(function (e) {
+						ignorar(e, 'cofreDisco:reexecutar');
+					});
+				}, 50);
+			}
+		}
+	}
+
+	function espelharAgora(motivo) {
+		clearTimeout(estado.timer);
+		estado.timer = 0;
+		return executar(motivo || 'manual', null);
+	}
+
+	function agendar(ms) {
+		if (estado.timer) return;
+		estado.timer = setTimeout(function () {
+			estado.timer = 0;
+			const alvo = estado.pendentes.size ? new Set(estado.pendentes) : null;
+			executar('agendado', alvo).catch(function (e) {
+				ignorar(e, 'cofreDisco:agendado');
+			});
+		}, ms);
+	}
+
+	function aoGravar(r, motivo, nivel) {
+		if (!pronto()) return;
+		const tocados = (r && Array.isArray(r.touched) && r.touched) || [];
+		tocados.forEach((pid) => estado.pendentes.add(String(pid)));
+		if (!tocados.length && !(r && r.written)) return;
+		const urgente =
+			motivo === 'pagehide' || motivo === 'oculta' || motivo === 'saindo' || (nivel | 0) > 0;
+		if (urgente) {
+			clearTimeout(estado.timer);
+			estado.timer = 0;
+			executar(motivo, new Set(estado.pendentes)).catch(function (e) {
+				ignorar(e, 'cofreDisco:urgente');
+			});
+			return;
+		}
+		agendar(ATRASO_MS);
+	}
+
+	async function lerArquivos(dirHandle, prefixo, out, resumo) {
+		for await (const [name, h] of dirHandle.entries()) {
+			const path = prefixo ? prefixo + '/' + name : name;
+			if (h.kind === 'directory') {
+				await lerArquivos(h, path, out, resumo);
+				continue;
+			}
+			if (name === MANIFEST_FILE && !prefixo) continue;
+			try {
+				const file = await h.getFile();
+				const isText = root.Core && typeof root.Core.isTextFile === 'function' ? root.Core.isTextFile(path) !== false : true;
+				const entry = { path: path, data: null, text: null, isText: isText, history: [] };
+				if (isText) entry.text = await file.text();
+				else entry.data = new Uint8Array(await file.arrayBuffer());
+				out.push([path, entry]);
+				resumo.bytes += file.size || 0;
+			} catch (e) {
+				resumo.erros++;
+				ignorar(e, 'cofreDisco:ler ' + path);
+			}
+			if (out.length % CEDER_A_CADA === 0) await ceder();
+		}
+	}
+	async function lerProjeto(pid) {
+		if (!pronto()) throw new Error('pasta de backup indisponivel');
+		if (!estado.dirs.size) await indexarDiretorios();
+		const d = estado.dirs.get(String(pid));
+		if (!d) throw new Error('projeto nao encontrado na pasta de backup');
+		const files = [];
+		const resumo = { bytes: 0, erros: 0 };
+		await lerArquivos(d.handle, '', files, resumo);
+		const m = d.manifest || {};
+		return {
+			id: m.id != null ? m.id : pid,
+			name: m.name || d.nome,
+			kind: m.kind || 'folder',
+			openFile: m.openFile || null,
+			openTabs: Array.isArray(m.openTabs) ? m.openTabs : [],
+			emptyDirs: Array.isArray(m.emptyDirs) ? m.emptyDirs : [],
+			snapSeq: 0,
+			snapshots: [],
+			files: files,
+			__resumo: resumo,
+		};
+	}
 })(typeof window !== 'undefined' ? window : globalThis);
