@@ -485,6 +485,14 @@ const SCAN_MAX = Math.max(50, Number(process.env.AURORA_SCAN_MAX || 0) || 20000)
 const MAX_PROCS = Math.max(4, Number(process.env.AURORA_MAX_PROCS || 0) || 24);
 const sessions = new Map();
 
+const SITE_ORIGEM = 'https://sypnase-live-preview.vercel.app';
+const ORIGEM_LOCAL = /^https?:\\/\\/(localhost|127\\.0\\.0\\.1|\\[::1\\])(:\\d{1,5})?$/i;
+const ORIGENS_CONFIGURADAS = String(process.env.AURORA_ALLOW_ORIGIN || '')
+	.split(',')
+	.map(normalizarOrigem)
+	.filter(Boolean);
+const SID_FORMATO = /^[A-Za-z0-9_-]{4,80}$/;
+const TOKEN_FORMATO = /^[A-Za-z0-9_-]{16,160}$/;
 const LIMITE_HTTP = limiteConfigurado('AURORA_RATE_HTTP', 1200);
 const LIMITE_AUTH = limiteConfigurado('AURORA_RATE_AUTH', 20);
 const LIMITE_TERMINAL = limiteConfigurado('AURORA_RATE_TERMINAL', 90);
@@ -497,31 +505,47 @@ function limiteConfigurado(nome, padrao) {
 	const n = Number(process.env[nome]);
 	return Number.isFinite(n) && n > 0 ? Math.floor(n) : padrao;
 }
-const ALLOW_ORIGIN = String(process.env.AURORA_ALLOW_ORIGIN || '').trim();
+function normalizarOrigem(valor) {
+	return String(valor || '')
+		.trim()
+		.replace(/\\/+$/, '')
+		.toLowerCase();
+}
+function origemDoPedido(req) {
+	return normalizarOrigem(req && req.headers && req.headers.origin);
+}
 function origemPermitida(req) {
-	if (!ALLOW_ORIGIN) return true;
-	const o = String((req && req.headers && req.headers.origin) || '').replace(/\\/+$/, '');
-	if (!o) return true;
-	const lista = ALLOW_ORIGIN.split(',');
-	for (let i = 0; i < lista.length; i++) {
-		const x = String(lista[i] || '')
-			.trim()
-			.replace(/\\/+$/, '');
-		if (x && (x === '*' || x === o)) return true;
-	}
-	return false;
+	const origem = origemDoPedido(req);
+	if (!origem) return true;
+	if (ORIGENS_CONFIGURADAS.includes('*') || ORIGENS_CONFIGURADAS.includes(origem)) return true;
+	if (ORIGENS_CONFIGURADAS.length) return false;
+	return origem === SITE_ORIGEM || ORIGEM_LOCAL.test(origem);
+}
+function prepararCors(req, res) {
+	const origem = origemDoPedido(req);
+	res.origemCors = !origem ? '*' : origemPermitida(req) ? origem : '';
 }
 function cors(res) {
-	res.setHeader('Access-Control-Allow-Origin', '*');
+	if (res.origemCors) res.setHeader('Access-Control-Allow-Origin', res.origemCors);
+	if (res.origemCors !== '*') res.setHeader('Vary', 'Origin');
 	res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+	res.setHeader('X-Content-Type-Options', 'nosniff');
 	res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
 	res.setHeader(
 		'Access-Control-Allow-Headers',
 		'Content-Type, Authorization, Accept, Notion-Version, Mcp-Session-Id, MCP-Protocol-Version, Last-Event-ID, ngrok-skip-browser-warning, X-Requested-With, Cache-Control, Pragma',
 	);
-	res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id');
+	res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id, Retry-After');
 	res.setHeader('Access-Control-Allow-Private-Network', 'true');
 	res.setHeader('Access-Control-Max-Age', '86400');
+}
+function jsonSeguro(obj) {
+	const texto = JSON.stringify(obj);
+	if (texto === undefined) return 'null';
+	return texto.replace(
+		/[<>&\\u2028\\u2029]/g,
+		(c) => '\\\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'),
+	);
 }
 function enderecoDe(req) {
 	return String((req && req.socket && req.socket.remoteAddress) || 'desconhecido');
@@ -569,6 +593,78 @@ const limitadorTerminal = criarLimitador(LIMITE_TERMINAL, 60000);
 const limitadorRede = criarLimitador(LIMITE_REDE, 60000);
 const limitadorWs = criarLimitador(LIMITE_WS_MENSAGENS, 10000);
 const conexoesWs = new Map();
+
+function resumo(valor) {
+	return crypto.createHash('sha256').update(String(valor)).digest();
+}
+function mesmoToken(a, b) {
+	return crypto.timingSafeEqual(resumo(a), resumo(b));
+}
+function sessaoOciosa(s, agora) {
+	if (workersVivos(s).length || s.pending.size || s.polls.length) return false;
+	for (const p of s.procs.values()) if (!p.done && !p.exited) return false;
+	return agora - Math.max(s.lastSeen || 0, s.criadaEm || 0) > 60000;
+}
+function liberarSessaoOciosa() {
+	const agora = Date.now();
+	let alvo = null;
+	for (const [sid, s] of sessions) {
+		if (!sessaoOciosa(s, agora)) continue;
+		if (!alvo || (s.lastSeen || 0) < (alvo.s.lastSeen || 0)) alvo = { sid, s };
+	}
+	if (alvo) sessions.delete(alvo.sid);
+	return !!alvo;
+}
+function varrerSessoes() {
+	const agora = Date.now();
+	for (const [sid, s] of sessions)
+		if (sessaoOciosa(s, agora) && agora - (s.lastSeen || s.criadaEm || 0) > SESSAO_OCIOSA_MS)
+			sessions.delete(sid);
+}
+function autenticar(req, sid, token, opcoes) {
+	const exigirSessao = !!(opcoes && opcoes.exigirSessao);
+	const endereco = enderecoDe(req);
+	const bloqueio = limitadorAuth.bloqueado(endereco);
+	if (bloqueio)
+		return {
+			erro: 429,
+			mensagem: 'muitas tentativas de autenticacao; aguarde antes de repetir',
+			retryEm: bloqueio.retryEm,
+		};
+	if (!SID_FORMATO.test(String(sid || ''))) return { erro: 400, mensagem: 'sessao invalida' };
+	if (!TOKEN_FORMATO.test(String(token || '')))
+		return {
+			erro: 400,
+			mensagem: 'token fraco ou invalido: use de 16 a 160 caracteres [A-Za-z0-9_-]',
+		};
+	const existente = sessions.get(sid);
+	if (!existente && exigirSessao) {
+		limitadorAuth.consumir(endereco);
+		return { erro: 403, mensagem: 'sessao desconhecida' };
+	}
+	if (!existente && sessions.size >= MAX_SESSOES && !liberarSessaoOciosa())
+		return { erro: 503, mensagem: 'limite de sessoes do relay atingido; tente mais tarde' };
+	const sessao = existente || getSession(sid);
+	if (sessao.token && !mesmoToken(sessao.token, token)) {
+		limitadorAuth.consumir(endereco);
+		return { erro: 403, mensagem: 'token invalido' };
+	}
+	sessao.token = token;
+	return { sessao };
+}
+function recusar(res, auth) {
+	if (auth.erro === 429) sendRetry(res, 429, auth.mensagem, auth.retryEm);
+	else sendJson(res, auth.erro, { error: auth.mensagem });
+}
+function recusarUpgrade(sock, codigo, texto) {
+	try {
+		sock.end(
+			\`HTTP/1.1 \${codigo} \${texto}\${CRLF}Connection: close\${CRLF}Content-Length: 0\${CRLF}\${CRLF}\`,
+		);
+	} catch (e) {
+		ignorarErro(e, 'recusarUpgrade');
+	}
+}
 
 function sendJson(res, code, obj) {
 	try {
