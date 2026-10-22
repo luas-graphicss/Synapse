@@ -660,6 +660,8 @@ function varrerSessoes() {
 		if (sessaoOciosa(s, agora) && agora - (s.lastSeen || s.criadaEm || 0) > SESSAO_OCIOSA_MS)
 			sessions.delete(sid);
 }
+const varreduraSessoes = setInterval(varrerSessoes, 600000);
+varreduraSessoes.unref();
 function autenticar(req, sid, token, opcoes) {
 	const exigirSessao = !!(opcoes && opcoes.exigirSessao);
 	const endereco = enderecoDe(req);
@@ -2429,11 +2431,23 @@ function proxyNotion(req, res, u, parts) {
 }
 
 const server = http.createServer(function (req, res) {
+	prepararCors(req, res);
 	let u;
 	try {
 		u = new URL(req.url, 'http://x');
 	} catch (e) {
 		sendJson(res, 400, { error: 'url invalida' });
+		return;
+	}
+	if (!origemPermitida(req)) {
+		sendJson(res, 403, {
+			error: \`origem nao autorizada: \${origemDoPedido(req)} - acrescente em AURORA_ALLOW_ORIGIN\`,
+		});
+		return;
+	}
+	const taxa = limitadorHttp.consumir(enderecoDe(req));
+	if (!taxa.ok) {
+		sendRetry(res, 429, 'limite de requisicoes por minuto atingido', taxa.retryEm);
 		return;
 	}
 	const parts = u.pathname.split('/').filter(Boolean);
@@ -2503,12 +2517,12 @@ const server = http.createServer(function (req, res) {
 		parts[3] === 'events' &&
 		req.method === 'GET'
 	) {
-		const s1 = getSession(parts[1]);
-		if (s1.token && s1.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const auth1 = autenticar(req, parts[1], parts[2]);
+		if (auth1.erro) {
+			recusar(res, auth1);
 			return;
 		}
-		s1.token = parts[2];
+		const s1 = auth1.sessao;
 		avisarTransporteLocal(\`bridge/\${parts[1]}/.../events\`);
 		cors(res);
 		res.writeHead(200, {
@@ -2541,12 +2555,12 @@ const server = http.createServer(function (req, res) {
 	}
 
 	if (parts[0] === 'bridge' && parts.length === 4 && parts[3] === 'poll' && req.method === 'POST') {
-		const s5 = getSession(parts[1]);
-		if (s5.token && s5.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const auth5 = autenticar(req, parts[1], parts[2]);
+		if (auth5.erro) {
+			recusar(res, auth5);
 			return;
 		}
-		s5.token = parts[2];
+		const s5 = auth5.sessao;
 		readBody(req)
 			.then(function (raw) {
 				let wait = 20000;
@@ -2604,11 +2618,12 @@ const server = http.createServer(function (req, res) {
 		parts[3] === 'reply' &&
 		req.method === 'POST'
 	) {
-		const s2 = sessions.get(parts[1]);
-		if (!s2 || s2.token !== parts[2]) {
-			sendJson(res, 403, { error: 'sessao/token invalido' });
+		const auth2 = autenticar(req, parts[1], parts[2], { exigirSessao: true });
+		if (auth2.erro) {
+			recusar(res, auth2);
 			return;
 		}
+		const s2 = auth2.sessao;
 		readBody(req)
 			.then(function (raw) {
 				let msg;
@@ -2634,12 +2649,12 @@ const server = http.createServer(function (req, res) {
 	}
 
 	if (parts[0] === 'bridge' && parts.length === 4 && parts[3] === 'meta' && req.method === 'POST') {
-		const sMe = getSession(parts[1]);
-		if (sMe.token && sMe.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const authMe = autenticar(req, parts[1], parts[2]);
+		if (authMe.erro) {
+			recusar(res, authMe);
 			return;
 		}
-		sMe.token = parts[2];
+		const sMe = authMe.sessao;
 		avisarTransporteLocal(\`bridge/\${parts[1]}/.../meta\`);
 		readBody(req)
 			.then(function (raw) {
@@ -2678,22 +2693,36 @@ const server = http.createServer(function (req, res) {
 		req.method === 'POST'
 	) {
 		const act = parts[3];
-		if (!origemPermitida(req)) {
-			sendJson(res, 403, {
-				error: 'origem nao autorizada para terminal/disco - ajuste AURORA_ALLOW_ORIGIN',
-			});
+		const authT = autenticar(req, parts[1], parts[2], { exigirSessao: true });
+		if (authT.erro) {
+			recusar(res, authT);
 			return;
 		}
-		if (!sessions.has(parts[1])) {
-			sendJson(res, 403, { error: 'sessao desconhecida para terminal/disco' });
-			return;
+		const sT = authT.sessao;
+		if (act === 'run') {
+			const cota = limitadorTerminal.consumir(parts[1]);
+			if (!cota.ok) {
+				sendRetry(
+					res,
+					429,
+					\`limite de \${LIMITE_TERMINAL} comandos por minuto nesta sessao. NADA foi executado: repita em \${cota.retryEm}s.\`,
+					cota.retryEm,
+				);
+				return;
+			}
 		}
-		const sT = getSession(parts[1]);
-		if (sT.token && sT.token !== parts[2]) {
-			sendJson(res, 403, { error: 'token invalido' });
-			return;
+		if (act === 'fetchurl' || act === 'fetchjson') {
+			const cota = limitadorRede.consumir(parts[1]);
+			if (!cota.ok) {
+				sendRetry(
+					res,
+					429,
+					\`limite de \${LIMITE_REDE} chamadas de rede por minuto nesta sessao. Repita em \${cota.retryEm}s.\`,
+					cota.retryEm,
+				);
+				return;
+			}
 		}
-		sT.token = parts[2];
 		readBody(req)
 			.then(function (raw) {
 				let b;
@@ -2714,14 +2743,12 @@ const server = http.createServer(function (req, res) {
 	}
 
 	if (parts[0] === 'mcp' && parts.length === 3) {
-		const sid3 = parts[1],
-			tok3 = parts[2];
-		const sM = getSession(sid3);
-		if (sM.token && sM.token !== tok3) {
-			sendJson(res, 403, { error: 'token invalido' });
+		const authM = autenticar(req, parts[1], parts[2]);
+		if (authM.erro) {
+			recusar(res, authM);
 			return;
 		}
-		sM.token = tok3;
+		const sM = authM.sessao;
 		limparClients(sM);
 
 		const cidHdr = String(req.headers['mcp-session-id'] || u.searchParams.get('cid') || '').slice(
