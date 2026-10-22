@@ -2937,33 +2937,77 @@ server.on('error', function (e) {
 	}
 	console.error('[relay] erro no servidor: ' + ((e && e.message) || e));
 });
+function iniciar() {
+	server.listen(PORT, function () {
+		console.log(`Synapse MCP Relay ${VERSION} ouvindo na porta ${PORT}`);
+		console.log('Pasta dos projetos (terminal): ' + WORK);
+		console.log(
+			'Catalogo em cache: ' +
+				(nTools()
+					? nTools() + ' ferramentas (o Notion valida a conexao mesmo com a aba fechada)'
+					: 'vazio - abra o site e ative o MCP uma vez'),
+		);
+		console.log('Diagnostico: http://localhost:' + PORT + '/stats');
+		console.log('');
+		console.log('v8.7 - este processo agora e um COMPLEMENTO, nao o servidor MCP.');
+		console.log(
+			'  O site fala direto com http://localhost:' + PORT + ' (terminal, disco e dev server)',
+		);
+		console.log(
+			'  enquanto o MCP do Notion continua pela nuvem, com a mesma capacidade do modo nuvem.',
+		);
+		console.log(
+			'  NAO precisa de tunel. No site: menu MCP > modo local > Testar > permitir terminal.',
+		);
+		console.log('  Tunel so e preciso se o site estiver aberto em OUTRO aparelho:');
+		console.log(
+			'    cloudflared tunnel --url http://localhost:' + PORT + '   ou   ngrok http ' + PORT,
+		);
+		console.log(
+			`  Origens aceitas: ${SITE_ORIGEM}, localhost e as de AURORA_ALLOW_ORIGIN (ex.: https://seusite,http://localhost:5500)`,
+		);
+		console.log(
+			'  Downloads/API pelo relay so para hosts confiaveis; libere outros com AURORA_FETCH_HOSTS=dominio.com,*.cdn.com',
+		);
+	});
+}
 
-server.listen(PORT, function () {
-	console.log(`Synapse MCP Relay ${VERSION} ouvindo na porta ${PORT}`);
-	console.log('Pasta dos projetos (terminal): ' + WORK);
-	console.log(
-		'Catalogo em cache: ' +
-			(nTools()
-				? nTools() + ' ferramentas (o Notion valida a conexao mesmo com a aba fechada)'
-				: 'vazio - abra o site e ative o MCP uma vez'),
-	);
-	console.log('Diagnostico: http://localhost:' + PORT + '/stats');
-	console.log('');
-	console.log('v8.7 - este processo agora e um COMPLEMENTO, nao o servidor MCP.');
-	console.log(
-		'  O site fala direto com http://localhost:' + PORT + ' (terminal, disco e dev server)',
-	);
-	console.log(
-		'  enquanto o MCP do Notion continua pela nuvem, com a mesma capacidade do modo nuvem.',
-	);
-	console.log(
-		'  NAO precisa de tunel. No site: menu MCP > modo local > Testar > permitir terminal.',
-	);
-	console.log('  Tunel so e preciso se o site estiver aberto em OUTRO aparelho:');
-	console.log(
-		'    cloudflared tunnel --url http://localhost:' + PORT + '   ou   ngrok http ' + PORT,
-	);
-	console.log(
-		'  Para restringir quem usa o terminal: AURORA_ALLOW_ORIGIN=https://seusite,http://localhost:5500',
-	);
-});
+if (require.main === module) iniciar();
+
+module.exports = {
+	server,
+	iniciar,
+	sessions,
+	VERSION,
+	limites: {
+		http: LIMITE_HTTP,
+		auth: LIMITE_AUTH,
+		terminal: LIMITE_TERMINAL,
+		rede: LIMITE_REDE,
+		wsMensagens: LIMITE_WS_MENSAGENS,
+		wsConexoes: LIMITE_WS_CONEXOES,
+		sessoes: MAX_SESSOES,
+	},
+	origemPermitida,
+	mesmoToken,
+	criarLimitador,
+	limitadores: {
+		http: limitadorHttp,
+		auth: limitadorAuth,
+		terminal: limitadorTerminal,
+		rede: limitadorRede,
+		ws: limitadorWs,
+		zerar() {
+			limitadorHttp.zerar();
+			limitadorAuth.zerar();
+			limitadorTerminal.zerar();
+			limitadorRede.zerar();
+			limitadorWs.zerar();
+			conexoesWs.clear();
+		},
+	},
+	jsonSeguro,
+	wafSanearTexto,
+	wafSanearJson,
+	politicaDeRede: { avaliarUrl, hostConfiavel, ipPrivado, buscarConfiavel },
+};
