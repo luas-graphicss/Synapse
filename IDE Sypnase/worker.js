@@ -12,6 +12,8 @@ import {
 	listarFerramentas,
 	textoDoResultado,
 } from './terminal.js';
+import { criarPoliticaDeRede } from './politica-de-rede.mjs';
+import { codificarObjetoWaf, jsonSeguro } from './codificacao.mjs';
 
 const SYNAPSE_DEPURAR =
 	typeof process !== 'undefined' && !!process.env && process.env.SYNAPSE_DEPURAR === '1';
@@ -24,32 +26,32 @@ function ignorarErro(erro, contexto) {
 
 ('use strict');
 
-const VERSAO = 'cf-10.3.0-terminal-port';
+const VERSAO = 'cf-10.4.0-rede-confiavel';
+const SITE_ORIGEM = 'https://sypnase-live-preview.vercel.app';
+const ORIGEM_LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?$/i;
+const LIMITE_BRIDGE_MIN = 1200;
+const LIMITE_REDE_MIN = 40;
 
-const WAF_MENOR = String.fromCharCode(8249);
-function wafSanearTexto(s) {
-	if (typeof s !== 'string' || !s) return s;
-	let t = s;
-	if (t.includes('<')) {
-		t = t
-			.replace(
-				/<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:._-]{0,40})\s*\/?\s*>/g,
-				(m, b, n) => `[${b || ''}${n}]`,
-			)
-			.replace(/<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:._-]{0,40})/g, (m, b, n) => `[${b || ''}${n}`)
-			.replace(/</g, WAF_MENOR);
-	}
-	if (t.includes(':')) t = t.replace(/javascript\s*:/gi, 'javascript :');
-	if (t.includes('=')) t = t.replace(/\bon([a-z]{3,15})\s*=/gi, 'on$1 =');
-	t = t.replace(/\x24\{/g, '\x24 {');
-	return t;
+function normalizarOrigem(valor) {
+	return String(valor || '')
+		.trim()
+		.replace(/\/+$/, '')
+		.toLowerCase();
+}
+function origemPermitida(req, env) {
+	const origem = normalizarOrigem(req.headers.get('origin'));
+	if (!origem) return true;
+	const configuradas = String((env && env.ORIGENS_PERMITIDAS) || '')
+		.split(',')
+		.map(normalizarOrigem)
+		.filter(Boolean);
+	if (configuradas.includes('*') || configuradas.includes(origem)) return true;
+	if (configuradas.length) return false;
+	return origem === SITE_ORIGEM || ORIGEM_LOCAL.test(origem);
 }
 function wafSanearJson(obj) {
 	try {
-		if (obj == null || typeof obj !== 'object') return obj;
-		const s = JSON.stringify(obj);
-		if (!s.includes('<') && !s.includes('javascript')) return obj;
-		return JSON.parse(wafSanearTexto(s));
+		return codificarObjetoWaf(obj);
 	} catch (e) {
 		return obj;
 	}
@@ -74,10 +76,14 @@ const CORS = {
 };
 
 function jres(obj, status, extra) {
-	return new Response(JSON.stringify(obj), {
+	return new Response(jsonSeguro(obj), {
 		status: status || 200,
 		headers: Object.assign(
-			{ 'Content-Type': 'application/json; charset=utf-8', 'X-Synapse-Relay': VERSAO },
+			{
+				'Content-Type': 'application/json; charset=utf-8',
+				'X-Content-Type-Options': 'nosniff',
+				'X-Synapse-Relay': VERSAO,
+			},
 			CORS,
 			extra || {},
 		),
@@ -806,6 +812,18 @@ export class RelaySessao {
 			return this.rotaMcp(req, url);
 		}
 		const acao = p[3] || '';
+		if (!origemPermitida(req, this.env))
+			return jres(
+				{ error: 'origem nao autorizada para esta sessao - ajuste ORIGENS_PERMITIDAS no worker' },
+				403,
+			);
+		const cota = this.cotaBridge(acao === 'fetchurl' || acao === 'fetchjson' ? 'rede' : 'bridge');
+		if (!cota.ok)
+			return jres(
+				{ error: `limite de ${cota.limite} chamadas por minuto nesta sessao`, retryable: true },
+				429,
+				{ 'Retry-After': String(cota.retryEm) },
+			);
 		if (acao === 'ws') return this.rotaWs(req);
 		if (acao === 'events') {
 			this.contar('bridge');
@@ -843,6 +861,29 @@ export class RelaySessao {
 		return jres({ ok: true, tools: n, reservas: this.reservasCfg().length });
 	}
 
+	cotaBridge(tipo) {
+		const agora = Date.now();
+		if (!this.cotas) this.cotas = {};
+		let balde = this.cotas[tipo];
+		if (!balde || agora - balde.inicio >= 60000) {
+			balde = { inicio: agora, usados: 0 };
+			this.cotas[tipo] = balde;
+		}
+		balde.usados++;
+		const limite = tipo === 'rede' ? LIMITE_REDE_MIN : LIMITE_BRIDGE_MIN;
+		return {
+			ok: balde.usados <= limite,
+			limite,
+			retryEm: Math.max(1, Math.ceil((balde.inicio + 60000 - agora) / 1000)),
+		};
+	}
+
+	politicaDeRede() {
+		if (!this.politica)
+			this.politica = criarPoliticaDeRede({ hostsExtras: this.env && this.env.FETCH_HOSTS });
+		return this.politica;
+	}
+
 	async rotaFetch(req, acao) {
 		if (req.method !== 'POST') return tres('use POST', 405);
 		let b = null;
@@ -853,8 +894,10 @@ export class RelaySessao {
 		}
 		b = b || {};
 		const u = String(b.url || '');
-		if (!(u.slice(0, 7).toLowerCase() === 'http://' || u.slice(0, 8).toLowerCase() === 'https://'))
-			return jres({ error: 'url invalida: use http(s)' }, 400);
+		const politica = this.politicaDeRede();
+		const avaliacao = politica.avaliarUrl(u);
+		if (!avaliacao.ok)
+			return jres({ error: avaliacao.motivo }, avaliacao.motivo.startsWith('host') ? 403 : 400);
 		const permitidos = [
 			'authorization',
 			'x-auth-token',
@@ -887,13 +930,12 @@ export class RelaySessao {
 					hd['Content-Type'] = 'application/json';
 				const op = {
 					method: met,
-					redirect: 'follow',
 					headers: hd,
 					signal: AbortSignal.timeout(30000),
 				};
 				if (b.body != null && met !== 'GET' && met !== 'HEAD')
 					op.body = typeof b.body === 'string' ? b.body : JSON.stringify(b.body);
-				const r = await fetch(u, op);
+				const r = await politica.buscarConfiavel(u, op);
 				const tx = await r.text();
 				return jres({
 					status: r.status,
@@ -904,8 +946,7 @@ export class RelaySessao {
 				});
 			}
 			const cap = 25 * 1024 * 1024;
-			const r2 = await fetch(u, {
-				redirect: 'follow',
+			const r2 = await politica.buscarConfiavel(u, {
 				headers: hd,
 				signal: AbortSignal.timeout(30000),
 			});

@@ -39,6 +39,8 @@ tag = "v3"
 PLANO = "free"
 LIMITE_DIA = "300000"
 LIMITE_MIN = "6000"
+ORIGENS_PERMITIDAS = ""
+FETCH_HOSTS = ""
 
 
 
