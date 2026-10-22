@@ -13,7 +13,8 @@
 	}
 
 	function revoke(project, url) {
-		root.URL.revokeObjectURL(url);
+		if (typeof url === 'string' && url.startsWith('blob:')) root.URL.revokeObjectURL(url);
+		else if (root.SynapsePreviewIsolado?.ehVirtual(url)) root.SynapsePreviewIsolado.descartar(project, url);
 		project.blobs.delete(url);
 	}
 

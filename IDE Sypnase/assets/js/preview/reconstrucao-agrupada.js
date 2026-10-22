@@ -43,6 +43,19 @@ function scheduleBuild(proj) {
 		}
 		return;
 	}
+
+
+	const isolado = window.SynapsePreviewIsolado;
+	if (isolado && isolado.ativoPara(proj) && !isolado.buildEmSegundoPlanoNecessario(proj)) {
+		proj.previewDirty = true;
+		const _sh = scheduleHandles.get(proj.id);
+		if (_sh) {
+			if (_sh.raf) cancelAnimationFrame(_sh.raf);
+			if (_sh.t) clearTimeout(_sh.t);
+			scheduleHandles.delete(proj.id);
+		}
+		return;
+	}
 	const sh = scheduleHandles.get(proj.id);
 	if (sh) {
 		if (sh.raf) cancelAnimationFrame(sh.raf);
@@ -61,8 +74,24 @@ function scheduleBuild(proj) {
 	const nf = (proj.files && proj.files.size) || 0;
 	let espera = nf > 600 ? 700 : nf > 250 ? 450 : total > 400000 ? 280 : 0;
 	if (document.hidden) espera = Math.max(espera, 1200);
-	const go = () => {
+
+	const janela = isolado ? isolado.PICO.janelaDeEscritasMs : 250;
+	espera = Math.max(espera, janela - (Date.now() - (proj.__ultimoBuildEm || 0)));
+	const go = async () => {
 		scheduleHandles.delete(proj.id);
+
+
+
+		if (window.SynapseAgendador && (!isolado || isolado.PICO.esperarDigitacao)) {
+			if (proj.__aguardandoDigitacao) return;
+			proj.__aguardandoDigitacao = true;
+			try {
+				await window.SynapseAgendador.aguardarFimDaDigitacao();
+			} finally {
+				proj.__aguardandoDigitacao = false;
+			}
+			if (scheduleHandles.has(proj.id)) return;
+		}
 		buildPreview(proj);
 	};
 	if (espera > 0) scheduleHandles.set(proj.id, { t: setTimeout(go, espera) });
@@ -169,6 +198,11 @@ function preludiosDoPreview(contexto) {
 		preludios.push({ nome: 'viewport', codigo: `window.__lpVP=${JSON.stringify(medidas)};` });
 	}
 
+
+
+	if (window.SynapseCofreGuarda && window.SynapseCofreGuarda.PRELUDIO)
+		preludios.push({ nome: 'guarda-armazenamento', codigo: window.SynapseCofreGuarda.PRELUDIO });
+
 	preludios.push({ nome: 'rotas-spa', codigo: AURORA_SPA_SHIM });
 	preludios.push({ nome: 'preludio-aurora', codigo: AURORA_PRELUDE });
 	preludios.push({ nome: 'visao', codigo: VISION_HOOK });
@@ -244,6 +278,12 @@ async function autoCompilarPreview(proj, token, alvo) {
 		el.previewEmpty.classList.add('hidden');
 		el.device.classList.remove('hidden');
 		setStatus('run', 'Auto-compilando...');
+	}
+
+	try {
+		window.SynapsePreviewIsolado?.cederParaLegado(proj);
+	} catch (e) {
+		ignorarErro(e, 'autoCompilarPreview');
 	}
 	try {
 		el.frame.setAttribute(
@@ -334,11 +374,29 @@ async function buildPreview(proj, buildOptions = {}) {
 		renderPreviewEmpty(true);
 		return;
 	}
+	const isolado = window.SynapsePreviewIsolado;
+	let admitido = false;
+	if (isolado) {
+
+
+		await isolado.pronto;
+		await isolado.admitirBuild(proj);
+		admitido = true;
+	}
+	try {
+		return await buildPreviewAdmitido(proj, buildOptions);
+	} finally {
+		if (admitido) isolado.concluirBuild();
+	}
+}
+async function buildPreviewAdmitido(proj, buildOptions) {
 	window.SynapsePreviewRuntime.cancel(proj);
 	proj.previewEverOpened = true;
 	proj.previewDirty = false;
+	proj.__ultimoBuildEm = Date.now();
 	const token = (proj.buildToken = (proj.buildToken || 0) + 1);
 	window.SynapsePreviewBlobUsage.startBuild(proj);
+	if (window.SynapsePreviewIsolado?.ativoPara(proj)) proj.__publicacaoPendente = [];
 	const publishBrowserBuild = (html) => {
 		if (buildOptions.shouldMount && !buildOptions.shouldMount())
 			throw new Error('The project changed or Run was canceled before preview launch.');
@@ -370,6 +428,9 @@ async function buildPreview(proj, buildOptions = {}) {
 				ignorarErro(e, 'buildPreview');
 			}
 			proj.lastHtml = null;
+
+			proj.__previewLegado = false;
+			proj.__publicacaoPendente = [];
 		}
 		limparBlobsSoltos(proj);
 		if (proj.detect && proj.detect.framework === 'flutter' && !proj.entry) {
@@ -403,7 +464,8 @@ async function buildPreview(proj, buildOptions = {}) {
 					mime: mime,
 					txt: f.text != null ? f.text : null,
 					bin: f.text != null ? null : f.data,
-					url: mkBlob(proj, fileBytes(f), mime),
+
+					url: mkBlob(proj, fileBytes(f), mime, { caminho: p, transferivel: f.data == null }),
 				};
 				cacheRaw.set(p, ent);
 				__novos++;
@@ -464,7 +526,7 @@ async function buildPreview(proj, buildOptions = {}) {
 					ignorarErro(e, 'processCss');
 				}
 			}
-			const url = mkBlob(proj, text, 'text/css');
+			const url = mkBlob(proj, text, 'text/css', { nome: path });
 			cch.set(path, { txt: text, url: url });
 			cssCache[path] = url;
 			return url;
@@ -755,7 +817,31 @@ function setFrame(proj, html, token) {
 	if (token !== undefined && token !== proj.buildToken) return;
 	proj.lastHtml = html;
 	window.SynapsePreviewBlobUsage.publishBuild(proj);
-	if (proj.id === State.active) {
+	const isolado = window.SynapsePreviewIsolado;
+	if (isolado && isolado.ativoPara(proj)) {
+
+
+		if (proj.id === State.active && State.layout !== 'editor') {
+			proj.previewEverOpened = true;
+			if (!(proj.blocked && el.previewError && !el.previewError.classList.contains('hidden'))) {
+				hidePreviewError();
+				el.previewEmpty.classList.add('hidden');
+				el.device.classList.remove('hidden');
+			}
+		}
+		const tokenPublicado = proj.buildToken;
+		isolado
+			.publicarHtml(proj, html, tokenPublicado)
+			.then(() => {
+				if (tokenPublicado === proj.buildToken && proj.id === State.active) hidePreviewLoading();
+			})
+			.catch((e) => {
+				logErr(proj, 'Preview isolado indisponivel (' + ((e && e.message) || e) + '); usando o modo reduzido.');
+				proj.__previewLegado = true;
+				proj.previewDirty = true;
+				if (proj.id === State.active) scheduleBuild(proj);
+			});
+	} else if (proj.id === State.active) {
 		if (State.layout === 'editor') {
 			proj.previewDirty = false;
 			return;
@@ -783,11 +869,6 @@ function setFrame(proj, html, token) {
 		} catch (e) {
 			ignorarErro(e, 'setFrame');
 		}
-	}
-	try {
-		headlessRefresh(proj, html);
-	} catch (e) {
-		ignorarErro(e, 'setFrame');
 	}
 }
 function renderPreviewEmpty(empty) {
@@ -1693,7 +1774,14 @@ const VISION_HOOK = String.raw`(function () {
 	}
 	function netSkip(u) {
 		u = String(u || '');
-		return u.indexOf('blob:') === 0 || u.indexOf('data:') === 0;
+		if (u.indexOf('blob:') === 0 || u.indexOf('data:') === 0) return true;
+		// Preview isolado: os arquivos do projeto sao servidos pelo SW local em /p/<pid>/...
+		try {
+			var abs = new URL(u, location.href);
+			return abs.origin === location.origin && abs.pathname.indexOf('/p/') === 0;
+		} catch (e) {
+			return false;
+		}
 	}
 	function netWrapFetch() {
 		var f = window.fetch;

@@ -2110,6 +2110,16 @@ quando for ativado (set_active_project ou clique do usuário). Nada a recompilar
 					}
 					await new Promise((r2) => setTimeout(r2, 900));
 					relTxt = ' · preview recarregado';
+				} else if (window.SynapsePreviewIsolado && window.SynapsePreviewIsolado.ativoPara(proj)) {
+
+
+					proj.__previewSolicitado = true;
+					try {
+						await buildPreview(proj);
+					} finally {
+						proj.__previewSolicitado = false;
+					}
+					relTxt = ' · preview recarregado';
 				} else {
 					const hl = HEADLESS.map.get(proj.id);
 					if (hl && hl.ifr) {

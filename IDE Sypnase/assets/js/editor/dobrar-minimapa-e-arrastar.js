@@ -29,8 +29,14 @@ function limparBlobsSoltos(proj) {
 		}
 	}
 }
-function mkBlob(proj, content, mime) {
-	const url = URL.createObjectURL(new Blob([content], { type: mime }));
+function mkBlob(proj, content, mime, dica) {
+
+
+	const isolado = window.SynapsePreviewIsolado;
+	const url =
+		isolado && isolado.ativoPara(proj)
+			? isolado.registrarRecurso(proj, content, mime, dica)
+			: URL.createObjectURL(new Blob([content], { type: mime }));
 	proj.blobs.add(url);
 	window.SynapsePreviewBlobUsage.trackBuildUrl(proj, url);
 	return url;
