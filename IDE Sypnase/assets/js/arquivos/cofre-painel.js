@@ -273,4 +273,223 @@
 		}
 		return partes.join('');
 	}
+
+	async function render(sess) {
+		return saude() + (await recuperacao(sess));
+	}
+
+	async function acao(op, btn, rerender) {
+		const k = btn && btn.getAttribute ? btn.getAttribute('data-k') : null;
+		const fx = FX();
+		const d = disco();
+		const S = store();
+		const uiConfirm = root.uiConfirm;
+		const recOpen = root.recOpen;
+
+		if (op === 'cofre:perda-ok') {
+			const M = root.SynapseCofreManifesto;
+			if (M && root.localStorage) {
+				M.clearLoss(root.localStorage);
+				M.clearWipe(root.localStorage);
+			}
+			if (fx) fx.wipeAttempt = null;
+			if (fx && typeof fx.render === 'function') fx.render();
+			atualizarIndicador();
+			return rerender();
+		}
+		if (op === 'cofre:persistir') {
+			const r = fx && fx.pedirPersistencia ? await fx.pedirPersistencia() : null;
+			toast(
+				r ? 'Armazenamento persistente' : 'Pedido recusado',
+				r
+					? 'O navegador concedeu armazenamento persistente a este site.'
+					: 'O navegador nao concedeu. Instalar a IDE como app, adicionar aos favoritos ou vincular uma pasta de backup resolve.',
+				r ? 'ok' : 'warn',
+			);
+			return rerender();
+		}
+		if (op === 'cofre:exportar') {
+			if (typeof root.exportZipDialog === 'function') root.exportZipDialog();
+			return;
+		}
+		if (op === 'cofre:vincular') {
+			if (!d) return;
+			try {
+				const nome = await d.vincular();
+				toast('Pasta vinculada', 'Os projetos passam a ser espelhados em "' + nome + '".', 'ok');
+			} catch (e) {
+				if (!(e && e.name === 'AbortError')) toast('Nao foi possivel vincular', (e && e.message) || String(e), 'err');
+			}
+			return rerender();
+		}
+		if (op === 'cofre:reconectar') {
+			if (!d) return;
+			const ok = await d.reconectar();
+			toast(ok ? 'Pasta reconectada' : 'Permissao negada', ok ? 'O espelho em disco voltou a funcionar.' : 'Sem permissao a pasta nao pode ser atualizada.', ok ? 'ok' : 'warn');
+			return rerender();
+		}
+		if (op === 'cofre:desvincular') {
+			if (!d) return;
+			const ok = typeof uiConfirm === 'function' ? await uiConfirm('Desvincular pasta de backup', 'Os arquivos ja espelhados continuam na pasta; a IDE so deixa de atualiza-los.', 'Desvincular', true) : true;
+			if (!ok) return;
+			await d.desvincular();
+			return rerender();
+		}
+		if (op === 'cofre:espelhar') {
+			if (!d) return;
+			const r = await d.espelharAgora('manual');
+			if (r) toast('Espelho atualizado', r.projetos + ' projeto(s), ' + r.escritos + ' arquivo(s) gravado(s) em ' + r.ms + 'ms', 'ok');
+			else toast('Espelho nao executado', (d.estado().ultimoErro) || 'tente novamente em instantes', 'warn');
+			return rerender();
+		}
+		if (op === 'cofre:achado-abrir' || op === 'cofre:achado-excluir') {
+			if (!S || k == null) return;
+			if (op === 'cofre:achado-excluir') {
+				const ok = typeof uiConfirm === 'function' ? await uiConfirm('Excluir projeto do armazenamento', 'Isso apaga definitivamente os arquivos gravados deste projeto no navegador.', 'Excluir', true) : true;
+				if (!ok) return;
+				await S.forgetProject(k);
+				return rerender();
+			}
+			let dec = null;
+			const LOCK = root.LOCK;
+			if (LOCK && LOCK.key && typeof root._decSession === 'function') dec = (r) => root._decSession(r, LOCK.key);
+			let pm = null;
+			try {
+				let raw = await S.getRecord(S.MANIFEST_PREFIX + k);
+				if (raw && raw.enc) {
+					if (!dec && typeof root.recDecKey === 'function') {
+						const r = await root.recDecKey(raw);
+						if (!r) return;
+						dec = (rec) => root._decSession(rec, r.key);
+						raw = r.data;
+					} else if (dec) raw = await dec(raw);
+				}
+				pm = raw && typeof raw === 'object' ? raw : { id: k };
+			} catch (e) {
+				ignorar(e, 'cofrePainel:manifesto');
+				pm = { id: k };
+			}
+			const pd = await S.loadProject(k, dec, pm);
+			if (!pd || !pd.files || !pd.files.length) {
+				toast('Nada para reabrir', pd && pd.__skipped ? 'Os arquivos estao protegidos por senha.' : 'Nenhum arquivo legivel foi encontrado para este projeto.', 'warn');
+				return;
+			}
+			const n = typeof recOpen === 'function' ? await recOpen([pd]) : 0;
+			if (n && fx) {
+				fx.forgotten.delete(String(k));
+				if (typeof root.saveSession === 'function') root.saveSession();
+			}
+			return n ? 'fechar' : undefined;
+		}
+		if (op === 'cofre:disco-abrir' || op === 'cofre:disco-excluir') {
+			if (!d || k == null) return;
+			if (op === 'cofre:disco-excluir') {
+				const ok = typeof uiConfirm === 'function' ? await uiConfirm('Excluir da pasta de backup', 'Remove a subpasta deste projeto do disco. O projeto aberto na IDE (se houver) nao e afetado.', 'Excluir', true) : true;
+				if (!ok) return;
+				await d.excluirProjeto(k);
+				return rerender();
+			}
+			let pd;
+			try {
+				if (typeof root.showPreviewLoading === 'function') root.showPreviewLoading('Lendo a pasta de backup...', '');
+				pd = await d.lerProjeto(k);
+			} catch (e) {
+				toast('Nao consegui ler a pasta', (e && e.message) || String(e), 'err');
+				return;
+			} finally {
+				try {
+					if (typeof root.hidePreviewLoading === 'function') root.hidePreviewLoading();
+				} catch (e) {
+					ignorar(e, 'cofrePainel:loading');
+				}
+			}
+			if (!pd.files.length) {
+				toast('Pasta vazia', 'Nenhum arquivo foi encontrado nesta subpasta.', 'warn');
+				return;
+			}
+			const n = typeof recOpen === 'function' ? await recOpen([pd]) : 0;
+			if (n && fx) {
+				fx.forgotten.delete(String(pd.id));
+				if (typeof root.saveSession === 'function') root.saveSession();
+			}
+			return n ? 'fechar' : undefined;
+		}
+	}
+
+	function atualizarIndicador() {
+		cssOnce();
+		const b = document.getElementById('recentBtn');
+		if (!b) return;
+		const fx = FX();
+		const d = disco();
+		const de = d ? d.estado() : null;
+		let nivel = '';
+		const motivos = [];
+		if (fx) {
+			if (fx.wipeAttempt) {
+				nivel = 'bad';
+				motivos.push('tentativa de apagar o armazenamento detectada');
+			}
+			if (fx.bootUnverified) {
+				nivel = 'bad';
+				motivos.push('indice nao lido no boot (recarregue)');
+			}
+			if (fx.lastErr && fx.owner) {
+				nivel = nivel || 'bad';
+				motivos.push('ultima gravacao falhou');
+			}
+			if (fx.persisted === false && !(de && de.vinculada)) {
+				nivel = nivel || 'warn';
+				motivos.push('sem armazenamento persistente e sem pasta de backup');
+			}
+		}
+		if (de && de.vinculada && de.permissao !== 'granted') {
+			nivel = nivel || 'warn';
+			motivos.push('pasta de backup precisa de permissao (Reconectar)');
+		}
+		if (de && de.ultimoErro && de.permissao === 'granted') {
+			nivel = nivel || 'warn';
+			motivos.push('espelho em disco com erro');
+		}
+		b.classList.toggle('rec-storage-warn', nivel === 'warn');
+		b.classList.toggle('rec-storage-bad', nivel === 'bad');
+		b.title = motivos.length
+			? 'Projetos recentes e backups — atencao: ' + motivos.join('; ')
+			: 'Projetos recentes e backups — recuperar projetos fechados';
+	}
+
+	function sugerirProtecao() {
+		try {
+			const fx = FX();
+			const d = disco();
+			const de = d ? d.estado() : null;
+			if (!fx || fx.persisted !== false) return false;
+			if (de && de.vinculada) return false;
+			const ls = root.localStorage;
+			const ultimo = ls ? +ls.getItem(NUDGE_KEY) || 0 : 0;
+			if (Date.now() - ultimo < NUDGE_MS) return false;
+			if (ls) ls.setItem(NUDGE_KEY, String(Date.now()));
+			toast(
+				'Proteja seus projetos',
+				de && de.suportado
+					? 'O navegador pode apagar os dados deste site. Vincule uma pasta de backup no disco: relogio (Recentes) > Escolher pasta.'
+					: 'O navegador pode apagar os dados deste site. Exporte .zip com frequencia ou use Chrome/Edge para ter pasta de backup.',
+				'warn',
+			);
+			atualizarIndicador();
+			return true;
+		} catch (e) {
+			ignorar(e, 'cofrePainel:sugerir');
+			return false;
+		}
+	}
+
+	root.SynapseCofrePainel = Object.freeze({
+		render: render,
+		saude: saude,
+		recuperacao: recuperacao,
+		acao: acao,
+		atualizarIndicador: atualizarIndicador,
+		sugerirProtecao: sugerirProtecao,
+	});
 })(typeof window !== 'undefined' ? window : globalThis);
