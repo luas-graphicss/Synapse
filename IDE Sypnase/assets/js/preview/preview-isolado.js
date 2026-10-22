@@ -580,4 +580,313 @@
 		fila.push({ caminho, tipo: 'text/html; charset=utf-8', corpo: html });
 		return publicar(proj, { entradas: fila, url: origem + caminho + '?v=' + (token || Date.now()), token });
 	}
+	function entradaDoProjeto(proj) {
+		try {
+			const e = proj.detect && proj.detect.entry;
+			if (e && /\.html?$/i.test(e)) return e;
+		} catch (err) {
+			ignorar(err, 'entradaDoProjeto');
+		}
+		return 'index.html';
+	}
+
+	function esperarCarga(reg, limiteMs) {
+		if (reg.aguardandoCarga) return reg.aguardandoCarga.promise;
+		const w = {};
+		w.promise = new Promise((res) => {
+			w.res = res;
+			w.timer = setTimeout(() => {
+				if (reg.aguardandoCarga === w) reg.aguardandoCarga = null;
+				res(false);
+			}, limiteMs || 15000);
+		});
+		reg.aguardandoCarga = w;
+		return w.promise;
+	}
+
+	function descartar(proj, url) {
+		const reg = frames.get(proj.id);
+		const caminho = caminhoDaUrl(url);
+		if (!reg || !caminho || reg.estado === 'hibernado' || !reg.porta) return;
+		reg.removidosPendentes.add(caminho);
+		if (reg.timerRemocao) return;
+		reg.timerRemocao = setTimeout(() => {
+			reg.timerRemocao = 0;
+			const caminhos = [...reg.removidosPendentes];
+			reg.removidosPendentes.clear();
+			if (caminhos.length) pedir(reg, { type: 'remover', caminhos }).catch((e) => ignorar(e, 'descartar'));
+		}, 1500);
+	}
+
+	async function limpar(proj) {
+		const reg = frames.get(proj.id);
+		proj.__publicacaoPendente = [];
+		if (!reg) return;
+		if (reg.estado !== 'hibernado' && reg.porta) {
+			try {
+				await pedir(reg, { type: 'limpar' }, { limiteMs: 8000 });
+			} catch (e) {
+				ignorar(e, 'limpar');
+			}
+		}
+		destruirRegistro(reg);
+		frames.delete(proj.id);
+		publicarResumo();
+	}
+
+	function cederParaLegado(proj) {
+		if (!proj) return;
+		proj.__previewLegado = true;
+		const reg = frames.get(proj.id);
+		if (reg && reg.estado !== 'hibernado') congelar(reg);
+		ocultarTodos();
+	}
+
+	async function prepararParaCaptura(proj, dimensoes) {
+		const reg0 = frames.get(proj.id);
+		const espera = reg0 ? PICO.intervaloDeCapturaMs - (Date.now() - (reg0.capturaEm || 0)) : 0;
+		if (espera > 0) await new Promise((r) => setTimeout(r, espera));
+		if (proj.previewDirty || !temPreview(proj.id)) {
+			if (typeof root.buildPreview === 'function') {
+				proj.__previewSolicitado = true;
+				try {
+					await root.buildPreview(proj);
+				} finally {
+					proj.__previewSolicitado = false;
+				}
+			}
+		}
+		const reg = await garantirRegistro(proj);
+		if (!reg.urlAtual) throw new Error('O projeto "' + proj.name + '" ainda nao tem preview montado. Use refresh_preview e tente de novo.');
+		clearTimeout(reg.timerDescongelado);
+		reg.capturaEm = Date.now();
+		reg.ultimoUso = Date.now();
+		const ehAtivo = proj.id === ativoId();
+		if (!ehAtivo) {
+			reg.emCaptura = true;
+			const w = (dimensoes && dimensoes.w) || (proj.viewport && proj.viewport.w) || 1280;
+			const h = (dimensoes && dimensoes.h) || (proj.viewport && proj.viewport.h) || 720;
+
+			reg.iframe.style.cssText =
+				'position:absolute;left:0;top:0;width:' + w + 'px;height:' + h + 'px;opacity:0.001;pointer-events:none;z-index:-1;border:0;display:block;';
+			reg.dimensoesCaptura = { w, h };
+		}
+
+		const precisaCarga = !reg.ultimaCargaEm || reg.navegacaoAdiada || !!reg.aguardandoCarga;
+		const carga = precisaCarga ? esperarCarga(reg, 12000) : null;
+		descongelar(reg);
+		if (carga) await carga;
+		await new Promise((r) => setTimeout(r, 2 * 17));
+		return { janela: reg.iframe.contentWindow, w: reg.dimensoesCaptura ? reg.dimensoesCaptura.w : null, h: reg.dimensoesCaptura ? reg.dimensoesCaptura.h : null };
+	}
+	function liberarCaptura(proj) {
+		const reg = frames.get(proj.id);
+		if (!reg || reg.estado === 'hibernado') return;
+		if (proj.id === ativoId()) return;
+		clearTimeout(reg.timerDescongelado);
+		reg.timerDescongelado = setTimeout(() => {
+			reg.emCaptura = false;
+			reg.dimensoesCaptura = null;
+			congelar(reg);
+			reg.iframe.style.cssText = '';
+			reg.iframe.style.display = 'none';
+		}, 600);
+	}
+
+	function admitirBuild(proj) {
+		const ehAtivo = proj && proj.id === ativoId();
+		if (builds.ativos < PICO.buildsConcorrentes && (ehAtivo || !builds.fila.length)) {
+			builds.ativos++;
+			return Promise.resolve();
+		}
+		return new Promise((res) => {
+			const item = { proj, res };
+			if (ehAtivo) builds.fila.unshift(item);
+			else builds.fila.push(item);
+		});
+	}
+	function concluirBuild() {
+		builds.ativos = Math.max(0, builds.ativos - 1);
+		while (builds.ativos < PICO.buildsConcorrentes && builds.fila.length) {
+			const item = builds.fila.shift();
+			builds.ativos++;
+			item.res();
+		}
+	}
+	function buildEmSegundoPlanoNecessario(proj) {
+		if (!proj) return false;
+		if (proj.id === ativoId()) return true;
+		if (proj.__previewSolicitado) return true;
+		if (proj.popout && !proj.popout.closed) return true;
+		return false;
+	}
+
+	function registroDaFonte(fonte) {
+		if (!fonte) return null;
+		for (const r of frames.values()) {
+			if (r.iframe && r.iframe.contentWindow === fonte) return r;
+		}
+		return null;
+	}
+	function projetoDaFonte(fonte) {
+		const r = registroDaFonte(fonte);
+		return r && !r.sonda ? projetoPorId(r.pid) : null;
+	}
+	function janelaDe(proj) {
+		if (!proj) return null;
+		const reg = frames.get(proj.id);
+		return reg && reg.iframe ? reg.iframe.contentWindow : null;
+	}
+	function elementoDe(proj) {
+		if (!proj) return null;
+		const reg = frames.get(proj.id);
+		return reg && reg.iframe ? reg.iframe : null;
+	}
+	function ativoPara(proj) {
+		return disponivel === true && !!proj && !proj.__previewLegado;
+	}
+
+	function manutencao() {
+		const agora = Date.now();
+		for (const r of [...frames.values()]) {
+			if (r.sonda || r.estado !== 'congelado' || r.emCaptura) continue;
+			if (agora - r.ultimoUso > PICO.hibernarAposMs) hibernar(r);
+		}
+	}
+	function aoMudarVisibilidade() {
+		if (document.hidden) {
+			clearTimeout(timerAbaOculta);
+			timerAbaOculta = setTimeout(() => {
+				if (!document.hidden) return;
+				for (const r of frames.values()) if (!r.sonda && r.estado === 'vivo') congelar(r);
+			}, PICO.congelarAbaOcultaMs);
+			return;
+		}
+		clearTimeout(timerAbaOculta);
+		const pid = ativoId();
+		const reg = pid != null ? frames.get(pid) : null;
+		const S = estado();
+		if (reg && reg.estado === 'congelado' && S && S.layout !== 'editor') {
+			const proj = projetoPorId(pid);
+			if (proj && !proj.__previewLegado) {
+				mostrar(reg);
+				descongelar(reg);
+			}
+		}
+	}
+	function aoMudarLayout(layout) {
+		const pid = ativoId();
+		const reg = pid != null ? frames.get(pid) : null;
+		if (!reg || reg.estado === 'hibernado') return;
+		if (layout === 'editor') congelar(reg);
+		else {
+			const proj = projetoPorId(pid);
+			if (proj && !proj.__previewLegado && reg.urlAtual) {
+				mostrar(reg);
+				descongelar(reg);
+			}
+		}
+	}
+
+	function resumo() {
+		let vivos = 0,
+			congelados = 0,
+			hibernados = 0;
+		for (const r of frames.values()) {
+			if (r.sonda) continue;
+			if (r.estado === 'vivo' || r.estado === 'carregando') vivos++;
+			else if (r.estado === 'congelado') congelados++;
+			else if (r.estado === 'hibernado') hibernados++;
+		}
+		return {
+			modo: disponivel ? 'isolado' : 'legado',
+			rotulo: disponivel
+				? mesmaOrigem
+					? 'preview via Service Worker (mesma origem, sem processo separado)'
+					: 'preview em processo separado'
+				: 'preview na thread da IDE (modo reduzido)',
+			mesmaOrigem,
+			origem: origem || '',
+			motivo: disponivel ? '' : motivo,
+			vivos,
+			congelados,
+			hibernados,
+			buildsAtivos: builds.ativos,
+			buildsNaFila: builds.fila.length,
+			pico: Object.assign({}, PICO),
+		};
+	}
+	function publicarResumo() {
+		try {
+			if (root.SynapseDesempenho) root.SynapseDesempenho.registrarPreviews(resumo());
+		} catch (e) {
+			ignorar(e, 'publicarResumo');
+		}
+	}
+
+	function definirOrigem(valor) {
+		try {
+			if (!valor) localStorage.removeItem(CHAVE_ORIGEM);
+			else if (valor === 'off' || valor === 'mesma-origem') localStorage.setItem(CHAVE_ORIGEM, valor);
+			else localStorage.setItem(CHAVE_ORIGEM, new URL(valor).origin);
+			sessionStorage.removeItem(CHAVE_SONDA);
+		} catch (e) {
+			ignorar(e, 'definirOrigem');
+		}
+	}
+
+	root.addEventListener('message', (e) => {
+		const d = e.data;
+		if (!d || d.type !== 'synapse-preview-host' || d.estado !== 'pronto') return;
+		if (!origem || e.origin !== origem) return;
+		const reg = registroDaFonte(e.source);
+		if (!reg || reg.porta) return;
+		adotarHost(reg, e);
+	});
+	document.addEventListener('visibilitychange', aoMudarVisibilidade);
+
+	function iniciar() {
+		sondar().catch((e) => {
+			ignorar(e, 'sondar');
+			concluirSonda(false, 'falha ao sondar a origem do preview');
+		});
+		if (root.SynapseAgendador) root.SynapseAgendador.manutencao(manutencao, 30000, { nome: 'preview-isolado' });
+		else setInterval(manutencao, 30000);
+	}
+	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar, { once: true });
+	else iniciar();
+
+	root.SynapsePreviewIsolado = Object.freeze({
+		pronto,
+		disponivel: () => disponivel === true,
+		origem: () => origem,
+		motivo: () => motivo,
+		ativoPara,
+		temPreview,
+		estadoDe: (pid) => (frames.get(pid) ? frames.get(pid).estado : null),
+		urlVirtual,
+		ehVirtual,
+		registrarRecurso,
+		publicarHtml,
+		publicar,
+		descartar,
+		limpar,
+		ativar,
+		congelarOutros,
+		ocultarTodos,
+		cederParaLegado,
+		prepararParaCaptura,
+		liberarCaptura,
+		admitirBuild,
+		concluirBuild,
+		buildEmSegundoPlanoNecessario,
+		projetoDaFonte,
+		janelaDe,
+		elementoDe,
+		aoMudarLayout,
+		resumo,
+		manutencao,
+		definirOrigem,
+		PICO,
+	});
 })(globalThis);
