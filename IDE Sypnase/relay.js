@@ -2748,25 +2748,24 @@ server.on('upgrade', function (req, sock, head) {
 	}
 	const pp = u2.pathname.split('/').filter(Boolean);
 	const key = req.headers['sec-websocket-key'];
+	if (!origemPermitida(req)) {
+		recusarUpgrade(sock, 403, 'Forbidden');
+		return;
+	}
+	const enderecoWs = enderecoDe(req);
+	if ((conexoesWs.get(enderecoWs) || 0) >= LIMITE_WS_CONEXOES) {
+		recusarUpgrade(sock, 429, 'Too Many Requests');
+		return;
+	}
 	if (pp[0] === 'dev' && pp.length >= 4 && key) {
-		const sU = getSession(pp[1]);
-		if (sU.token && sU.token !== pp[2]) {
-			try {
-				sock.write(`HTTP/1.1 403 Forbidden${NL}Connection: close${NL}${NL}`);
-				sock.destroy();
-			} catch (eU1) {
-				ignorarErro(eU1, 'relay');
-			}
+		const authU = autenticar(req, pp[1], pp[2], { exigirSessao: true });
+		if (authU.erro) {
+			recusarUpgrade(sock, authU.erro, authU.erro === 429 ? 'Too Many Requests' : 'Forbidden');
 			return;
 		}
-		const regU = (sU.dev || {})[pp[3]];
+		const regU = (authU.sessao.dev || {})[pp[3]];
 		if (!regU) {
-			try {
-				sock.write(`HTTP/1.1 404 Not Found${NL}Connection: close${NL}${NL}`);
-				sock.destroy();
-			} catch (eU2) {
-				ignorarErro(eU2, 'relay');
-			}
+			recusarUpgrade(sock, 404, 'Not Found');
 			return;
 		}
 		const subU = `/${pp.slice(4).join('/')}${u2.search || ''}`;
@@ -2804,25 +2803,23 @@ server.on('upgrade', function (req, sock, head) {
 		return;
 	}
 	if (!(pp.length === 4 && pp[0] === 'bridge' && pp[3] === 'ws') || !key) {
-		try {
-			sock.write(`HTTP/1.1 400 Bad Request${NL}Connection: close${NL}${NL}`);
-			sock.destroy();
-		} catch (e) {
-			ignorarErro(e, 'relay');
-		}
+		recusarUpgrade(sock, 400, 'Bad Request');
 		return;
 	}
-	const sw = getSession(pp[1]);
-	if (sw.token && sw.token !== pp[2]) {
-		try {
-			sock.write(`HTTP/1.1 403 Forbidden${NL}Connection: close${NL}${NL}`);
-			sock.destroy();
-		} catch (e) {
-			ignorarErro(e, 'relay');
-		}
+	const authW = autenticar(req, pp[1], pp[2]);
+	if (authW.erro) {
+		recusarUpgrade(sock, authW.erro, authW.erro === 429 ? 'Too Many Requests' : 'Forbidden');
 		return;
 	}
-	sw.token = pp[2];
+	const sw = authW.sessao;
+	conexoesWs.set(enderecoWs, (conexoesWs.get(enderecoWs) || 0) + 1);
+	const chaveMensagens = `${enderecoWs}#${sw.wseq++}`;
+	sock.once('close', function () {
+		const restantes = (conexoesWs.get(enderecoWs) || 1) - 1;
+		if (restantes > 0) conexoesWs.set(enderecoWs, restantes);
+		else conexoesWs.delete(enderecoWs);
+		limitadorWs.liberar(chaveMensagens);
+	});
 	const accept = crypto
 		.createHash('sha1')
 		.update(key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
@@ -2835,7 +2832,6 @@ server.on('upgrade', function (req, sock, head) {
 		ignorarErro(e, 'relay');
 	}
 	try {
-		const CRLF = String.fromCharCode(13, 10);
 		sock.write(
 			`HTTP/1.1 101 Switching Protocols${CRLF}Upgrade: websocket${CRLF}Connection: Upgrade${CRLF}Sec-WebSocket-Accept: ${accept}${CRLF}${CRLF}`,
 		);
@@ -2855,17 +2851,20 @@ server.on('upgrade', function (req, sock, head) {
 		}
 	}
 
-	const w = addWorker(sw, { kind: 'ws', sock: sock });
+
+
+	const w = { kind: 'ws', sock: sock };
 	wsSend(
 		sock,
 		JSON.stringify({
 			t: 'hello',
 			v: VERSION,
-			workerId: w.id,
+			workerId: sw.wseq,
 			perWorker: PER_WORKER,
-			pool: workersVivos(sw).length,
+			pool: workersVivos(sw).length + 1,
 		}),
 	);
+	addWorker(sw, w);
 
 	const hbw = setInterval(function () {
 		if (w.morto) {
@@ -2894,6 +2893,11 @@ server.on('upgrade', function (req, sock, head) {
 	wsAttach(
 		sock,
 		function (txt) {
+			if (!limitadorWs.consumir(chaveMensagens).ok) {
+				console.log(`[ponte] aba excedeu ${LIMITE_WS_MENSAGENS} mensagens em 10s - desconectando`);
+				wsClose(sock);
+				return;
+			}
 			let msg;
 			try {
 				msg = JSON.parse(txt);
