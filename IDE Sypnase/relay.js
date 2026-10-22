@@ -626,6 +626,7 @@ function getSession(sid) {
 	if (!s) {
 		s = {
 			token: null,
+			criadaEm: Date.now(),
 			workers: [],
 			polls: [],
 			clients: new Map(),
@@ -1420,30 +1421,31 @@ async function termAction(s, act, b, res) {
 			rec.exited = true;
 			rec.code = -1;
 		});
-		child.on('exit', function (code) {
-			rec.exited = true;
-			if (code != null) rec.code = code;
-			setTimeout(function () {
-				if (!rec.done) {
-					rec.done = true;
-					if (rec.code == null) rec.code = -1;
-					setTimeout(function () {
-						s.procs.delete(id);
-					}, 600000);
-				}
-			}, 2000);
-		});
-		child.on('close', function (code) {
-			flushDec();
-			rec.exited = true;
-			if (rec.code == null) rec.code = code == null ? -1 : code;
-			if (!rec.done) {
-				rec.done = true;
+			const expirarRegistro = function () {
 				setTimeout(function () {
 					s.procs.delete(id);
-				}, 600000);
-			}
-		});
+				}, 600000).unref();
+			};
+			child.on('exit', function (code) {
+				rec.exited = true;
+				if (code != null) rec.code = code;
+				setTimeout(function () {
+					if (!rec.done) {
+						rec.done = true;
+						if (rec.code == null) rec.code = -1;
+						expirarRegistro();
+					}
+				}, 2000).unref();
+			});
+			child.on('close', function (code) {
+				flushDec();
+				rec.exited = true;
+				if (rec.code == null) rec.code = code == null ? -1 : code;
+				if (!rec.done) {
+					rec.done = true;
+					expirarRegistro();
+				}
+			});
 		s.procs.set(id, rec);
 		sendJson(res, 200, { procId: id, dir: dir3 });
 		return;
@@ -1560,8 +1562,9 @@ async function termAction(s, act, b, res) {
 	}
 	if (act === 'fetchjson') {
 		const u4 = String(b.url || '');
-		if (!/^https?:\/\//i.test(u4)) {
-			sendJson(res, 400, { error: 'url invalida: use http(s)' });
+		const politica4 = avaliarUrl(u4);
+		if (!politica4.ok) {
+			sendJson(res, politica4.motivo.startsWith('host') ? 403 : 400, { error: politica4.motivo });
 			return;
 		}
 		if (typeof fetch !== 'function') {
@@ -1570,7 +1573,7 @@ async function termAction(s, act, b, res) {
 		}
 		let met = String(b.method || 'GET').toUpperCase();
 		if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'].includes(met)) met = 'GET';
-		const o4 = { method: met, redirect: 'follow', headers: relayHeaders(b.headers) };
+		const o4 = { method: met, headers: relayHeaders(b.headers) };
 		if (b.body != null && met !== 'GET' && met !== 'HEAD') {
 			o4.body = typeof b.body === 'string' ? b.body : JSON.stringify(b.body);
 			if (!o4.headers['Content-Type']) o4.headers['Content-Type'] = 'application/json';
@@ -1584,7 +1587,7 @@ async function termAction(s, act, b, res) {
 				ignorarErro(e, 'termAction');
 			}
 		}, 30000);
-		fetch(u4, o4)
+		buscarConfiavel(u4, o4)
 			.then(function (r4) {
 				return r4.text().then(function (tx) {
 					sendJson(res, 200, {
@@ -1608,8 +1611,9 @@ async function termAction(s, act, b, res) {
 	}
 	if (act === 'fetchurl') {
 		const u2 = String(b.url || '');
-		if (!/^https?:\/\//i.test(u2)) {
-			sendJson(res, 400, { error: 'url invalida: use http(s)' });
+		const politica2 = avaliarUrl(u2);
+		if (!politica2.ok) {
+			sendJson(res, politica2.motivo.startsWith('host') ? 403 : 400, { error: politica2.motivo });
 			return;
 		}
 		if (typeof fetch !== 'function') {
@@ -1625,7 +1629,7 @@ async function termAction(s, act, b, res) {
 				ignorarErro(e, 'termAction');
 			}
 		}, 30000);
-		fetch(u2, { redirect: 'follow', signal: ctl.signal, headers: relayHeaders(b.headers) })
+		buscarConfiavel(u2, { signal: ctl.signal, headers: relayHeaders(b.headers) })
 			.then(function (r2) {
 				if (!r2.ok) {
 					sendJson(res, 502, { error: 'download falhou: HTTP ' + r2.status });
@@ -1834,17 +1838,12 @@ function caminhoRelSeguro(p) {
 	return j.length > 512 ? null : j;
 }
 function devProxyHttp(req, res, u, parts) {
-	if (typeof origemPermitida === 'function' && !origemPermitida(req)) {
-		sendJson(res, 403, {
-			error: 'origem nao autorizada para terminal/disco - ajuste AURORA_ALLOW_ORIGIN',
-		});
+	const authDev = autenticar(req, parts[1], parts[2], { exigirSessao: true });
+	if (authDev.erro) {
+		recusar(res, authDev);
 		return;
 	}
-	const sDev = getSession(parts[1]);
-	if (sDev.token && sDev.token !== parts[2]) {
-		sendJson(res, 403, { error: 'token invalido' });
-		return;
-	}
+	const sDev = authDev.sessao;
 	const regDev = (sDev.dev || {})[parts[3]];
 	if (!regDev) {
 		sendJson(res, 404, { error: 'dev server nao registrado (use start_dev_server)' });
