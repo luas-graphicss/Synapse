@@ -145,8 +145,8 @@
       "id": "synapse.produtividade",
       "publisher": "synapse",
       "name": "produtividade",
-      "displayName": "%ext.name%",
-      "description": "%ext.description%",
+      "displayName": "Produtividade",
+      "description": "Exemplo da Fase 2: comandos com atalhos, item de status bar, configurações e mensagens com ações.",
       "categories": [
         "Outros"
       ],
